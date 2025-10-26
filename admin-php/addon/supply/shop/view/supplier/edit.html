@@ -1,0 +1,194 @@
+<div class="layui-form form-wrap">
+
+	<div class="layui-form-item">
+		<label class="layui-form-label"><span class="required">*</span>供应商名称：</label>
+		<div class="layui-input-block">
+			<input name="title" type="text" lay-verify="required" value="{$info.title??''}" placeholder="请输入供应商名称" class="layui-input len-mid" autocomplete="off">
+		</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label"><span class="required">*</span>联系电话：</label>
+		<div class="layui-input-block">
+			<input type="text" name="supplier_phone" lay-verify="required" value="{$info.supplier_phone??''}" placeholder="请输入联系电话" autocomplete="off" class="layui-input len-long">
+		</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label">LOGO：</label>
+		<div class="layui-input-block">
+			<div class="upload-img-block img-upload">
+				<div class="upload-img-box {if !empty($info) && $info.logo}hover{/if}">
+					<div class="upload-default" id="logo_image">
+						{if condition="!empty($info) && $info.logo"}
+						<div id="preview_logo_image" class="preview_img">
+							<img layer-src src="{:img($info.logo)}" class="img_prev"/>
+						</div>
+						{else/}
+						<div class="upload">
+							<i class="iconfont iconshangchuan"></i>
+							<p>点击上传</p>
+						</div>
+						{/if}
+					</div>
+					<div class="operation">
+						<div>
+							<i title="图片预览" class="iconfont iconreview js-preview" style="margin-right: 20px;"></i>
+							<i title="删除图片" class="layui-icon layui-icon-delete js-delete"></i>
+						</div>
+						<div class="replace_img js-replace">点击替换</div>
+					</div>
+					<input type="hidden" name="logo" value="{$info.logo??''}">
+				</div>
+			</div>
+		</div>
+		<div class="word-aux">建议宽度<span class="pic_width">200</span>px  建议高度<span class="pic_height">100</span>px</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label">供应商简介：</label>
+		<div class="layui-input-block">
+			<textarea class="layui-textarea len-long" name="desc" placeholder="请输入供应商简介">{$info.desc??''}</textarea>
+		</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label">供应商关键字：</label>
+		<div class="layui-input-block">
+			<input name="keywords" type="text" value="{$info.keywords??''}" placeholder="请输入供应商关键字" class="layui-input len-long" autocomplete="off">
+		</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label">供应商地址：</label>
+		<div class="layui-input-block">
+			<input name="supplier_address" type="text" value="{$info.supplier_address??''}" placeholder="请输入供应商地址" class="layui-input len-long" autocomplete="off">
+		</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label">供应商邮箱：</label>
+		<div class="layui-input-block">
+			<input type="text" name="supplier_email" value="{$info.supplier_email??''}" lay-verify="isemail" placeholder="请输入供应商邮箱" autocomplete="off" class="layui-input len-long">
+		</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label">供应商QQ：</label>
+		<div class="layui-input-block">
+			<input type="text" name="supplier_qq" value="{$info.supplier_qq??''}" autocomplete="off" placeholder="请输入供应商QQ" class="layui-input len-long">
+		</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label">供应商微信：</label>
+		<div class="layui-input-block">
+			<input type="text" name="supplier_weixin" value="{$info.supplier_weixin??''}" autocomplete="off" placeholder="请输入供应商微信" class="layui-input len-long">
+		</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label pay-alipay-name">结算银行开户名：</label>
+		<div class="layui-input-inline">
+			<input name="settlement_bank_account_name" type="text" value="{$info.settlement_bank_account_name??''}" class="layui-input len-long" placeholder="请输入结算银行开户名" autocomplete="off" />
+		</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label pay-alipay-account">结算公司银行账号：</label>
+		<div class="layui-input-inline">
+			<input name="settlement_bank_account_number" type="text" value="{$info.settlement_bank_account_number??''}" class="layui-input len-long" placeholder="请输入结算公司银行账号" autocomplete="off" />
+		</div>
+	</div>
+	<div class="layui-form-item">
+		<label class="layui-form-label">结算开户银行支行名称：</label>
+		<div class="layui-input-inline">
+			<input name="settlement_bank_name" type="text" value="{$info.settlement_bank_name??''}" class="layui-input len-long" autocomplete="off" placeholder="请输入结算开户银行支行名称" />
+		</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label">结算开户银行所在地：</label>
+		<div class="layui-input-inline">
+			<input name="settlement_bank_address" type="text" value="{$info.settlement_bank_address??''}" class="layui-input len-long" autocomplete="off" placeholder="请输入结算开户银行所在地" />
+		</div>
+	</div>
+
+	<input type="hidden" name="supplier_id" value="{$info.supplier_id??''}" />
+
+	<div class="form-row">
+		<button class="layui-btn" lay-submit lay-filter="save">保存</button>
+		<button class="layui-btn layui-btn-primary" onclick="back()">返回</button>
+	</div>
+
+</div>
+
+<script>
+	layui.use(['form'], function() {
+		var form = layui.form,
+			repeat_flag = false;//防重复标识
+
+		// 图片上传
+		var logo_upload = new Upload({
+			elem: '#logo_image'
+		});
+
+		form.render();
+
+		/**
+		 * 表单验证
+		 */
+		form.verify({
+			isemail: function(value) {
+				var reg = /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/;
+				if (value == '') {
+					return;
+				}
+				if (!reg.test(value)) {
+					return '请输入正确的邮箱!';
+				}
+			}
+		});
+
+		form.on('submit(save)', function (data) {
+			if (repeat_flag) return false;
+			repeat_flag = true;
+			
+			//删除图片
+			if(!data.field.logo) logo_upload.delete();
+
+			var url = ns.url('supply://shop/supplier/add');
+			if(data.field.supplier_id) url = ns.url('supply://shop/supplier/edit');
+			
+			$.ajax({
+				url: url,
+				data: data.field,
+				dataType: 'json',
+				type: 'post',
+				success: function (res) {
+					repeat_flag = false;
+
+					if (res.code == 0) {
+						layer.confirm(data.field.supplier_id ? '编辑成功' : '添加成功', {
+							title:'操作提示',
+							btn: ['返回列表', '继续操作'],
+							yes: function(index, layero) {
+								location.hash = ns.hash("supply://shop/supplier/lists")
+								layer.close(index);
+							},
+							btn2: function(index, layero) {
+								layer.close(index);
+							}
+						});
+					} else {
+						layer.msg(res.message);
+					}
+				}
+			});
+		});
+	});
+
+	function back(){
+		location.hash = ns.hash("supply://shop/supplier/lists")
+	}
+</script>

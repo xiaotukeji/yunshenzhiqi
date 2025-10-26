@@ -1,0 +1,124 @@
+<style>
+.layui-layout-admin .table-tab .layui-tab-title{margin-bottom: 15px;}
+</style>
+
+<div class="layui-tab table-tab" lay-filter="team_list_tab" style="margin-top: 15px !important;">
+    <ul class="layui-tab-title">
+        <li  class="layui-this" data-status="1" data-type="live_status">一级</li>
+        {if $fenxiao_level_num > 1}<li data-status="2" data-type="live_status">二级</li>{/if}
+        {if $fenxiao_level_num > 2}<li data-status="3" data-type="live_status">三级</li>{/if}
+    </ul>
+    <div class="layui-tab-content">
+        <table id="team_list" lay-filter="team_list"></table>
+    </div>
+</div>
+
+<!-- 用户信息 -->
+<script type="text/html" id="userdetail">
+    <div class='table-title'>
+        <div class='title-pic'>
+            <img layer-src src="{{ns.img(d.headimg)}}" onerror="this.src = '{:img('public/static/img/default_img/head.png')}' ">
+        </div>
+        <div class='title-content'>
+            <p class="layui-elip">{{d.nickname}}</p>
+        </div>
+    </div>
+</script>
+
+<!-- 工具栏操作 -->
+<script type="text/html" id="action">
+    <div class="table-btn">
+        <a class="layui-btn" lay-event="detail">查看</a>
+    </div>
+</script>
+
+<script>
+    var form,fx_team_table,element = false;
+    layui.use(['form', 'element'], function() {
+        form = layui.form;
+        element = layui.element;
+        form.render();
+
+        fx_team_table = new Table({
+            elem: '#team_list',
+            url: ns.url("fenxiao://shop/fenxiao/team"),
+            where:{fenxiao_id:"{$fenxiao_id}"},
+            cols: [
+                [ {
+                    field: 'userdetail',
+                    title: '账户信息',
+                    width: '18%',
+                    unresize: 'false',
+                    templet: '#userdetail'
+                }, {
+                    field: 'is_fenxiao',
+                    title: '是否是分销商',
+                    width: '8%',
+                    unresize: 'false',
+                    templet: function (data) {
+                        return data.is_fenxiao ? '是' : '否';
+                    }
+                },  {
+                    field: 'order_money',
+                    title: '消费额',
+                    width: '8%',
+                    unresize: 'false',
+                },  {
+                    field: 'order_num',
+                    title: '消费量',
+                    width: '8%',
+                    unresize: 'false',
+                },  {
+                    field: 'order_complete_money',
+                    title: '消费额(已完成)',
+                    width: '8%',
+                    unresize: 'false',
+                },  {
+                    field: 'order_complete_num',
+                    title: '消费量(已完成)',
+                    width: '8%',
+                    unresize: 'false',
+                }, {
+                    field: 'reg-login',
+                    title: '成为会员时间',
+                    width: '18%',
+                    unresize: 'false',
+                    templet: function (data) {
+                        return ns.time_to_date(data.reg_time);
+                    }
+                }, {
+                    title: '操作',
+                    unresize: 'false',
+                    toolbar: '#action',
+				    align:'right'
+                }
+                ]
+            ]
+        });
+
+        /**
+         * 监听工具栏操作
+         */
+        fx_team_table.tool(function(obj) {
+            var data = obj.data;
+            switch (obj.event) {
+                case 'detail': //编辑
+                    location.hash = ns.hash("shop/member/editmember?member_id=" + data.member_id);
+                    break;
+            }
+        });
+
+        element.on('tab(team_list_tab)', function () {
+            fx_team_table.reload({
+                page: {
+                    curr: 1
+                },
+                where: {
+                    'level': this.getAttribute('data-status')
+                }
+            });
+
+        });
+
+    });
+</script>

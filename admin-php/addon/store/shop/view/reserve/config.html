@@ -1,0 +1,108 @@
+<style>
+    .layui-input {
+        display: inline-block;
+    }
+</style>
+
+<div class="layui-form main-wrap form-wrap" lay-filter="form">
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="required">*</span>预约时间：</label>
+        <div class="layui-input-block">
+            <input type="checkbox" title="周一" lay-skin="primary" name="week[]" value="1" {if in_array(1, $config.week)}checked{/if}>
+            <input type="checkbox" title="周二" lay-skin="primary" name="week[]" value="2" {if in_array(2, $config.week)}checked{/if}>
+            <input type="checkbox" title="周三" lay-skin="primary" name="week[]" value="3" {if in_array(3, $config.week)}checked{/if}>
+            <input type="checkbox" title="周四" lay-skin="primary" name="week[]" value="4" {if in_array(4, $config.week)}checked{/if}>
+            <input type="checkbox" title="周五" lay-skin="primary" name="week[]" value="5" {if in_array(5, $config.week)}checked{/if}>
+            <input type="checkbox" title="周六" lay-skin="primary" name="week[]" value="6" {if in_array(6, $config.week)}checked{/if}>
+            <input type="checkbox" title="周日" lay-skin="primary" name="week[]" value="0" {if in_array(0, $config.week)}checked{/if}>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"></label>
+        <div class="layui-input-inline len-short">
+            {php}$today = strtotime(date('Y-m-d')) {/php}
+            <select name="start">
+                {for start="0" end="48" name="i"}
+                    <option value="{$i * 1800}" {if $config.start == ($i * 1800)}selected{/if}>{:date('H:i', $today + ($i * 1800))}</option>
+                {/for}
+            </select>
+        </div>
+        <div class="layui-form-mid layui-word-aux">-</div>
+        <div class="layui-input-inline len-short">
+            <select name="end" id="">
+                {for start="0" end="48" name="i"}
+                <option value="{$i * 1800}" {if $config.end == ($i * 1800)}selected{/if}>{:date('H:i', $today + ($i * 1800))}</option>
+                {/for}
+            </select>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="required">*</span>预约时间间隔：</label>
+        <div class="layui-input-block">
+            <input type="radio" title="30分钟" lay-skin="primary" name="interval" value="30" {if empty($config) || $config.interval == 30}checked{/if}>
+            <input type="radio" title="1小时" lay-skin="primary" name="interval" value="60" {if !empty($config) && $config.interval == 60}checked{/if}>
+            <input type="radio" title="90分钟" lay-skin="primary" name="interval" value="90" {if !empty($config) && $config.interval == 90}checked{/if}>
+            <input type="radio" title="2小时" lay-skin="primary" name="interval" value="120" {if !empty($config) && $config.interval == 120}checked{/if}>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="required">*</span>预约提前：</label>
+        <div class="layui-input-block">
+            <input type="number" name="advance" value="{$config.advance ?? 1}" class="layui-input len-short" lay-verify="advance">
+            <div class="layui-word-aux">小时</div>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="required">*</span>每时段可预约：</label>
+        <div class="layui-input-block">
+            <input type="number" name="max" value="{$config.max ?? 1}" class="layui-input len-short" lay-verify="max">
+            <div class="layui-word-aux">人</div>
+        </div>
+    </div>
+    <div class="form-row">
+        <button class="layui-btn  bg-color " lay-submit="" lay-filter="save">保存</button>
+    </div>
+</div>
+
+<script>
+    var repeat_flag = false, form;
+
+    layui.use(['form'], function () {
+        form = layui.form;
+
+        form.verify({
+            advance(value) {
+                if (isNaN(value) || !/(^[1-9]\d*$)/.test(value)) {
+                    return "预约提前时间格式输入错误";
+                }
+                if (value < 0) {
+                    return "预约提前时间不能小于0";
+                }
+            },
+            max(value) {
+                if (isNaN(value) || !/(^[1-9]\d*$)/.test(value)) {
+                    return "每时段可预约人数格式输入错误";
+                }
+                if (value < 0) {
+                    return "每时段可预约人数不能小于0";
+                }
+            }
+        })
+
+        form.on('submit(save)', function (data) {
+            if (repeat_flag) return false;
+            repeat_flag = true;
+
+            $.ajax({
+                url: ns.url("store://shop/reserve/config"),
+                data: data.field,
+                dataType: 'JSON',
+                type: 'POST',
+                success: function (res) {
+                    layer.msg(res.message, { time: 1000 }, function () {});
+                    repeat_flag = false;
+                }
+            });
+        })
+    })
+</script>

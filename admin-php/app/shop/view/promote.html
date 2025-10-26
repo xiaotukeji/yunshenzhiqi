@@ -1,0 +1,91 @@
+<style>
+    .marked-message{height: 48px;background: #FFF5ED;font-size: 14px;font-family: Source Han Sans SC;font-weight: 400;color: #666;line-height: 50px;padding: 0 16px;display: flex;}
+    .promote-flex{display: flex;margin-top: 15px;padding: 0 10px 0;}
+    .promote-img{background-color: #f8f8f8;display: flex;justify-content: center;align-items: center;width: 200px;height: 200px;}
+    .promote-img img{width: 160px;height: 160px;}
+    .label-width{width: 100px;}
+    .block-left{margin-left: 100px !important;display: flex;}
+    .promote-download{margin-left: 20px;}
+    .h5-path{margin-left: 20px;width: 300px;}
+    .h5-path .fuzhi{width: 1px;height: 0px;border: 0px;}
+    .h5-path span{display: block;margin-bottom: 10px;}
+    .h5-path p input{height: 30px;line-height: 30px;border: 1px solid #e6e6e5;width: 150px;padding: 0px 5px;border-radius: 5px;margin-right: 10px;}
+</style>
+
+<script type="text/html" id="promote">
+    <div>
+        <div class="marked-message">
+            <p>活动可分享至多个渠道推广，增加曝光率，提升分享打开率。</p>
+        </div>
+        <div class="promote-flex">
+            <div class="promote-img">
+                <img src="{{ ns.img(d.h5.path) }}" alt="推广二维码">
+            </div>
+            <div class="layui-form">
+                <div class="layui-form-item">
+                    <label class="layui-form-label label-width">选择渠道：</label>
+                    <div class="layui-input-block block-left">
+                        <input type="radio" name="promote_type" value="h5" title="H5" checked lay-filter="promote_type" />
+                        {if addon_is_exit('weapp', request()->siteid()) == 1}
+                        <input type="radio" name="promote_type" value="weapp" title="微信小程序" lay-filter="promote_type" data-config='{"type":"weapp","load":"true"}' />
+                        {/if}
+
+                        {if addon_is_exit('pc', request()->siteid()) == 1}
+                        {{# if(d.pc && d.pc.path){ }}
+                        <input type="radio" name="promote_type" value="pc" title="PC" lay-filter="promote_type" />
+                        {{# } }}
+                        {/if}
+
+                        {if addon_is_exit('aliapp', request()->siteid()) == 1 }
+                        <input type="radio" name="promote_type" value="aliapp" title="支付宝小程序" lay-filter="promote_type"  data-config='{"type":"weapp","load":"true"}' />
+                        {/if}
+                    </div>
+                </div>
+                <div class="h5-path">
+                    <span>推广链接</span>
+                    <p class="tips text-color"><input type="text" value="{{d.h5.url}}" readonly /><a class="layui-btn" href="javascript:ns.copy('h5_url_{{ d.id }}');">复制</a></p>
+                    <input type="text" id="h5_url_{{ d.id }}" value="{{d.h5.url}}" readonly class="fuzhi"/>
+                </div>
+                <div class="promote-download">
+                    <a class="text-color" href="{{ ns.img(d.h5.path) }}" download>下载二维码</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</script>
+
+<script>
+    // 推广渠道监听
+    function promoteTypeSwitch(){
+        window.form.on('radio(promote_type)', function(radio){
+            var data = $(radio.elem).attr('data-config');
+            if(data) data = JSON.parse(data);
+            else data = {};
+
+            if(radio.value == 'h5' || radio.value == 'pc') {
+                var html = '<img src="'+ ns.img(data.path) +'"/>';
+                $('.promote-img').html(html);
+                $('.promote-download a').attr('href',ns.img(data.path)).show();
+                $(".h5-path").show().find('input').val(data.url);
+            }else {
+                if(data.load){
+                    var html = '<div class="common-loading-wrap">';
+                    html += '<i class="common-loading-layer layui-icon layui-icon-loading layui-anim layui-anim-rotate layui-anim-loop"></i>';
+                    html += '</div>';
+                    $('.promote-img').html(html);
+                    $('.promote-download a').hide();
+                }else if(data.path){
+                    var html = '<img src="'+ ns.img(data.path) +'"/>';
+                    $('.promote-img').html(html);
+                    $('.promote-download a').attr('href',ns.img(data.path)).show();
+                }else{
+                    var html =  '<span>小程序配置错误</span>';
+                    $('.promote-img').html(html);
+                    $('.promote-download a').hide();
+                }
+                $(".h5-path").hide();
+            }
+        });
+    }
+</script>

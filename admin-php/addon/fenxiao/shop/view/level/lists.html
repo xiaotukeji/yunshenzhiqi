@@ -1,0 +1,260 @@
+<div class="single-filter-box">
+	<button class="layui-btn" onclick="clickAdd()">添加等级</button>
+</div>
+<!-- 列表 -->
+<table id="level_list" lay-filter="level_list"></table>
+
+<!-- 商品 -->
+<script type="text/html" id="goods">
+	<div class="table-title">
+		<div class="title-pic">
+			<img layer-src src="{{ns.img(d.goods_image.split(',')[0],'small')}}"/>
+		</div>
+		<div class="title-content">
+			<a href="javascript:;" class="multi-line-hiding text-color">{{d.goods_name}}</a>
+		</div>
+	</div>
+</script>
+
+<!-- 时间 -->
+<script id="time" type="text/html">
+	<div class="layui-elip">开始时间：{{ns.time_to_date(d.start_time)}}</div>
+	<div class="layui-elip">结束时间：{{ns.time_to_date(d.end_time)}}</div>
+</script>
+
+<!-- 状态 -->
+<script type="text/html" id="status">
+	{{#  if(d.status == 0){  }}
+	停用
+	{{#  }else if(d.status == 1){  }}
+	启用
+	{{#  }  }}
+</script>
+
+<!-- 操作 -->
+<script type="text/html" id="operation">
+	<div class="table-btn">
+		<a class="layui-btn" lay-event="edit">编辑</a>
+        {{#  if(d.is_default == 0){  }}
+		<a class="layui-btn" lay-event="del">删除</a>
+        {{#  }  }}
+	</div>
+</script>
+
+<script>
+    layui.use('form', function() {
+        var table,
+            repeat_flag = false; //防重复标识
+
+        table = new Table({
+            elem: '#level_list',
+            url: ns.url("fenxiao://shop/level/lists"),
+            cols: [
+                [{
+                    title: '等级',
+                    unresize: 'false',
+                    width: '10%',
+					templet: function (data) {
+                        var level = new Array();
+                            level[0] = '默认等级';
+                            level[1] = '一级';
+                            level[2] = '二级';
+                            level[3] = '三级';
+                            level[4] = '四级';
+                            level[5] = '五级';
+                            level[6] = '六级';
+                            level[7] = '七级';
+                            level[8] = '八级';
+                            level[9] = '九级';
+                            level[10] = '十级';
+						return level[data.level_num] != undefined ? level[data.level_num] : '';
+					}
+                }, {
+                    field: 'level_name',
+                    title: '等级名称',
+                    unresize: 'false',
+                    width: '10%'
+                }, {
+                    field: 'one_rate',
+                    title: '一级佣金比例',
+                    unresize: 'false',
+                    width: '10%',
+                    templet: function(data) {
+                        return data.one_rate + '%';
+                    },
+					hide: {if $basics_info.level >= 1}  false  {else /}  true  {/if}
+                }, {
+                    field: 'two_rate',
+                    title: '二级佣金比例',
+                    unresize: 'false',
+                    width: '10%',
+                    templet: function(data) {
+                        return data.two_rate + '%';
+                    },
+					hide: {if $basics_info.level >= 2}  false  {else /}  true  {/if}
+                }, {
+                	field:'three_rate',
+                    title: '三级佣金比例',
+                    unresize: 'false',
+                    width: '15%',
+                    templet: function(data) {
+                        return data.three_rate + '%';
+                    },
+					hide: {if $basics_info.level >= 3}  false  {else /}  true  {/if}
+                }, {
+                    title: '升级条件',
+                    unresize: 'false',
+                    width: '35%',
+                    templet: function(data) {
+						if(data.level_num == 0){
+						    return "默认等级";
+						}else{
+						    var upgrade_content = '';
+						    if(data.upgrade_type == 1){
+                                upgrade_content += data.one_fenxiao_order_num == 0 ? '' : '一级分销订单总数大于等于' + data.one_fenxiao_order_num + ' 或者 ';
+                                upgrade_content += data.one_fenxiao_order_money == 0 ? '' : '一级分销订单佣金总额大于等于' + data.one_fenxiao_order_money + ' 或者 ';
+								upgrade_content += data.one_fenxiao_total_order == 0 ? '' : '一级分销订单总额大于等于' + data.one_fenxiao_total_order + ' 或者 ';
+                                upgrade_content += data.order_num == 0 ? '' : '自购订单总数大于等于' + data.order_num + ' 或者 ';
+                                upgrade_content += data.order_money == 0 ? '' : '自购订单总额大于等于' + data.order_money + ' 或者 ';
+                                upgrade_content += data.one_child_num == 0 ? '' : '下线人数大于等于' + data.one_child_num + ' 或者 ';
+                                upgrade_content += data.one_child_fenxiao_num == 0 ? '' : '下线分销商人数大于等于' + data.one_child_fenxiao_num + ' 或者 ';
+							}else if(data.upgrade_type == 2){
+                                upgrade_content += data.one_fenxiao_order_num == 0 ? '' : '一级分销订单总数大于等于' + data.one_fenxiao_order_num + ' 并且 ';
+                                upgrade_content += data.one_fenxiao_order_money == 0 ? '' : '一级分销订单佣金总额大于等于' + data.one_fenxiao_order_money + ' 并且 ';
+								upgrade_content += data.one_fenxiao_total_order == 0 ? '' : '一级分销订单总额大于等于' + data.one_fenxiao_total_order + ' 并且 ';
+                                upgrade_content += data.order_num == 0 ? '' : '自购订单总数大于等于' + data.order_num + ' 并且 ';
+                                upgrade_content += data.order_money == 0 ? '' : '自购订单总额大于等于' + data.order_money + ' 并且 ';
+                                upgrade_content += data.one_child_num == 0 ? '' : '下线人数大于等于' + data.one_child_num + ' 并且 ';
+                                upgrade_content += data.one_child_fenxiao_num == 0 ? '' : '下线分销商人数大于等于' + data.one_child_fenxiao_num + ' 并且 ';
+							}
+                            var upgrade_content = upgrade_content.replace(/ 或者 $/g,"");
+                            var upgrade_content = upgrade_content.replace(/ 并且 $/g,"");
+							return upgrade_content;
+						}
+                    }
+                }, {
+                    title: '操作',
+                    toolbar: '#operation',
+                    unresize: 'false',
+					align:'right'
+                }]
+            ],
+
+        });
+
+        /**
+         * 监听工具栏操作
+         */
+        table.tool(function(obj) {
+            var data = obj.data;
+            switch (obj.event) {
+                case 'del': //删除
+                    del(data.level_id);
+                    break;
+                case 'start': //启用
+                    start_status(data.level_id,1);
+                    break;
+                case 'stop': //停用
+                    stop_status(data.level_id,0);
+                    break;
+                case 'edit': //编辑
+                    location.hash = ns.hash("fenxiao://shop/level/edit", {"level_id": data.level_id});
+                    break;
+            }
+        });
+
+        /**
+         * 删除
+         */
+        function del(level_id){
+            if (repeat_flag) return false;
+            repeat_flag = true;
+
+            layer.confirm('确定要删除该分销等级吗?', function(index) {
+				layer.close(index);
+                $.ajax({
+                    url: ns.url("fenxiao://shop/level/delete"),
+                    data: {level_id:level_id},
+                    dataType: 'JSON',
+                    type: 'POST',
+                    success: function(res) {
+                        layer.msg(res.message);
+                        repeat_flag = false;
+
+                        if (res.code == 0) {
+                            table.reload();
+                        }
+                    }
+                });
+            }, function () {
+                layer.close();
+                repeat_flag = false;
+            });
+        }
+
+        /**
+         * 停用
+         */
+        function stop_status(level_id,type){
+            if (repeat_flag) return false;
+            repeat_flag = true;
+
+            layer.confirm('确定要停用该分销等级吗?', function(index) {
+				layer.close(index);
+                $.ajax({
+                    url: ns.url("fenxiao://shop/level/status"),
+                    data: {level_id:level_id,type:type},
+                    dataType: 'JSON',
+                    type: 'POST',
+                    success: function(res) {
+                        layer.msg(res.message);
+                        repeat_flag = false;
+
+                        if (res.code == 0) {
+                            table.reload();
+                        }
+                    }
+                });
+            }, function () {
+                layer.close();
+                repeat_flag = false;
+            });
+        }
+
+        /**
+         * 启用
+         */
+        function start_status(level_id,type){
+            if (repeat_flag) return false;
+            repeat_flag = true;
+
+            layer.confirm('确定要启用该分销等级吗?', function(index) {
+				layer.close(index);
+                $.ajax({
+                    url: ns.url("fenxiao://shop/level/status"),
+                    data: {level_id:level_id,type:type},
+                    dataType: 'JSON',
+                    type: 'POST',
+                    success: function(res) {
+                        layer.msg(res.message);
+                        repeat_flag = false;
+
+                        if (res.code == 0) {
+                            table.reload();
+                        }
+                    }
+                });
+            }, function () {
+                layer.close();
+                repeat_flag = false;
+            });
+        }
+
+    });
+
+	function clickAdd()
+	{
+	    location.hash = ns.hash('fenxiao://shop/level/add');
+	}
+
+</script>

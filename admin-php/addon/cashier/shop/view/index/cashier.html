@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<script>
+    var prefix = '{$root}'.replace(/(http:\/\/)|(https:\/\/)/g, '') + '_';
+
+    {if isset($token) && $store_id > 0}
+    localStorage.setItem(prefix + 'cashierToken', '{$token}');
+    localStorage.setItem(prefix + 'siteId', '{:request()->siteid()}');
+    localStorage.setItem(prefix + 'globalStoreId', '{$store_id}');
+    {else/}
+    localStorage.removeItem(prefix + 'cashierToken');
+    localStorage.removeItem(prefix + 'siteId');
+    localStorage.removeItem(prefix + 'globalStoreId');
+    {/if}
+    location.href = '{$store_id ? $url : $url."/pages/login/login"}';
+</script>
+</body>
+</html>
+

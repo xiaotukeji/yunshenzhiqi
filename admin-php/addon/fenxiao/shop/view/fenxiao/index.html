@@ -1,0 +1,462 @@
+
+
+<style>
+	/* 总样式 */
+	.summary-wrap { display: flex}
+	.body-content {background: none !important;padding: 0 !important;margin: 0 !important;}
+	.summary-wrap .common-wrap{margin:15px 15px 0 15px; flex: 1;padding: 15px; background: #fff;position: relative}
+	/* 佣金概览 */
+	.commission-wrap{height: 120px;background: #fff;position: relative;margin:25px 15px 0 15px;padding: 15px}
+	.commission-wrap .commission-overview{display: flex;}
+	.commission-wrap .li{width: 25%;height: 120px;text-align: left;display: flex;flex-direction: column;padding: 0 15px 10px 15px}
+	.commission-wrap .li .title{display: flex;align-items: center;font-size: 14px;margin-top: 25px;color: #909399;}
+	.commission-wrap .li .money{margin-top: 10px;font-size: 26px;color: #303133;}
+	/* 分销商概览 */
+	.summary-wrap .fenxiao-wrap{height: 120px;width: 40%;background: #fff;position: relative; margin:15px 0px 0 15px;padding: 15px}
+	.summary-wrap .fenxiao-wrap .member-overview{display: flex;}
+	.summary-wrap .fenxiao-wrap .li{width: 50%;height: 120px;text-align: left;display: flex;flex-direction: column;padding: 0 15px 10px 15px}
+	.summary-wrap .fenxiao-wrap .li .title{display: flex;align-items: center;font-size: 14px;margin-top: 25px;color: #909399;}
+	.summary-wrap .fenxiao-wrap .li .num{margin-top: 10px;font-size: 26px;color: #303133;}
+	/* 分销订单金额概览 */
+	.summary-wrap .order-wrap{height: 120px;width: 40%;background: #fff;position: relative; flex:1;margin:15px 15px 0 15px;padding: 15px}
+	.summary-wrap .order-wrap .order-overview{display: flex;}
+	.summary-wrap .order-wrap .li{width: 33%;height: 120px;text-align: left;display: flex;flex-direction: column;padding: 0 15px 10px 15px}
+	.summary-wrap .order-wrap .li .title{display: flex;align-items: center;font-size: 14px;margin-top: 25px;color: #909399;}
+	.summary-wrap .order-wrap .li .num{margin-top: 10px;font-size: 26px;color: #303133;}
+	.summary-wrap .order-wrap .li .money{margin-top: 10px;font-size: 26px;color: #303133;}
+	/* 分销商人数报表 */
+	.summary-wrap .common-wrap:nth-child(1){margin-right: 0}
+	/* 分销订单金额报表 */
+	.trend-wrap {margin:15px 15px 0 15px;padding: 15px; background: #fff}
+	/* 分销商等级比例 */
+	.summary-wrap .common-wrap .body.level{position: absolute;top: 50%;margin-top: -75px !important;width: calc(100% - 30px)}
+</style>
+
+
+<div class="commission-wrap common-wrap">
+	<div class="head">
+		<span class="title">佣金概览</span>
+	</div>
+	<div class="commission-overview">
+		<div class="li">
+			<div class="title prompt-block">
+				可提现佣金（元）
+				<div class="prompt">
+					<i class="iconfont iconwenhao1"></i>
+					<div class="prompt-box">
+						<div class="prompt-con">所有分销订单已完成，佣金已结算，可以提现的佣金(不包含已提现的佣金)</div>
+					</div>
+				</div>
+			</div>
+			<p class="money" id="fenxiao_account">0.00</p>
+		</div>
+		<div class="li">
+			<div class="title prompt-block">
+				提现待审核（元）
+				<div class="prompt">
+					<i class="iconfont iconwenhao1"></i>
+					<div class="prompt-box">
+						<div class="prompt-con">已申请提现等待管理审核的佣金</div>
+					</div>
+				</div>
+			</div>
+			<p class="money" id="account_withdraw_apply">0.00</p>
+		</div>
+		<div class="li">
+			<div class="title prompt-block">
+				提现佣金（元）
+				<div class="prompt">
+					<i class="iconfont iconwenhao1"></i>
+					<div class="prompt-box">
+						<div class="prompt-con">所有已经提现成功的佣金总和</div>
+					</div>
+				</div>
+			</div>
+			<p class="money" id="account_withdraw">0.00</p>
+		</div>
+		<div class="li">
+			<div class="title prompt-block">
+				进行中佣金（元）
+				<div class="prompt">
+					<i class="iconfont iconwenhao1"></i>
+					<div class="prompt-box">
+						<div class="prompt-con">指所有分销订单待结算佣金的和</div>
+					</div>
+				</div>
+			</div>
+			<p class="money" id="commission_money">0.00</p>
+		</div>
+	</div>
+</div>
+<div class="summary-wrap">
+	<div class="fenxiao-wrap common-wrap">
+		<div class="head">
+			<span class="title">分销商概览</span>
+		</div>
+		<div class="member-overview">
+			<div class="li">
+				<div class="title">待审核（人）</div>
+				<p class="num" id="fenxiao_apply_num">0</p>
+			</div>
+			<div class="li">
+				<div class="title">分销商（人）</div>
+				<p class="num" id="fenxiao_num">0</p>
+			</div>
+		</div>
+	</div>
+	<div class="order-wrap common-wrap">
+		<div class="head">
+			<span class="title">分销概览</span>
+		</div>
+		<div class="order-overview">
+			<div class="li">
+				<div class="title prompt-block">
+					分销订单总额（元）
+					<div class="prompt">
+						<i class="iconfont iconwenhao1"></i>
+						<div class="prompt-box">
+							<div class="prompt-con">指所有分销订单实付金额的和 (包含退款)</div>
+						</div>
+					</div>
+				</div>
+				<p class="num" id="real_goods_money">0.00</p>
+			</div>
+			<div class="li">
+				<div class="title prompt-block">
+					分销佣金总额（元）
+					<div class="prompt">
+						<i class="iconfont iconwenhao1"></i>
+						<div class="prompt-box">
+							<div class="prompt-con">指所有分销订单所得佣金的和</div>
+						</div>
+					</div>
+				</div>
+				<p class="num" id="commission">0.00</p>
+			</div>
+			<div class="li">
+				<div class="title">分销商品数（个）</div>
+				<p class="money" id="fenxiao_goods_num">0</p>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="summary-wrap">
+	<div class="common-wrap">
+		<div class="head">
+			<div class="title">新增分销商数(人)</div>
+		</div>
+		<div class="body">
+			<div id="fenxiao_member" style="width: 100%; height: 300px;"></div>
+		</div>
+	</div>
+	<div class="common-wrap">
+		<div class="head">
+			<div class="title">分销商等级比例</div>
+		</div>
+		<div class="body level">
+			<div id="fenxiao_level" style="width: 100%; height: 150px;"></div>
+		</div>
+	</div>
+</div>
+<div class="trend-wrap common-wrap">
+	<div class="head">
+		<div class="title">分销订单金额(元)</div>
+	</div>
+	<div class="body">
+		<div id="order_money" style="width: 100%; height: 300px;"></div>
+	</div>
+</div>
+
+
+<script src="SHOP_JS/echarts.min.js"></script>
+<script src="SHOP_JS/china.js"></script>
+<script>
+	getFenxiaoStat()
+	function getFenxiaoStat(){
+		$.ajax({
+			type: 'post',
+			dataType: 'json',
+			url: ns.url("fenxiao://shop/fenxiao/stat"),
+			success:function(res){
+				$('#fenxiao_account').html(res.fenxiao_account);
+				$('#account_withdraw').html(res.account_data.account_withdraw);
+				$('#account_withdraw_apply').html(res.account_data.account_withdraw_apply);
+				$('#commission_money').html(res.commission_money);
+				$('#fenxiao_apply_num').html(res.fenxiao_apply_num);
+				$('#fenxiao_goods_num').html(res.fenxiao_goods_num);
+				$('#fenxiao_num').html(res.fenxiao_num);
+				$('#commission').html(res.shop_commission.commission);
+				$('#real_goods_money').html(res.shop_commission.real_goods_money);
+			}
+		})
+	}
+
+	var baseColor = getComputedStyle(document.documentElement).getPropertyValue('--base-color');
+
+	function getDay(day){
+		var today = new Date();
+		var targetday_milliseconds = today.getTime() + 1000 * 60 * 60 * 24 * day;
+		today.setTime(targetday_milliseconds); //注意，这行是关键代码
+		var tYear = today.getFullYear();
+		var tMonth = today.getMonth();
+		var tDate = today.getDate();
+		tMonth = doHandleMonth(tMonth + 1);
+		tDate = doHandleMonth(tDate);
+		return tMonth + "-" + tDate;
+	}
+
+	function doHandleMonth(month){
+		var m = month;
+		if(month.toString().length == 1){
+			m = "0" + month;
+		}
+		return m;
+	}
+
+	getFenxiaoOrder();
+	getFenxiaoLevel();
+	getFenixaoMmeber();
+
+	//图形统计
+	function getFenxiaoOrder() {
+		var dateObj = new Date(Date.now() - 1296000000);
+		var date = dateObj.getFullYear() + '-' + (dateObj.getMonth() + 1) + '-' + (dateObj.getDate() + 1);
+		$.ajax({
+			type:'post',
+			dataType:'json',
+			url:ns.url("shop/stat/getStatData"),
+			data : {
+				start_time: new Date(date).getTime() / 1000
+			},
+			success:function(res){
+				dealWithChart(res.fenxiao_order_total_money);
+			}
+		})
+	}
+
+	function getFenixaoMmeber(){
+		$.ajax({
+			type:'post',
+			dataType:'json',
+			url:ns.url("shop/stat/getStatData"),
+			success:function(res){
+				dealWithChartTo(res.add_fenxiao_member_count);
+			}
+		})
+	}
+
+	function dealWithChart(ten_day_json){
+		if(!$('#order_money').length) return;
+		var data = [getDay(-14), getDay(-13), getDay(-12), getDay(-11), getDay(-10), getDay(-9), getDay(-8), getDay(-7), getDay(-6), getDay(-5), getDay(-4), getDay(-3), getDay(-2), getDay(-1), getDay(0)];
+		// 基于准备好的dom，初始化echarts实例
+		var baseColor = getComputedStyle(document.documentElement).getPropertyValue('--base-color');
+		// 指定图表的配置项和数据
+
+		// 基于准备好的dom，初始化echarts实例
+		var moneyChart = echarts.init(document.getElementById('order_money'));
+
+		// 指定图表的配置项和数据
+		moneyOption = {
+			xAxis: {
+				type: 'category',
+				data: data
+			},
+			yAxis: {
+				type: 'value'
+			},
+			grid: {
+				top: '8%',
+				bottom: '9%',
+				left: '5%',
+				right: '4%'
+			},
+			tooltip: {
+				trigger: 'axis',
+				showContent: true,
+				backgroundColor: 'rgba(0, 0, 0, 0.5)',
+				padding: [5, 10],
+				textStyle: {
+					color: '#fff',
+					lineHeight: 30,
+				},
+				formatter: function(params, ticket, callback) {
+					return "日期：" + params[0].axisValue + '<br />' + params[0].seriesName + "：" + params[0].value + "元";
+				},
+			},
+			series: [{
+				name: ['订单金额'],
+				data: ten_day_json,
+				type: 'line',
+				smooth: true,
+				itemStyle: {
+					color: baseColor
+				},
+				areaStyle: {
+					color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+						offset: 0,
+						color: baseColor
+					}, {
+						offset: 1,
+						color: '#fff'
+					}])
+				}
+			}]
+		};
+
+		// 使用刚指定的配置项和数据显示图表。
+		moneyChart.setOption(moneyOption);
+	}
+
+	function getFenxiaoLevel(){
+		$.ajax({
+			dataType: 'JSON',
+			type: 'POST',
+			url: ns.url("fenxiao://shop/level/lists"),
+			data: {
+				page_size: 0,
+			},
+			success: function(res) {
+				var level = res.data.list;
+				if(!$('#fenxiao_level').length) return;
+				var echart = echarts.init(document.getElementById('fenxiao_level'));
+
+				// 指定图表的配置项和数据
+				var option = {
+					tooltip: {
+						trigger: 'item',
+						formatter: '{a} <br/>{b}: {c} ({d}%)'
+					},
+					legend: {
+						orient: 'vertical',
+						left: '50%',
+						top: '10%',
+						align: 'auto',
+						data: level.map(function (item) {
+							return {
+								name: item.level_name,
+								icon: 'circle',
+							}
+						})
+					},
+					color: level.map(function (item) {
+						return getRandomColor();
+					}),
+					series: [{
+						width: 150,
+						height: 150,
+						top: '0',
+						left: '10%',
+						name: '',
+						type: 'pie',
+						radius: ['50%', '70%'],
+						avoidLabelOverlap: false,
+						label: {
+							show: false,
+							position: 'center'
+						},
+						emphasis: {
+							label: {
+								show: true,
+								fontSize: '12',
+								color: baseColor
+							}
+						},
+						labelLine: {
+							show: false
+						},
+						data: level.map(function (item) {
+							return {
+								value: item.fenxiao_num,
+								name: item.level_name,
+								tooltip: {
+									trigger: 'item',
+									backgroundColor: 'rgba(255, 255, 255, 0.7)',
+									borderColor: '#999',
+									borderWidth: 1,
+									padding: 10,
+									textStyle: {
+										fontSize: 12,
+										color: '#333'
+									}
+								}
+							}
+						})
+					}]
+				};
+				// 使用刚指定的配置项和数据显示图表。
+				echart.setOption(option);
+			}
+		})
+	}
+
+	function getRandomColor(){
+		return  '#' + (function(color){
+			return (color +=  '0123456789abcdef'[Math.floor(Math.random()*16)])
+			&& (color.length == 6) ?  color : arguments.callee(color);
+		})('');
+	}
+
+	function dealWithChartTo(ten_day_json){
+		if(!$('#fenxiao_member').length) return;
+
+		var data = [getDay(-6), getDay(-5), getDay(-4), getDay(-3), getDay(-2), getDay(-1), getDay(0)];
+		// 基于准备好的dom，初始化echarts实例
+		var baseColor = getComputedStyle(document.documentElement).getPropertyValue('--base-color');
+		// 指定图表的配置项和数据
+
+		// 基于准备好的dom，初始化echarts实例
+		var moneyChart = echarts.init(document.getElementById('fenxiao_member'));
+
+		// 指定图表的配置项和数据
+		var moneyOption = {
+			xAxis: {
+				type: 'category',
+				data: data
+			},
+			yAxis: {
+				type: 'value'
+			},
+			grid: {
+				top: '8%',
+				bottom: '9%',
+				left: '8%',
+				right: '4%'
+			},
+			tooltip: {
+				trigger: 'axis',
+				showContent: true,
+				backgroundColor: 'rgba(0, 0, 0, 0.5)',
+				padding: [5, 10],
+				textStyle: {
+					color: '#fff',
+					lineHeight: 30,
+				},
+				formatter: function(params, ticket, callback) {
+					return "日期：" + params[0].axisValue + '<br />' + params[0].seriesName + "：" + params[0].value + "人";
+				},
+			},
+			series: [{
+				name: ['新增分销商数'],
+				data: ten_day_json,
+				type: 'line',
+				smooth: true,
+				itemStyle: {
+					color: baseColor
+				},
+				areaStyle: {
+					color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+						offset: 0,
+						color: baseColor
+					}, {
+						offset: 1,
+						color: '#fff'
+					}])
+				}
+			}]
+		};
+
+		// 使用刚指定的配置项和数据显示图表。
+		moneyChart.setOption(moneyOption);
+	}
+</script>
+

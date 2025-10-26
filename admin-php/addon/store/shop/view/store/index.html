@@ -1,0 +1,206 @@
+<link rel="stylesheet" href="SHOP_CSS/index.css">
+<style>
+    .echart-wrap .head { display: flex; }
+    .echart-wrap .head .title {flex: 1}
+    .echart-wrap .head .sort-type {display: flex;border: 1px solid #eee;border-radius: 5px;overflow:hidden}
+    .echart-wrap .sort-type .type-item {width: 80px;text-align: center;background: #F5F5F5;line-height: 28px;cursor: pointer;transition: all .3s;font-size: 12px}
+    .echart-wrap .sort-type .type-item:hover {background: #eee}
+    .echart-wrap .sort-type .type-item.active {background: var(--base-color);color: #fff}
+    .align-right {text-align: right!important;}
+    .ranking-empty {text-align: center;padding: 100px 0;}
+    .echart-wrap .common-wrap { min-width: calc((100% - 45px) / 2); max-width: calc((100% - 45px) / 2); box-sizing: border-box; }
+    .echart-wrap .common-wrap .body {width: 100%}
+    .ranking-wrap tr th {white-space: nowrap}
+    .ranking-wrap .goods-name {height: 20px;overflow: hidden;text-overflow: ellipsis}
+</style>
+
+<div class="common-wrap">
+    <div class="head">
+        <div class="title">实时概况</div>
+        <div class="sub-title">更新时间：{:date('Y-m-d H:i:s')}</div>
+    </div>
+    <div class="body summary-wrap">
+        <div class="summary-item">
+            <div class="title">营业中门店数量</div>
+            <div class="value" id="in_business_num">0</div>
+        </div>
+        <div class="summary-item">
+            <div class="title">门店总数</div>
+            <div class="value" id="store_num">0</div>
+        </div>
+        <div class="summary-item">
+            <div class="title">累计门店订单量</div>
+            <div class="value" id="total_order_num">0</div>
+        </div>
+        <div class="summary-item">
+            <div class="title">累计门店交易额</div>
+            <div class="value" id="total_order_money" value-type="money">0.00</div>
+        </div>
+    </div>
+    <div class="body summary-wrap">
+        <div class="summary-item">
+            <div class="title">待审核结算单</div>
+            <div class="value" id="wait_audit_num">0</div>
+        </div>
+        <div class="summary-item">
+            <div class="title">待审核结算金额（元）</div>
+            <div class="value" id="wait_audit_money" value-type="money">0.00</div>
+        </div>
+        <div class="summary-item">
+            <div class="title">待打款结算单</div>
+            <div class="value" id="wait_transfer_num">0</div>
+        </div>
+        <div class="summary-item">
+            <div class="title">待打款结算金额（元）</div>
+            <div class="value" id="wait_transfer_money" value-type="money">0.00</div>
+        </div>
+    </div>
+</div>
+
+<div class="echart-wrap ranking-wrap">
+    <div class="common-wrap store-ranking">
+        <div class="head">
+            <div class="title">门店排行</div>
+            <div class="sort-type">
+                <div class="type-item active" sort-type="num">交易量</div>
+                <div class="type-item" sort-type="money">交易额</div>
+            </div>
+        </div>
+        <div class="market-item-content store body">
+            <div class="ranking-empty">暂无排名</div>
+        </div>
+    </div>
+    <div class="common-wrap goods-ranking">
+        <div class="head">
+            <div class="title">商品排行</div>
+            <div class="sort-type">
+                <div class="type-item active" sort-type="num">交易量</div>
+                <div class="type-item" sort-type="money">交易额</div>
+            </div>
+        </div>
+        <div class="market-item-content goods body">
+            <div class="ranking-empty">暂无排名</div>
+        </div>
+    </div>
+</div>
+
+<script src="SHOP_JS/echarts.min.js"></script>
+<script>
+    //综合统计
+    function getSumCount() {
+        $.ajax({
+            type:'post',
+            dataType:'json',
+            url:ns.url('store://shop/store/index'),
+            success:function(res){
+                if (res.code == 0) {
+                    Object.keys(res.data).forEach(function(key){
+                        let value = res.data[key];
+                        if ($('#' + key).attr('value-type') == 'money') value = moneyFormat(value);
+                        $('#' + key).text(value)
+                    })
+                }
+            }
+        })
+    }
+    getSumCount();
+
+    // 门店排名
+    function storeRanking() {
+        var order = $('.store-ranking .active').attr('sort-type');
+        $.ajax({
+            dataType: 'JSON',
+            type: 'POST',
+            url: ns.url("store://shop/store/storeranking"),
+            data: {
+                order: order
+            },
+            success: function(res) {
+                var html = "";
+                if(res.code >= 0 && res.data.length){
+                    html += `<table class="layui-table" lay-skin="nob">
+                        <thead>
+                            <tr>
+                                <th>排名</th>
+                                <th>门店名称</th>
+                                <th class="align-right">${order == 'num' ? '交易量（单）' : '交易额（元）'}</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+                    res.data.forEach((item,index)=>{
+                        html += `<tr>
+                                <td>${index + 1}</td>
+                                <td>${item.store_name}</td>
+                                <td class="align-right">${order == 'num' ? item.order_num : item.order_money}</td>
+                            </tr>
+                        `;
+                    });
+                    html += ' </tbody></table>'
+                    $(".market-item-content.store").html(html);
+                }else{
+                    html += `<div class="ranking-empty">暂无排名</div>`;
+                    $(".market-item-content.store").html(html);
+                }
+            }
+        });
+    }
+    storeRanking();
+
+    // 商品排名
+    function goodsRanking() {
+        var order = $('.goods-ranking .active').attr('sort-type');
+        $.ajax({
+            dataType: 'JSON',
+            type: 'POST',
+            url: ns.url("store://shop/store/goodsranking"),
+            data: {
+                order: order
+            },
+            success: function(res) {
+                var html = "";
+                if(res.code >= 0 && res.data.length){
+                    html += `<table class="layui-table" lay-skin="nob">
+                        <colgroup>
+                            <col>
+                            <col width="60%">
+                            <col>
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>排名</th>
+                                <th>商品名称</th>
+                                <th class="align-right">${order == 'num' ? '交易量（件）' : '交易额（元）'}</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
+                    res.data.forEach((item,index)=>{
+                        html += `<tr>
+                                <td>${index + 1}</td>
+                                <td><div class="goods-name" title="${item.goods_name}">${item.goods_name}</div></td>
+                                <td class="align-right">${order == 'num' ? item.goods_num : item.goods_money}</td>
+                            </tr>
+                        `;
+                    });
+                    html += ' </tbody></table>';
+                    $(".market-item-content.goods").html(html);
+                }else{
+                    html += `<div class="ranking-empty">暂无排名</div>`;
+                    $(".market-item-content.goods").html(html);
+                }
+            }
+        });
+    }
+    goodsRanking();
+
+    $(function(){
+        $('.store-ranking .type-item').click(function () {
+            $(this).addClass('active').siblings().removeClass('active');
+            storeRanking();
+        })
+
+        $('.goods-ranking .type-item').click(function () {
+            $(this).addClass('active').siblings().removeClass('active');
+            goodsRanking();
+        })
+    })
+</script>

@@ -1,0 +1,492 @@
+<style>
+	.goods-info .layui-form-item {margin-bottom: 0;}
+	.add-carmichael .head{font-weight: bolder;margin-bottom: 15px;display: flex;vertical-align: middle;}
+	.add-carmichael .head div:first-child{flex: 1;line-height: 34px}
+	.add-carmichael .layui-textarea {height: 190px;}
+	.edit-carmichael .layui-form-label{width: 90px}
+	.edit-carmichael .layui-form-label + .layui-input-block {margin-left: 90px}
+	.layui-table .table-btn {justify-content: flex-end;}
+</style>
+
+<div class="layui-card card-common card-brief goods-info">
+	<div class="layui-card-header">
+		<span class="card-title">商品信息</span>
+	</div>
+	<div class="layui-card-body">
+		<div class="layui-form-item">
+			<label class="layui-form-label">商品名称：</label>
+			<div class="layui-input-block">
+				<p>{$goods.goods_name}</p>
+			</div>
+		</div>
+		<div class="layui-form-item">
+			<label class="layui-form-label">总库存：</label>
+			<div class="layui-input-block">
+				<p>{$goods.goods_stock}</p>
+			</div>
+		</div>
+		{notempty name="$goods.goods_spec_format"}
+			{foreach name="$goods.sku_data" item="vo"}
+			<div class="layui-form-item">
+				<div class="layui-row">
+					<div class="layui-col-md4">
+				      	<label class="layui-form-label">规格名称：</label>
+						<div class="layui-input-block">
+							<p>{$vo.spec_name}</p>
+						</div>
+				    </div>
+				    <div class="layui-col-md4">
+				      	<label class="layui-form-label">库存：</label>
+						<div class="layui-input-block">
+							<p>{$vo.stock}</p>
+						</div>
+				    </div>
+				    <div class="layui-col-md4">
+				      	<button class="layui-btn" onclick="add({$vo.sku_id})">添加卡密数据</button>
+				    </div>
+				</div>
+			</div>
+			{/foreach}
+		{else/}
+			<div class="layui-form-item">
+				<label class="layui-form-label">卡密管理：</label>
+				<div class="layui-input-block">
+					<button class="layui-btn" onclick="add({$goods['sku_data'][0]['sku_id']})">添加卡密数据</button>
+				</div>
+			</div>
+		{/notempty}
+	</div>	
+</div>
+
+<div class="layui-card card-common card-brief">
+	<div class="layui-card-header">
+		<span class="card-title">卡密数据</span>
+	</div>
+	<div class="layui-card-body layui-tab" style="padding-top:0;" lay-filter="tab">
+		<ul class="layui-tab-title">
+			<li class="layui-this" lay-id="basic_info">未售出</li>
+			<li lay-id="basic_info11">已售出</li>
+		</ul>
+		<table id="carmichael_list" lay-filter="carmichael_list"></table>
+	</div>	
+</div>
+
+<script type="text/html" id="toolbarOperation">
+	<button class="layui-btn layui-btn-primary" lay-event="delete">批量删除</button>
+</script>
+
+<script type="text/html" id="batchOperation">
+	<button class="layui-btn layui-btn-primary" lay-event="delete">批量删除</button>
+</script>
+
+<script type="text/html" id="operation">
+	<div class="table-btn">
+		{{# if (d.order_id == 0){  }}
+		<a class="layui-btn" lay-event="edit">编辑</a>
+		<a class="layui-btn" lay-event="delete">删除</a>
+		{{# } else { }}
+		<a class="layui-btn" lay-event="order">查看订单</a>
+		{{# } }}
+	</div>
+</script>
+
+<!-- 添加卡密 -->
+<script type="text/html" id="carmichaelTemplate">
+	<div class="add-carmichael">
+		<div class="head text-color">
+			<div>添加卡密格式为卡号+空格+密码，一行一组，如AAAAA BBBBB</div>
+			<div>
+				<button class="layui-btn important">导入数据</button>
+		      	<a class="layui-btn" href="{:addon_url('virtualcard://shop/goods/downloadTemplate',[ 'request_mode' => 'download' ])}" target="_blank">下载模板</a>
+	      	</div>
+		</div>
+		<textarea class="layui-textarea"></textarea>
+	</div>
+</script>
+
+<!-- 编辑卡密 -->
+<script type="text/html" id="editCarmichaelTemplate">
+	<div class="edit-carmichael">
+		<div class="layui-form">
+			<div class="layui-form-item">
+				<label class="layui-form-label"><span class="required">*</span>卡号：</label>
+				<div class="layui-input-block goods-cate">
+					<input type="text" name="cardno" class="layui-input" value="{{ d.cardno }}">
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<label class="layui-form-label">密码：</label>
+				<div class="layui-input-block goods-cate">
+					<input type="text" name="password" class="layui-input" value="{{ d.password }}">
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+
+<!-- 用户信息 -->
+<script type="text/html" id="member_info">
+	{{# if(d.order_id){ }}
+	<div class="table-title">
+		<div class='title-pic'>
+			<img layer-src src="{{ns.img(d.headimg)}}" onerror="this.src = '{:img('public/static/img/default_img/head.png')}' "/>
+		</div>
+		<div class='title-content'>
+			<p class="multi-line-hiding">{{d.nickname}}</p>
+		</div>
+	</div>
+	{{# }else{ }}
+	--
+	{{# } }}
+</script>
+
+<script type="text/javascript">
+var laytpl,repeat_flag = false,table,upload;
+layui.use(['form', 'laydate', 'upload', 'laytpl', 'element'], function() {
+	laytpl = layui.laytpl;
+	upload = layui.upload;
+	element = layui.element;
+
+	unsold();
+
+	element.on('tab(tab)', function(data){
+		if (data.index == 0) {
+			unsold();
+		} else {
+			sold();
+		}
+  	});
+
+	table.tool(function(obj) {
+	    var data = obj.data;
+	    switch (obj.event) {
+	        case 'order': 
+           	 	location.hash = ns.hash("shop/order/detail?order_id=" + data.order_id);
+            	break;
+            case 'edit':
+            	edit(data);
+            	break;
+        	case 'delete':
+	        	layer.confirm('是否确定删除该条数据？', function(index) {
+	               	deleteGoodsVirtual(data.id);
+					layer.close(index);
+	            }, function () {
+	                layer.close();
+	            });
+	        	break;
+        }
+    });
+
+    /**
+     * 批量操作
+     */
+    table.bottomToolbar(function(obj) {
+        if (obj.data.length < 1) {
+            layer.msg('请选择要操作的数据');
+            return;
+        }
+
+        switch (obj.event) {
+            case "del":
+                var id_array = new Array();
+                for (i in obj.data) id_array.push(obj.data[i].id);
+                deleteGoodsVirtual(id_array.toString());
+                break;
+        }
+    });
+
+    /**
+     * 批量操作
+     */
+    table.toolbar(function(obj) {
+        if (obj.data.length < 1) {
+            layer.msg('请选择要操作的数据');
+            return;
+        }
+
+        switch (obj.event) {
+            case "delete":
+                var id_array = new Array();
+                for (i in obj.data) id_array.push(obj.data[i].id);
+                deleteGoodsVirtual(id_array.toString());
+                break;
+           
+        }
+    });
+});
+
+function edit(data){
+	var cardinfo = JSON.parse(data.card_info);
+	laytpl($('#editCarmichaelTemplate').html()).render(cardinfo, function (html) {
+		var index = layer.open({
+			title: '编辑卡密',
+			skin: 'layer-tips-class',
+			type: 1,
+			area: ['400px', '220px'],
+			content: html,
+			btn: ['保存', '关闭'],
+			yes: function () {
+				if (!/[\S]+/.test($('[name="cardno"]').val())) {
+					layer.msg('请输入卡号', {icon: 5});
+					return;
+				}
+				$.ajax({
+		            url: ns.url("virtualcard://shop/goods/editGoodsVirtual"),
+		            data: {
+		            	id: data.id,
+		                cardno: $('[name="cardno"]').val(),
+						password: $('[name="password"]').val()
+		            },
+		            dataType: 'JSON',
+		            type: 'POST',
+		            success: function (res) {
+		                if (res.code == 0) {
+		                	layer.close(index);
+                			table.reload();
+		                } else{
+			                layer.msg(res.message);
+			            }
+		            }
+		        });
+			}
+		})
+	})
+}
+
+function deleteGoodsVirtual(ids){
+	$.ajax({
+        url: ns.url("virtualcard://shop/goods/deleteGoodsVirtual"),
+        data: {
+        	id: ids,
+    	 	goods_id : "{$goods_id}"
+        },
+        dataType: 'JSON',
+        type: 'POST',
+        success: function (res) {
+        	layer.msg(res.message);
+            if (res.code == 0) {
+            	table.reload({
+        			page: 1
+        		});
+            } 
+        }
+    });
+}
+
+function add(sku_id){
+	var index = layer.open({
+		title: '添加卡密',
+		skin: 'layer-tips-class',
+		type: 1,
+		area: ['700px', '350px'],
+		content: $('#carmichaelTemplate').html(),
+		btn: ['保存', '关闭'],
+		success: function(){
+		    upload.render({
+		        elem: '.important',
+		        url: ns.url("shop/upload/file"),
+		        accept: 'file',
+				acceptMime: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+				exts: 'xlsx',
+		        done: function(res){
+		            if (res.code >= 0) {
+	               		$.ajax({
+				            url: ns.url("virtualcard://shop/goods/import"),
+				            data: {
+				                path: res.data.path
+				            },
+				            dataType: 'JSON',
+				            type: 'POST',
+				            success: function (res) {
+				                if (res.code == 0) {
+		                			$('.add-carmichael .layui-textarea').val(res.data);
+				                } else{
+					                layer.msg(res.message);
+					            }
+				            }
+				        });
+		            } else{
+		                layer.msg(res.message);
+		            }
+		        }
+		    });
+		},
+		yes: function () {
+			var carmichaelSingle = [];
+			var carmichael = $('.add-carmichael .layui-textarea').val().trim();
+			if (carmichael.length) {
+				carmichaelSingle = carmichael.split("\n");
+				carmichaelSingle = carmichaelSingle.filter(function (str){
+					return /[\S]+/.test(str);
+				})
+			}
+			if (carmichaelSingle.length == 0) {
+				layer.msg('请输入要添加的卡密数据');
+				return;
+			} 
+			if (repeat_flag) return;
+			repeat_flag = true;
+			$.ajax({
+	            url: ns.url("virtualcard://shop/goods/addCarmichael"),
+	            data: {
+	                goods_id : "{$goods_id}",
+	                sku_id: sku_id,
+	                data: carmichaelSingle.toString()
+	            },
+	            dataType: 'JSON',
+	            type: 'POST',
+	            success: function (res) {
+	                layer.msg(res.message);
+	                repeat_flag = false;
+	                if (res.code == 0) {
+	                	layer.close(index);
+                		table.reload({
+                			page: 1
+                		});
+	                }
+	            }
+	        });
+		}
+	})
+}
+
+function unsold(){
+	table = new Table({
+        elem: '#carmichael_list',
+        url: ns.url("virtualcard://shop/goods/carmichael"),
+        where:{
+        	"goods_id" : "{$goods_id}",
+        	"is_sold": 0
+        },
+        cols: [
+            [
+                {
+                    width: "3%",
+                    type: 'checkbox',
+                    unresize: 'false'
+                }, 
+                {notempty name="$goods.goods_spec_format"}
+                {
+	                title: '所属规格',
+	                unresize: 'false',
+	                templet: function (data) {
+						return data.spec_name && data.spec_name != null ? data.spec_name : '<span title="'+data.sku_name+'">'+data.sku_name+'</span>';
+	                }
+	            },
+	            {/notempty}
+                {
+	                title: '卡号',
+	                width: '16%',
+	                unresize: 'false',
+	                templet: function (data) {
+	                    var carmichael = JSON.parse(data.card_info);
+	                    return carmichael.cardno;
+	                }
+	            },
+	            {
+	                title: '密码',
+	                width: '16%',
+	                unresize: 'false',
+	                templet: function (data) {
+	                    var carmichael = JSON.parse(data.card_info);
+	                    return carmichael.password;
+	                }
+	            },
+	            {
+	                title: '状态',
+	                width: '10%',
+	                align: 'center',
+	                templet: function (data) {
+	                    return data.order_id == 0 ? '未售出' : '已售出';
+	                }
+	            },
+                {
+	                title: '售出时间',
+	                width: '18%',
+	                unresize: 'false',
+	                align: 'center',
+	                templet: function (data) {
+	                    return data.sold_time > 0 ? ns.time_to_date(data.sold_time) : '';
+	                }
+				},{
+	                title: '操作',
+	                unresize: 'false',
+					align:'right',
+	                toolbar: '#operation'
+	            }
+            ]
+        ],
+        toolbar: '#toolbarOperation',
+        bottomToolbar: "#batchOperation"
+    });
+}
+
+function sold(){
+	table = new Table({
+        elem: '#carmichael_list',
+        url: ns.url("virtualcard://shop/goods/carmichael"),
+        where:{
+        	"goods_id" : "{$goods_id}",
+        	"is_sold" : 1
+        },
+        cols: [
+            [
+             	{notempty name="$goods.goods_spec_format"}
+                {
+	                title: '所属规格',
+	                unresize: 'false',
+	                templet: function (data) {
+						return data.spec_name && data.spec_name != null ? data.spec_name : '<span title="'+data.sku_name+'">'+data.sku_name+'</span>';
+	                }
+	            },
+	            {/notempty}
+                {
+	                title: '卡号',
+	                width: '14%',
+	                unresize: 'false',
+	                templet: function (data) {
+	                    var carmichael = JSON.parse(data.card_info);
+	                    return carmichael.cardno;
+	                }
+	            },
+	            {
+	                title: '密码',
+	                width: '14%',
+	                unresize: 'false',
+	                templet: function (data) {
+	                    var carmichael = JSON.parse(data.card_info);
+	                    return carmichael.password;
+	                }
+	            },
+	            {
+	                title: '状态',
+	                width: '12%',
+	                align: 'center',
+	                templet: function (data) {
+	                    return data.order_id == 0 ? '未售出' : '已售出';
+	                }
+	            },
+                {
+	                title: '售出时间',
+	                width: '18%',
+	                unresize: 'false',
+	                align: 'center',
+	                templet: function (data) {
+	                    return data.sold_time > 0 ? ns.time_to_date(data.sold_time) : '';
+	                }
+
+				}, {
+					title: '所属用户',
+					width: '15%',
+					templet: "#member_info"
+	            }, {
+	                title: '操作',
+	                unresize: 'false',
+					align:'right',
+	                toolbar: '#operation'
+	            }
+            ]
+        ]
+    });
+}
+</script>

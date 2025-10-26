@@ -1,0 +1,327 @@
+.ns-seckill {
+  .ns-seckill-time-box {
+    &>span {
+      cursor: pointer;
+      bottom: 0;
+      line-height: 64px;
+      position: absolute;
+      color: #fff;
+      z-index: 1;
+      background-color: rgba(0, 0, 0, .3);
+      width: 35px;
+      font-size: 24px;
+      text-align: center;
+    }
+
+    .left-btn {
+      left: 0;
+    }
+
+    .right-btn {
+      right: 0;
+    }
+
+    .ns-seckill-time-list {
+      width: 100%;
+      height: 64px;
+      position: relative;
+    }
+
+    ul {
+      width: 500%;
+      position: absolute;
+      top: 0;
+      left: 16px;
+      display: flex;
+
+      li {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 302.5px;
+        height: 64px;
+        overflow: hidden;
+        cursor: pointer;
+        text-align: center;
+        background: linear-gradient(135deg, #EDEDED 0%, #FFFFFF 100%);
+        opacity: 0.87;
+        color: #424242;
+        &::after{
+          content: "";
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 12px;
+          border-left: 30px solid rgba(255,255,255,0.87);
+          border-bottom: 60px solid rgba(255,255,255,0.87);
+          border-right: 30px solid transparent;
+          border-top: 60px solid transparent;
+        }
+        &:first-of-type::after{
+          border: 0;
+        }
+
+        div:first-child {
+          font-size: 16px;
+        }
+
+        div:nth-child(2) {
+          line-height: 14px;
+          font-size: 12px;
+        }
+
+        &.selected-tab {
+          background: linear-gradient(135deg, #F42424 0%, #FA6400 100%);
+          opacity: 0.88;
+          color: #FFF;
+        }
+        &.selected-tab + li{
+          background-color: red;
+        }
+        &.selected-tab+li::after{
+          border-left-color: rgba(250,75,0,0.88);
+          border-bottom-color: rgba(250,75,0,0.88);
+        }
+        &.selected-tab::after{
+          border-left-color: rgba(255,255,255,1);
+          border-bottom-color: rgba(255,255,255,1);
+        }
+      }
+    }
+  }
+
+  .ns-seckill-head {
+    position: relative;
+    width: $width;
+    margin: auto;
+    .el-carousel{
+      .el-image{
+        height: 100%;
+      }
+    }
+  }
+
+  .ns-seckill-box {
+    padding-top: 54px;
+    width: $width;
+    margin: 0 auto 50px;
+
+    .ns-seckill-title {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #e8e8e8;
+
+      .seckill-title-left {
+        display: flex;
+        align-items: center;
+
+        .name {
+          font-size: 30px;
+          font-weight: bold;
+          border-bottom: 4px solid #f42424;
+          color: #333;
+        }
+
+        .desc {
+          margin-left: 15px;
+          font-size: 16px;
+          color: #424242;
+
+        }
+      }
+
+      .ns-seckill-right {
+        &>span {
+          font-size: 20px;
+          color: #424242;
+        }
+
+        .count-down {
+          display: inline-block;
+          margin-left: 6px;
+
+          &>p {
+            display: flex;
+            align-items: center;
+
+            i {
+              margin-left: 3px;
+              margin-right: -6px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.ns-seckill-time-box {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  width: $width;
+  height: 64px;
+  margin: 0 auto;
+  overflow: hidden;
+  z-index: 5;
+
+  .seckill-time {
+    width: $width;
+    margin: 0 auto;
+
+    .el-tabs__nav-wrap .el-tabs__item .seckill-time-li.selected-tab div p {
+      color: #ffffff;
+      border: none;
+    }
+
+    .seckill-time-li {
+      text-align: center;
+      padding: 0;
+      height: 56px;
+      line-height: unset;
+      padding-top: 6px;
+      box-sizing: border-box;
+      color: #afafaf;
+
+      div {
+        &:first-child {
+          font-size: 18px;
+          line-height: 22px;
+        }
+
+        &:last-child {
+          height: 14px;
+          line-height: 14px;
+          margin-top: 6px;
+
+          p {
+            height: 14px;
+            line-height: 14px;
+          }
+        }
+      }
+    }
+
+    .selected-tab {
+      background: $base-color;
+      color: #ffffff;
+    }
+  }
+}
+
+.goods-list {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  margin-top: 35px;
+
+  .goods {
+    width: 228px;
+    margin-bottom: 18px;
+    margin-right: 17px;
+    overflow: hidden;
+    color: #303133;
+    transition: 0.3s;
+    padding: 18px;
+    background-color: #fff;
+    box-sizing: border-box;
+    cursor: pointer;
+
+    &:nth-child(5n+5) {
+      margin-right: 0;
+    }
+  }
+
+  .img {
+    width: 192px;
+    height: 192px;
+  }
+
+  .price {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+
+    .curr-price {
+      display: flex;
+      align-items: flex-end;
+      height: 24px;
+      color: $base-color;
+      font-weight: bold;
+
+      span:first-child {
+        font-size: 14px;
+        line-height: 24px;
+      }
+
+      span:nth-child(2) {
+        font-size: 12px;
+      }
+    }
+
+    .main_price {
+      color: $base-color;
+      font-size: 16px;
+      line-height: 24px;
+    }
+
+    .primary_price {
+      text-decoration: line-through;
+      color: $base-color-info;
+      margin-left: 5px;
+      font-size: 12px;
+    }
+  }
+
+  .name {
+    margin-top: 10px;
+    font-size: 14px;
+    white-space: normal;
+    overflow: hidden;
+
+    p {
+      line-height: 24px;
+      display: -webkit-box;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
+      overflow: hidden;
+      height: 50px;
+    }
+  }
+
+  .el-button {
+    width: 100%;
+    height: 42px;
+    line-height: 42px;
+    background: $base-color;
+    color: #ffffff;
+    margin-top: 5px;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    font-size: 16px;
+  }
+}
+
+.empty-wrap {
+  padding: 50px 0 60px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  img{
+    width: 400px;
+    height: 244px;
+  }
+  span{
+    font-size: 14px;
+    color: #4A4A4A;
+  }
+}

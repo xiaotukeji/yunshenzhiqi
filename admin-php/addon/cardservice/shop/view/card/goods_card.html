@@ -1,0 +1,296 @@
+<style>
+    .screen{margin-bottom: 15px;}
+    .contraction span {
+        cursor: pointer;
+        display: inline-block;
+        width: 17px;
+        height: 17px;
+        text-align: center;
+        line-height: 14px;
+        user-select: none;
+    }
+    .card-list {
+        overflow: hidden;
+        padding: 0 45px;
+    }
+    .card-list li .img-wrap {
+        vertical-align: middle;
+        margin-right: 8px;
+        width: 80px;
+        height: 80px;
+        text-align: center;
+        border: 1px solid #e2e2e2;
+    }
+    .card-list li .img-wrap img {
+        max-width: 100%;
+        max-height: 100%;
+    }
+    .card-list li .info-wrap{
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    .card-list li .name-wrap{
+        flex: 1;
+    }
+    .card-list li .info-wrap span.sku-name {
+        -webkit-line-clamp: 2;
+        margin-bottom: 5px;
+        line-height: 1.3;
+        margin-top: 0;
+        color: #333;
+        font-size: 14px;
+    }
+    .card-list li .info-wrap span {
+        display: -webkit-box;
+        margin-top: 5px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: normal;
+        word-break: break-all;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 1;
+        line-height: 1;
+        font-size: 12px;
+    }
+    .card-list li {
+        float: left;
+        display: flex;
+        padding: 10px;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #EFEFEF;
+        width: 294px;
+        align-items: center;
+    }
+
+    .table-title .title-content p{overflow: hidden;text-overflow:ellipsis;white-space: nowrap;}
+    .goods-box{
+        display: flex;
+        padding: 10px;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+    .goods-box .goods-info{
+        width: 700px;
+    }
+    .goods-box .goods-info .goods-content{
+        display: flex;
+        justify-content: space-between;
+    }
+    .goods-box .goods-info .goods-name{
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        display: -moz-box;
+        -moz-line-clamp: 2;
+        -moz-box-orient: vertical;
+
+        overflow-wrap: break-word;
+        word-break: break-all;
+        white-space: normal;
+        overflow: hidden;
+        height: 38px;
+    }
+    .goods-box .goods-img{
+        margin-right: 15px;
+        display: flex;
+        align-items: center;
+    }
+    .goods-box .goods-img img{
+        width: 80px;
+        max-height: 80px;
+    }
+    .goods-box .box-left{
+        display: flex;
+    }
+    .goods-box .box-right{
+        display: flex;
+        align-items: center;
+    }
+    .user-detail{
+        cursor: pointer;
+    }
+    .table-title .title-content{
+        overflow: unset;
+    }
+</style>
+
+<!--商品信息-->
+<div class="goods-box">
+    <div class="box-left">
+        <div class="goods-img">
+            <img src="{:img(explode(',', $goods_info['goods_image'])[0])}">
+        </div>
+        <div class="goods-info">
+            <div class="goods-name">{$goods_info['goods_name']}</div>
+            <div class="goods-content">
+                <div>卡类型：{$card_info.card_type_name}</div>
+                <div>价格：{$goods_info['price']}</div>
+                <div>库存：{$goods_info['goods_stock']}</div>
+                <div>销量：{$goods_info['sale_num']}</div>
+            </div>
+        </div>
+    </div>
+    <div class="box-right">
+        <button class="layui-btn layui-btn-primary" onclick="location.hash='{:hash_url('shop/goods/lists')}'">返回</button>
+    </div>
+</div>
+
+<!-- 搜索框 -->
+<div class="screen layui-collapse" lay-filter="selection_panel">
+    <div class="layui-colla-item">
+        <form class="layui-colla-content layui-form layui-show">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">购买人：</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="search_text" placeholder="请输入购买人名称" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <button class="layui-btn" lay-submit lay-filter="search">筛选</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 列表 -->
+<table id="card_list" lay-filter="card_list"></table>
+
+<!-- 工具栏操作 -->
+<script type="text/html" id="operation">
+    <div class="table-btn">
+        <a class="layui-btn" lay-event="order">订单</a>
+        <a class="layui-btn" lay-event="detail">详情</a>
+    </div>
+</script>
+
+<script type="text/html" id="userdetail">
+    <div class='table-title user-detail' onclick="memberDetail({{d.member_id}})">
+        <div class='title-pic'>
+            <img layer-src src="{{ns.img(d.headimg)}}" onerror="this.src = '{:img('public/static/img/default_img/head.png')}' ">
+        </div>
+        <div class='title-content'>{{d.nickname}}</div>
+    </div>
+</script>
+
+<script type="text/html" id="goodsDetail">
+    <div class="table-title">
+        <div class=" table-title">
+            <div class="title-pic"><img src="{{ns.img(d.goods_image.split(',')[0], 'mid')}}"></div>
+            <div class="title-content">
+                <p title="{{ d.sku_name }}">{{ d.goods_name }}</p>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script>
+    var laytpl;
+    $(function () {
+        layui.use(['form', 'laydate','laytpl'], function () {
+            laytpl = layui.laytpl;
+            var table,
+                form = layui.form,
+                laydate = layui.laydate;
+            form.render();
+
+            //渲染时间
+            laydate.render({
+                elem: '#start_time',
+                type: 'datetime'
+            });
+
+            laydate.render({
+                elem: '#end_time',
+                type: 'datetime'
+            });
+
+            /**
+             * 加载表格
+             */
+            table = new Table({
+                elem: '#card_list',
+                url: ns.url("cardservice://shop/card/goodscard"), //数据接口
+                where: {goods_id:"{$goods_id}"},
+                cols: [
+                    [{
+                        field: 'nickname',
+                        title: '买家信息',
+                        templet: '#userdetail'
+                    },
+                    {
+                        title: '总次数/已使用',
+                        templet: function (data) {
+                            var totalNum = data.card_type == 'timecard' ? '不限' : data.total_num;
+                            return totalNum + '/' + data.total_use_num;
+                        }
+                    },{
+                        title: '创建时间',
+                        width: '15%',
+                        templet: function (data) {
+                            return ns.time_to_date(data.create_time)
+                        }
+                    },{
+                        title: '到期时间',
+                        width: '15%',
+                        templet: function (data) {
+                            if (data.end_time > 0) {
+                                return ns.time_to_date(data.end_time);
+                            } else {
+                                return '永久有效';
+                            }
+                        }
+                    }, {
+                        title: '操作',
+                        toolbar: '#operation',
+                        unresize: 'false',
+                        align : 'right'
+                    }]
+                ]
+            });
+
+            /**
+             * 监听工具栏操作
+             */
+            table.tool(function(obj) {
+                var data = obj.data;
+                switch (obj.event) {
+                    case 'order':
+                        window.open(ns.href("shop/order/detail?order_id=" + data.order_id));
+                        break;
+                    case 'detail':
+                        window.open(ns.href("cardservice://shop/card/detail?card_id=" + data.card_id));
+                        break;
+                }
+            });
+
+            /**
+             * 搜索功能
+             */
+            form.on('submit(search)', function (data) {
+                table.reload({
+                    page: {
+                        curr: 1
+                    },
+                    where: data.field
+                });
+                return false;
+            });
+
+            //批量导出
+            form.on('submit(export_card)', function (data) {
+                location.href = ns.url("shop/card/exportVerify?request_mode=download", data.field);
+                return false;
+            });
+        });
+    });
+
+    function memberDetail(member_id){
+        window.open(ns.href("shop/member/editmember", {'member_id':member_id}))
+    }
+</script>

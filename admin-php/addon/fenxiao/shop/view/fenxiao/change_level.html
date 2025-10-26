@@ -1,0 +1,130 @@
+<!-- 列表 -->
+<table id="level_list" lay-filter="level_list"></table>
+
+<input type="hidden" value="" id="param" />
+
+<!-- 工具栏操作 -->
+<script type="text/html" id="operation">
+    <div class="table-btn">
+        <a class="layui-btn" lay-event="confirm">变更</a>
+    </div>
+</script>
+
+<script>
+    var change_end_func = '{$change_end_func}';
+    var repeat_flag = false;
+    layui.use(['form'], function() {
+        var table, form = layui.form;
+        form.render();
+
+        table = new Table({
+            elem: '#level_list',
+            url: ns.url("fenxiao://shop/fenxiao/changelevel"),
+            where:{
+                fenxiao_id : "{$fenxiao_id}"
+            },
+            cols: [
+                [{
+                    title: '等级',
+                    unresize: 'false',
+                    width: '20%',
+                    templet: function (data) {
+                        var level = new Array();
+                        level[0] = '默认等级';
+                        level[1] = '一级';
+                        level[2] = '二级';
+                        level[3] = '三级';
+                        level[4] = '四级';
+                        level[5] = '五级';
+                        level[6] = '六级';
+                        level[7] = '七级';
+                        level[8] = '八级';
+                        level[9] = '九级';
+                        level[10] = '十级';
+                        return level[data.level_num] != undefined ? level[data.level_num] : '';
+                    }
+                }, {
+                    field: 'level_name',
+                    title: '等级名称',
+                    unresize: 'false',
+                    width: '20%',
+                }, {
+                    field: 'one_rate',
+                    title: '一级佣金比例',
+                    unresize: 'false',
+                    width: '20%',
+                    templet: function(data) {
+                        return data.one_rate + '%';
+                    },
+                    hide: {if $basics_info.level >= 1}  false  {else /}  true  {/if}
+                }, {
+                    field: 'two_rate',
+                    title: '二级佣金比例',
+                    unresize: 'false',
+                    width: '20%',
+                    templet: function(data) {
+                        return data.two_rate + '%';
+                    },
+                    hide: {if $basics_info.level >= 2}  false  {else /}  true  {/if}
+                },{
+                    field:'three_rate',
+                    title: '三级佣金比例',
+                    unresize: 'false',
+                    width: '20%',
+                    templet: function(data) {
+                        return data.three_rate + '%';
+                    },
+                    hide: {if $basics_info.level >= 3}  false  {else /}  true  {/if}
+                }, {
+                    title: '操作',
+                    toolbar: '#operation',
+                    unresize: 'false',
+				    align:'right'
+                }]
+            ]
+        });
+
+        /**
+         * 监听工具栏操作
+         */
+        table.tool(function(obj) {
+            var data = obj.data,
+                event = obj.event;
+            switch (event) {
+                case 'confirm': //确认更改上下级关系
+                    layer.confirm('确定要变更为该等级吗?', function (index) {
+                        if (repeat_flag) return;
+                        repeat_flag = true;
+						layer.close(index);
+
+                        $.ajax({
+                            url: ns.url("fenxiao://shop/fenxiao/confirmChangeLevel"),
+                            data: {
+                                level_id:data.level_id,
+                                member_id:"{$member_id}"
+                            },
+                            dataType: 'JSON',
+                            type: 'POST',
+                            async: false,
+                            success: function(res) {
+                                layer.msg(res.message);
+                                repeat_flag = false;
+                                if (res.code == 0) {
+                                    $("#param").val(1);
+                                    if(typeof parent[change_end_func] == 'function'){
+                                        parent[change_end_func]();
+                                    }
+                                }
+                            }
+                        });
+                    });
+                    break;
+            }
+        });
+    });
+
+    function fun(callback) {
+        var param = $("#param").val();
+        callback(param);
+    }
+</script>

@@ -1,0 +1,20 @@
+{
+	"name": "niushop-pos",
+	"version": "2.0",
+	"main": "main.js",
+	"scripts": {
+		"electron": "chcp 65001&&electron .", 
+		"debug": "electron --inspect-brk=5858 .",
+		"start": "wait-on tcp:8080 && electron .",
+		"build": "electron-packager ./ niushop-pos --plantform=win32 --arch=x64 --out niushop-pos --overwrite --icon=xdt.ico"
+	},
+	"author": "",
+	"license": "ISC",
+	"devDependencies": {
+		"electron": "^26.6.2",
+		"electron-packager": "^12.2.0"
+	},
+	"dependencies": {
+		"electron-localshortcut": "^3.2.1"
+	}
+}

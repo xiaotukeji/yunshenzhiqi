@@ -1,0 +1,116 @@
+<?php
+/**
+ * Niushop商城系统 - 团队十年电商经验汇集巨献!
+ * =========================================================
+ * Copy right 2019-2029 上海牛之云网络科技有限公司, 保留所有权利。
+ * ----------------------------------------------
+ * 官方网址: https://www.niushop.com
+ * 这不是一个自由软件！您只能在不用于商业目的的前提下对程序代码进行修改和使用。
+ * 任何企业和个人不允许对程序代码以任何形式任何目的再发布。
+ * =========================================================
+ */
+
+namespace addon\cashier\storeapi\controller;
+
+use app\model\system\Address as AddressModel;
+use app\storeapi\controller\BaseStoreApi;
+
+/**
+ * 地址控制器
+ */
+class Address extends BaseStoreApi
+{
+    /**
+     * 通过ajax得到运费模板的地区数据
+     */
+    public function areaList()
+    {
+        $address_model = new AddressModel();
+        $pid = $this->params['pid'] ?? 0;
+        $condition = [
+            'pid' => $pid
+        ];
+        $list = $address_model->getAreaList($condition, 'id, pid, name, level', 'id asc');
+        return $this->response($list);
+    }
+
+    /**
+     * 获取地理位置id
+     */
+    public function getGeographicId()
+    {
+        $address_model = new AddressModel();
+        $address = $this->params['address'] ?? ',,';
+        $address_array = explode(',', $address);
+        $province = $address_array[0];
+        $city = $address_array[1];
+        $district = $address_array[2];
+        $subdistrict = $address_array[3];
+        $province_list = $address_model->getAreaList(['name' => $province, 'level' => 1], 'id', '');
+        $province_id = !empty($province_list['data']) ? $province_list['data'][0]['id'] : 0;
+        $city_list = ($province_id > 0) && !empty($city) ? $address_model->getAreaList(['name' => $city, 'level' => 2, 'pid' => $province_id], 'id', '') : [];
+        $city_id = !empty($city_list['data']) ? $city_list['data'][0]['id'] : 0;
+        $district_list = !empty($district) && $city_id > 0 && $province_id > 0 ? $address_model->getAreaList(['name' => $district, 'level' => 3, 'pid' => $city_id], 'id', '') : [];
+        $district_id = !empty($district_list['data']) ? $district_list['data'][0]['id'] : 0;
+
+        $subdistrict_list = !empty($subdistrict) && $city_id > 0 && $province_id > 0 && $district_id > 0 ? $address_model->getAreaList(['name' => $subdistrict, 'level' => 4, 'pid' => $district_id], 'id', '') : [];
+        $subdistrict_id = !empty($subdistrict_list['data']) ? $subdistrict_list['data'][0]['id'] : 0;
+
+        $data = [];
+        $data['province_id'] = $province_id;
+        $data['city_id'] = $city_id;
+        $data['district_id'] = $district_id;
+        $data['subdistrict_id'] = $subdistrict_id;
+
+        return $this->response($this->success($data));
+    }
+
+    /**
+     * 转化省市区地址形式为实际的省市区id
+     */
+    public function tranAddressInfo()
+    {
+        $latlng = $this->params['latlng'] ?? '';
+
+        $address_model = new AddressModel();
+        $address_result = $address_model->getAddressByLatlng(['latlng' => $latlng]);
+        if ($address_result['code'] < 0)
+            return $this->response($address_result);
+
+        $address_data = $address_result['data'];
+        $province = $address_data['province'] ?? '';
+        $city = $address_data['city'] ?? '';
+        $district = $address_data['district'] ?? '';
+        $province_id = $address_model->getAreasInfo([['name', 'like', '%' . $province . '%'], ['level', '=', 1]], 'id')['data']['id'] ?? 0;
+
+        if ($province_id > 0)
+            $city_id = $address_model->getAreasInfo([['name', 'like', '%' . $city . '%'], ['level', '=', 2], ['pid', '=', $province_id]], 'id')['data']['id'] ?? 0;
+
+        if (isset($city_id) && $city_id > 0 && $province_id > 0)
+            $district_id = $address_model->getAreasInfo([['name', 'like', '%' . $district . '%'], ['level', '=', 3], ['pid', '=', $city_id]], 'id')['data']['id'] ?? 0;
+
+        $data = [
+            'province_id' => $province_id ?? 0,
+            'city_id' => $city_id ?? 0,
+            'district_id' => $district_id ?? 0,
+            'province' => $province,
+            'city' => $city,
+            'district' => $district,
+            'address' => $address_data['full_address'] ?? ''
+        ];
+
+        return $this->response($this->success($data));
+    }
+
+    public function getAddressByName()
+    {
+        $address = $this->params['address'] ?? '';
+
+        $address_model = new AddressModel();
+        $address_result = $address_model->getAddressByName($address);
+        if ($address_result['code'] < 0)
+            return $this->response($address_result);
+
+        return $this->response($address_result);
+    }
+}

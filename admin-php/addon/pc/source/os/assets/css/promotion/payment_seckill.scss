@@ -1,0 +1,347 @@
+.payment-wrap {
+  width: 1210px;
+  margin: 20px auto;
+}
+.clear {
+	clear: both;
+}
+.item-block {
+	padding: 0 15px 1px;
+	margin: 10px 0;
+	border-radius: 0;
+	border: none;
+	background: #ffffff;
+	.block-text {
+		border-color: #eeeeee;
+		color: $ns-text-color-black;
+		padding: 7px 0;
+		border-bottom: 1px;
+	}
+	.box{
+		.liuyan-text{
+			background-color: #F7F7F7;
+			border: 2px solid #DADADA;
+			height: 56px;
+			width: 80%;
+			padding: 10px;
+			box-sizing: border-box;
+			border-radius: 4px;
+			
+}
+	}
+}
+.padd-bom-10{
+	padding-bottom: 10px;
+}
+.padd-bom-20{
+	padding-bottom: 20px;
+}
+//收货地址
+.address-desc {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+}
+.address-item {
+	width: 23%;
+	border: 3px solid #eee;
+	box-sizing: border-box;
+	margin: 1%;
+	height: 150px;
+	cursor: pointer;
+	float: left;
+
+	.add-address {
+		padding: 10px;
+		text-align: center;
+		line-height: 120px;
+	}
+	.address-info {
+		padding: 10px;
+		height: 100%;
+		box-sizing: border-box;
+		position: relative;
+		.options {
+			position: absolute;
+			right: 0;
+			top: 10px;
+			width: 50%;
+			text-align: right;
+			div {
+				display: inline-block;
+				margin-right: 10px;
+				color: #999999;
+			}
+		}
+		.address-name {
+			color: $base-color;
+			padding: 0px 0 6px;
+			border-bottom: 1px solid #eee;
+			width: 100%;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+			padding-right: 71px;
+			box-sizing: border-box;
+			line-height: 25px;
+		}
+		.address-mobile {
+			padding: 10px 0 4px;
+		}
+	}
+}
+.address-item.active {
+	background-color: #fffbf9;
+	border-color: $base-color;
+}
+
+//支付方式
+.pay-type-list {
+	padding: 20px 0;
+}
+.distribution{
+	color: #ff547b;
+	margin-left: 10px;
+}
+.pay-type-item {
+	background-color: white;
+	display: inline-block;
+	border: 2px solid #eeeeee;
+	padding: 5px 20px;
+	margin-right: 20px;
+	cursor: pointer;
+}
+.pay-type-item.active {
+	border-color: $base-color;
+}
+.mobile-wrap {
+	width: 300px;
+}
+
+//商品列表
+.goods-list {
+	padding: 15px 0;
+
+	.store-icon {
+		margin-right: 5px;
+		font-size: 16px;
+	}
+
+	.shop-icon {
+		font-size: 18px;
+	}
+	table {
+		width: 100%;
+	}
+	.goods-info-left {
+		width: 60px;
+		height: 60px;
+		float: left;
+		.goods-img {
+			width: 60px;
+			height: 60px;
+		}
+	}
+	.goods-info-right {
+		float: left;
+		height: 60px;
+		margin-left: 10px;
+		color: $base-color;
+		width: 80%;
+		.goods-name {
+			line-height: 20px;
+			padding-top: 10px;
+			display: -webkit-box;
+			-webkit-box-orient: vertical;
+			-webkit-line-clamp: 2;
+			overflow: hidden;
+		}
+		.goods-spec {
+			color: #999;
+		}
+	}
+	.goods-footer {
+		background-color: #f3fbfe;
+		padding: 10px;
+		margin-top: 10px;
+		.goods-footer-right {
+			width: 50%;
+			float: left;
+		}
+		.goods-footer-left {
+			width: 50%;
+			float: left;
+		}
+		.order-cell {
+			cursor: pointer;
+			.tit {
+				padding: 5px 0 0 0;
+			}
+		}
+		.express-item {
+			margin-top: 5px;
+			display: inline-block;
+			border: 2px solid #eeeeee;
+			padding: 3px 10px;
+			margin-right: 20px;
+			cursor: pointer;
+		}
+		.express-item.active {
+			border-color: $base-color;
+		}
+	}
+}
+
+.promotion-show {
+	color: #999;
+}
+.align-right {
+	text-align: right;
+}
+
+//统计
+.order-statistics {
+	float: right;
+	padding: 10px;
+	// color: #999;
+}
+.order-submit {
+	float: right;
+	padding: 10px;
+}
+.order-money {
+	display: inline-block;
+	margin-right: 20px;
+	div {
+		display: inline-block;
+		font-size: $ns-font-size-lg;
+	}
+}
+
+.buyer-message.el-textarea {
+	width: 400px;
+}
+.address-open {
+	cursor: pointer;
+	font-size: 13px;
+	padding: 0 0 10px 10px;
+}
+.pay-password-item {
+	margin-bottom: 10px;
+}
+.pay-password {
+	width: 80%;
+}
+.pay-password.hide-password {
+	position: fixed;
+	top: -9999px;
+}
+.platform-coupon {
+	cursor: pointer;
+}
+
+.forget-password {
+	text-align: right;
+	margin-right: 45px;
+	cursor: pointer;
+}
+.disabled-selected-wrap {
+	pointer-events: none;
+	cursor: pointer;
+}
+
+.cursor-pointer {
+	cursor: pointer;
+}
+//发票样式
+.invoice-information {
+  .invoice-type-box {
+    display: inline-block;
+    padding: 10px 0px;
+    vertical-align: bottom;
+    height: 30px;
+    line-height: 30px;
+    &.invoice-title-box {
+      margin-right: 100px;
+    }
+    .invoice-name {
+      margin-right: 25px;
+    }
+    .invoice-to-type {
+      display: inline-block;
+      margin-right: 30px;
+      position: relative;
+      // i{
+      // 	width: 17px;
+      // 	height: 17px;
+      // 	display: inline-block;
+      // 	position: absolute;
+      // 	border-radius: 34px;
+      // 	overflow: hidden;
+      // 	top: 7px;
+      // 	left:-1px;
+      // 	background: #fff;
+      // 	background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABbUlEQVQ4jYXTsUvVURQH8I8PE1zKTdcEK7I/wNkkKpGgxNaGBqUQ3JT2xoQoaajmhhTEgoig1V0QdQiaCgTxJRK4PDlybtwe+vzCDw7n+/3ee+75ndPVmpzXhut4jDu4nNQPfMFbbNbyRhX34BW+YxdTuJTfw8wF9wa9xdRdmT/jD66g2VbVRn5LeI813MVRqWARB5g8xVyjmZq46EV5wjAe4BFaKR7CchqaGQ8l10pteIa7s2FLeWrgKtbRV918H6MYwXZqX4Y3KriN1Ur8vM1c0JdcwafwxgGD2KqIsQ49uFXFUclgo4P4PPSUvxBDcq0Sf+tg/FrFUfnPRk7YvYp4hv1TzPvJFYzHZXHAO8zgYhJb2e2VnI2DjEeqXoV2Nka77MJrDOSQlFk4C134iN94Upo4l6cGEbN/FoIrmvD8W6ajfNMv7GABN3Ahux1x5IKLpZpIz3/bGImnOXH9edMh9vAhczcxjb8nDhwDyjpTCJDO1nsAAAAASUVORK5CYII=);
+      // 	background-size: 100% 100%;
+      // }
+      i {
+        width: 14px;
+        height: 14px;
+        display: inline-block;
+        border-radius: 34px;
+        overflow: hidden;
+        background: #fff;
+        vertical-align: text-bottom;
+        border: 1px solid #999;
+        &.active {
+          width: 17px;
+          height: 17px;
+          overflow: hidden;
+          background: #fff;
+          background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAABbUlEQVQ4jYXTsUvVURQH8I8PE1zKTdcEK7I/wNkkKpGgxNaGBqUQ3JT2xoQoaajmhhTEgoig1V0QdQiaCgTxJRK4PDlybtwe+vzCDw7n+/3ee+75ndPVmpzXhut4jDu4nNQPfMFbbNbyRhX34BW+YxdTuJTfw8wF9wa9xdRdmT/jD66g2VbVRn5LeI813MVRqWARB5g8xVyjmZq46EV5wjAe4BFaKR7CchqaGQ8l10pteIa7s2FLeWrgKtbRV918H6MYwXZqX4Y3KriN1Ur8vM1c0JdcwafwxgGD2KqIsQ49uFXFUclgo4P4PPSUvxBDcq0Sf+tg/FrFUfnPRk7YvYp4hv1TzPvJFYzHZXHAO8zgYhJb2e2VnI2DjEeqXoV2Nka77MJrDOSQlFk4C134iN94Upo4l6cGEbN/FoIrmvD8W6ajfNMv7GABN3Ahux1x5IKLpZpIz3/bGImnOXH9edMh9vAhczcxjb8nDhwDyjpTCJDO1nsAAAAASUVORK5CYII=);
+          background-size: 100% 100%;
+          border: 0px solid #fff;
+        }
+      }
+      input {
+        vertical-align: middle;
+        margin: 0px;
+        width: 15px;
+        height: 15px;
+      }
+    }
+    .invoice-box-form {
+      display: inline-block;
+      input {
+        height: 28px;
+        line-height: 28px;
+        margin-right: 20px;
+        border: 1px solid #dddddd;
+        padding-left: 10px;
+        border-radius: 3px;
+        outline: none;
+      }
+    }
+  }
+  .invoice-condition {
+    padding: 10px 0px;
+    .invoice-name {
+      margin-right: 25px;
+    }
+    .invoice-box-form {
+      display: inline-block;
+      .option-item {
+        margin-right: 20px;
+        cursor: pointer;
+        &.active {
+          color: #ff547b;
+        }
+      }
+    }
+  }
+  .invoice-tops{
+    margin-bottom: 20px;
+  }
+}

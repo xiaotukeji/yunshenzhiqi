@@ -1,0 +1,106 @@
+<!-- 搜索框 -->
+<div class="single-filter-box">
+	<button class="layui-btn" onclick="add()">添加打印模板</button>
+</div>
+
+<table id="template_list" lay-filter="template_list"></table>
+
+<!-- 操作 -->
+<script type="text/html" id="operation">
+	<div class="table-btn">
+		<a class="layui-btn" lay-event="edit">编辑</a>
+		<a class="layui-btn" lay-event="del">删除</a>
+	</div>
+</script>
+
+<script>
+	layui.use(['form'], function() {
+		var table,
+			form = layui.form,
+			repeat_flag = false; //防重复标识
+		form.render();
+
+		table = new Table({
+			elem: '#template_list',
+			url: ns.url("printer://shop/template/lists"),
+			cols: [
+				[{
+			    	'field':'template_name',
+					title: '模板名称',
+					unresize: 'false'
+				}, {
+					title: '模板类型',
+					unresize: 'false',
+					templet: function(data) {
+						return data.type_name;
+					}
+				}, {
+                    title: '添加时间',
+                    unresize: 'false',
+                    templet: function(data) {
+                        return ns.time_to_date(data.create_time);
+                    }
+                }, {
+					title: '操作',
+					toolbar: '#operation',
+					unresize: 'false',
+					align:'right'
+				}]
+			]
+
+		});
+
+		/**
+		 * 监听工具栏操作
+		 */
+		table.tool(function(obj) {
+			var data = obj.data;
+			switch (obj.event) {
+				case 'edit': //编辑
+					location.hash = ns.hash("printer://shop/template/edit", {"template_id": data.template_id});
+					break;
+				case 'del': //删除
+                    deleteTemplate(data.template_id);
+					break;
+			}
+		});
+		
+		/**
+		 * 删除
+		 */
+		function deleteTemplate(template_id) {
+			layer.confirm('确定要删除该模板吗?', function(index) {
+				if (repeat_flag) return;
+				repeat_flag = true;
+				layer.close(index);
+
+				$.ajax({
+					url: ns.url("printer://shop/template/delete"),
+					data: {
+                        template_id: template_id
+					},
+					dataType: 'JSON',
+					type: 'POST',
+					success: function(res) {
+						layer.msg(res.message);
+						repeat_flag = false;
+						if (res.code == 0) {
+							table.reload({
+							    page: {
+							        curr: 1
+							    },
+							});
+						}
+					}
+				});
+			}, function() {
+				layer.close();
+				repeat_flag = false;
+			});
+		}
+	});
+
+	function add() {
+		location.hash = ns.hash("printer://shop/template/add");
+	}
+</script>

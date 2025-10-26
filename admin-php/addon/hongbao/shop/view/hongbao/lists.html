@@ -1,0 +1,280 @@
+<style>
+    .screen .layui-colla-content .goods-category-container .layui-input{width: 240px !important;}
+    .layui-layout-admin .layui-form-item .layui-input-inline{background-color: #fff;}
+    .layui-layout-admin .table-tab .layui-tab-title{margin-bottom: 15px;}
+</style>
+
+<!-- 按钮容器 -->
+<div class="single-filter-box">
+    <button class="layui-btn" onclick="add()">添加红包</button>
+</div>
+
+<!-- 筛选面板 -->
+<div class="screen layui-collapse" lay-filter="selection_panel">
+    <div class="layui-colla-item">
+        <form class="layui-colla-content layui-form layui-show">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">活动名称：</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="name" placeholder="请输入活动名称" autocomplete="off" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">活动时间：</label>
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" name="start_time" placeholder="开始时间" id="start_time" readonly>
+                        <i class="iconrili iconfont calendar"></i>
+                    </div>
+                    <div class="layui-form-mid">-</div>
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" name="end_time" placeholder="结束时间" id="end_time" readonly>
+                        <i class="iconrili iconfont calendar"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <button class="layui-btn" lay-submit lay-filter="search">筛选</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="layui-tab table-tab" lay-filter="hongbao_tab">
+    <ul class="layui-tab-title">
+        <li class="layui-this" lay-id="">全部</li>
+        {foreach $hongbao_status as $k=>$v}
+        <li data-status="{$k}">{$v}</li>
+        {/foreach}
+    </ul>
+    <div class="layui-tab-content">
+        <!-- 列表 -->
+        <table id="hongbao_list" lay-filter="hongbao_list"></table>
+    </div>
+</div>
+
+<!-- 时间 -->
+<script id="time" type="text/html">
+    <div class="layui-elip">开始：{{ns.time_to_date(d.start_time)}}</div>
+    <div class="layui-elip">结束：{{ns.time_to_date(d.end_time)}}</div>
+</script>
+
+<!-- 推广 -->
+{include file="app/shop/view/component/promote_show.html"}
+
+<!-- 操作 -->
+<script type="text/html" id="operation">
+    <div class="operation-wrap" data-hongbao-id="{{d.hongbao_id}}">
+        <div class="popup-qrcode-wrap" style="display: none"><img class="popup-qrcode-loadimg" src="__STATIC__/loading/loading.gif"/></div>
+        <div class="table-btn">
+            <a class="layui-btn" lay-event="detail">详情</a>
+            <!-- 进行中 -->
+            {{# if(d.status == 1){ }}
+            <a class="layui-btn" lay-event="operate">运营</a>
+            <a class="layui-btn text-color" lay-event="select">推广</a>
+            <a class="layui-btn" lay-event="edit">编辑</a>
+            <a class="layui-btn" lay-event="close">关闭</a>
+            {{# } }}
+            <!-- 已结束 -->
+            {{# if(d.status == 2){ }}
+            <a class="layui-btn" lay-event="operate">运营</a>
+            <a class="layui-btn" lay-event="del">删除</a>
+            {{# } }}
+            <!-- 未开始 -->
+            {{# if(d.status == 0){ }}
+            <a class="layui-btn" lay-event="edit">编辑</a>
+            <a class="layui-btn" lay-event="del">删除</a>
+            {{# } }}
+            <!-- 已关闭 -->
+            {{# if(d.status == -1){ }}
+            <a class="layui-btn" lay-event="operate">运营</a>
+            <a class="layui-btn" lay-event="del">删除</a>
+            {{# } }}
+        </div>
+    </div>
+</script>
+
+<script>
+    var laytpl;
+    layui.use(['form', 'laytpl', 'laydate', 'element'], function () {
+        var table,
+            form = layui.form,
+            element = layui.element,
+            laydate = layui.laydate,
+            validityType = 0,
+            repeat_flag = false; //防重复标识
+
+        laytpl = layui.laytpl,
+            form.render();
+
+        element.on('tab(hongbao_tab)', function () {
+            table.reload({
+                page: {curr: 1},
+                where: {
+                    'status': this.getAttribute('data-status')
+                }
+            })
+        });
+
+        table = new Table({
+            elem: '#hongbao_list',
+            url: ns.url("hongbao://shop/hongbao/lists"),
+            cols: [
+                [{
+                    field: 'name',
+                    title: '活动名称',
+                    unresize: 'false',
+                    width: '13%'
+                },  {
+                    title: '<span style="padding-right: 15px;">红包名称</span>',
+                    unresize: 'false',
+                    width: '15%',
+                    align: 'left',
+                    templet: function (data) {
+                        return '<span style="padding-right: 15px;"> '+ data.divide_num +' 名好友,瓜分 ￥' + data.money + '元</span>';
+                    }
+                }, {
+                    field: 'success_count',
+                    title: '成团数',
+                    unresize: 'false',
+                    width: '6%',
+                }, {
+                    title: '剩余库存',
+                    unresize: 'false',
+                    width: '12%',
+                    templet: function (data) {
+                        return data.inventory;
+                    }
+                }, {
+                    title: '活动时间',
+                    unresize: 'false',
+                    width: '15%',
+                    templet: '#time'
+                }, {
+                    field: 'status_name',
+                    title: '状态',
+                    unresize: 'false',
+                    width: '8%'
+                }, {
+                    title: '操作',
+                    toolbar: '#operation',
+                    unresize: 'false',
+					align:'right'
+                }]
+            ],
+        });
+
+        /**
+         * 监听工具栏操作
+         */
+        table.tool(function (obj) {
+            var data = obj.data;
+            switch (obj.event) {
+                case 'edit': //编辑
+                    location.hash = ns.hash("hongbao://shop/hongbao/edit", {"hongbao_id": data.hongbao_id});
+                    break;
+                case 'detail': //详情
+                    location.hash = ns.hash("hongbao://shop/hongbao/detail", {"hongbao_id": data.hongbao_id});
+                    break;
+                case 'del': //删除
+                    layer.confirm('确定要删除该裂变红包吗?', function (index) {
+                        if (repeat_flag) return false;
+                        repeat_flag = true;
+						layer.close(index);
+
+                        $.ajax({
+                            url: ns.url("hongbao://shop/hongbao/delete"),
+                            data: data,
+                            dataType: 'JSON',
+                            type: 'POST',
+                            success: function (res) {
+                                layer.msg(res.message);
+                                repeat_flag = false;
+
+                                if (res.code == 0) {
+                                    table.reload({
+                                        page: {
+                                            curr: 1
+                                        },
+                                    });
+                                }
+                            }
+                        });
+                    }, function () {
+                        layer.close();
+                        repeat_flag = false;
+                    });
+                    break;
+                case 'close': //关闭
+                    layer.confirm('确定要关闭吗?', function (index) {
+                        if (repeat_flag) return false;
+                        repeat_flag = true;
+						layer.close(index);
+                        $.ajax({
+                            url: ns.url("hongbao://shop/hongbao/close", {"hongbao_id": data.hongbao_id}),
+                            data: data,
+                            dataType: 'JSON',
+                            type: 'POST',
+                            success: function (res) {
+                                layer.msg(res.message);
+                                repeat_flag = false;
+
+                                if (res.code == 0) {
+                                    table.reload();
+                                }
+                            }
+                        });
+                    }, function () {
+                        layer.close();
+                        repeat_flag = false;
+                    });
+                    break;
+                case 'select': //推广
+                    spreadHongbao(data);
+                    break;
+                case 'operate': //运营
+                    location.hash = ns.hash("hongbao://shop/hongbao/operate", {"hongbao_id": data.hongbao_id});
+                    break;
+            }
+        });
+
+        //开始时间
+        laydate.render({
+            elem: '#start_time', //指定元素
+            type: 'datetime'
+        });
+        //结束时间
+        laydate.render({
+            elem: '#end_time', //指定元素
+            type: 'datetime'
+        });
+
+        // 搜索
+        form.on('submit(search)', function (data) {
+            if (validityType == 2) {
+                data.field.validity_start_time = $("#start_day").val();
+                data.field.validity_end_time = $("#end_day").val();
+            }
+            table.reload({
+                page: {
+                    curr: 1
+                },
+                where: data.field
+            });
+            return false;
+        });
+
+        function spreadHongbao(data){
+            new PromoteShow({
+                url:ns.url("hongbao://shop/hongbao/spreadHongbao"),
+                param:{hongbao_id:data.hongbao_id},
+            })
+        }
+    });
+
+    function add() {
+        location.hash = ns.hash("hongbao://shop/hongbao/add");
+    }
+</script>

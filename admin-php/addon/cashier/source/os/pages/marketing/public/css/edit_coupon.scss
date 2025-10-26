@@ -1,0 +1,199 @@
+.coupons-form {
+	position: relative;
+	.common-wrap.fixd {
+		padding: 30rpx;
+		height: calc(100vh - 0.4rem);
+		overflow-y: auto;
+		box-sizing: border-box;
+
+		.form-label {
+			width: 1.7rem !important;
+		}
+
+		.form-input-inline /deep/ .uni-select {
+			border: none;
+		}
+
+		.common-btn-wrap {
+			position: absolute;
+			left: 0;
+			bottom: 0;
+			right: 0;
+			padding: 0.24rem 0.2rem;
+		}
+
+		.form-word-aux-line {
+			margin-left: 1.7rem !important;
+			.gooods_select{
+				margin: 0;
+			}
+			.goods_names{
+				margin-left: 0.15rem;
+			}
+		}
+	}
+
+	.upload-box {
+		border: 0.01rem dashed #e6e6e6 !important;
+		width: 2.5rem !important;
+		height: 1.2rem !important;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+
+		.upload {
+			text-align: center;
+			color: #5a5a5a;
+
+			.iconfont {
+				font-size: 0.3rem;
+			}
+
+			image {
+				max-width: 100%;
+				height: 1.2rem !important;
+			}
+		}
+	}
+
+	.coupons-img {
+		align-items: flex-start !important;
+	}
+
+	.map-box {
+		width: 6.5rem;
+		height: 5rem;
+		position: relative;
+
+		.map-icon {
+			position: absolute;
+			top: calc(50% - 0.36rem);
+			left: calc(50% - 0.18rem);
+			width: 0.36rem;
+			height: 0.36rem;
+			z-index: 100;
+		}
+	}
+
+	.form-input {
+		font-size: 0.16rem;
+	}
+
+	.form-input-inline.btn {
+		height: 0.37rem;
+		line-height: 0.35rem;
+		box-sizing: border-box;
+		border: 0.01rem solid #e6e6e6;
+		text-align: center;
+		cursor: pointer;
+	}
+
+	.common-title {
+		font-size: 0.18rem;
+		margin-bottom: 0.2rem;
+	}
+	/deep/ .uni-select-lay-select{
+		height: 0.37rem;
+		width: 2.52rem;
+		margin: 0;
+	}
+	.radio-list{
+		width: 7rem !important;
+	}
+	.radio-item{
+		margin-right: 0.1rem;
+	}
+	/deep/ .uni-date-x{
+		height: 0.37rem;
+		
+	}
+	.top{
+		margin-top: 0.1rem;
+		
+	}
+	.w-250{
+		width: 2.5rem;
+	}
+	.form-input-inline{
+		width: 2.5rem;
+	}
+	.required{
+		color: red;
+	}
+	.table-wrap {
+		position: relative;
+		border: 1rpx solid #ccc;
+		color: #333;
+		.table-head {
+			background-color: #f7f7f7;
+		}
+
+		.table-body {
+			.table-tr {
+				&:last-of-type .table-td {
+					border-bottom: 0;
+				}
+			}
+		}
+
+		.table-tr {
+			display: flex;
+		}
+
+		.table-th,
+		.table-td {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 0.07rem 0.3rem;
+			border-bottom: 0.01rem solid #ccc;
+			border-right: 0.01rem solid #ccc;
+			text-align: center;
+
+			&:last-of-type {
+				border-right: 0;
+				justify-content: flex-end;
+			}
+
+			&.goods-name {
+				-webkit-box-pack: start;
+				-ms-flex-pack: start;
+				-webkit-justify-content: flex-start;
+				justify-content: flex-start;
+			}
+		}
+
+		.delete {
+			margin: 0;
+			font-size: $uni-font-size-base;
+			background-color: $primary-color;
+			color: #fff;
+			line-height: 0.32rem;
+			height: 0.32rem;
+			&::after{
+				border-width: 0;
+			}
+
+		}
+
+		.table-empty {
+			justify-content: center;
+			padding: 0.3rem;
+			color: #999;
+		}
+	}
+	.gooods_select{
+		background-color: $primary-color;
+		color: #fff;
+		display: inline-block;
+		padding: 0 0.2rem;
+		height: 0.36rem;
+		line-height: .36rem;
+		font-size: 0.14rem;
+		border-radius: 3px;
+		margin-top: 0.1rem;
+		&::after{
+			border-width: 0;
+		}
+	}
+}

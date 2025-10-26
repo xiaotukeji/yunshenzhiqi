@@ -1,0 +1,128 @@
+<link rel="stylesheet" href="STATIC_CSS/promotion_detail.css">
+<div class="layui-card card-common card-brief">
+    <div class="layui-card-header">
+        <span class="card-title">结算信息</span>
+    </div>
+    <div class="layui-card-body">
+        <div class="promotion-view">
+            <div class="promotion-view-item">
+                <label>结算编号：</label>
+                <span>{$withdraw_info.withdraw_no}</span>
+            </div>
+            <div class="promotion-view-item">
+                <label>结算状态：</label>
+                <span>{$withdraw_info.status_name}</span>
+            </div>
+            {if $withdraw_info['status'] == -1 || $withdraw_info['status'] == -2}
+            <div class="promotion-view-item">
+                <label>拒绝理由：</label>
+                <span>{$withdraw_info.refuse_reason}</span>
+            </div>
+            {/if}
+            <div class="promotion-view-item">
+                <label>结算金额：</label>
+                <span>{$withdraw_info.money}</span>
+            </div>
+            <div class="promotion-view-item">
+                <label>转账方式：</label>
+                <span>{$withdraw_info.transfer_type_name}</span>
+            </div>
+
+            <div class="promotion-view-item">
+                <label>结算类型：</label>
+                <span>{$withdraw_info.settlement_type_name}</span>
+            </div>
+            <div class="promotion-view-item">
+                <label>结算申请时间：</label>
+                <span>{:time_to_date($withdraw_info.apply_time)}</span>
+            </div>
+            {if $withdraw_info.transfer_type == "bank"}
+                <div class="promotion-view-item">
+                    <label>银行名称：</label>
+                    <span>{$withdraw_info['bank_name']}</span>
+                </div>
+            {/if}
+            <div class="promotion-view-item">
+                <label>结算收款账号：</label>
+                <span>{$withdraw_info.account_number}</span>
+            </div>
+            <div class="promotion-view-item">
+                <label>结算方式：</label>
+                <span>{$withdraw_info.transfer_type_name}</span>
+            </div>
+
+            <div class="promotion-view-item">
+                <label>真实姓名：</label>
+                <span>{$withdraw_info.realname}</span>
+            </div>
+        </div>
+
+        <div class="promotion-view">
+            {if !empty($withdraw_info['voucher_img'])}
+            <div class="promotion-view-item-line">
+                <label class="promotion-view-item-custom-label">转账凭证：</label>
+                <div class="promotion-view-item-custom-box img-upload">
+                    <div class="upload-img-block icon">
+                        <div class="upload-img-box">
+                            {if condition="$withdraw_info.voucher_img"}
+                            <img layer-src  src="{:img($withdraw_info.voucher_img)}" >
+                            {else/}
+                            <img layer-src src="__STATIC__/img/shape.png" />
+                            {/if}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {/if}
+            {if !empty($withdraw_info.voucher_desc)}
+            <div class="promotion-view-item-line">
+                <label class="promotion-view-item-custom-label">凭证说明：</label>
+                <div class="promotion-view-item-custom-box">{$withdraw_info.voucher_desc}</div>
+            </div>
+            {/if}
+        </div>
+
+    </div>
+
+</div>
+
+{if $withdraw_info.settlement_type != 'apply'}
+<div class="layui-card card-common card-brief">
+    <div class="layui-card-header">
+        <span class="card-title">周期结算</span>
+    </div>
+    <div class="layui-card-body">
+        <div class="promotion-view">
+            <div class="promotion-view-item">
+                <label>周期结算编号：</label>
+                <span>{$withdraw_info.settlement_info.settlement_no}</span>
+            </div>
+            <div class="promotion-view-item">
+                <label>周期开始时间：</label>
+                <span>{:time_to_date($withdraw_info.settlement_info.start_time)}</span>
+            </div>
+            <div class="promotion-view-item">
+                <label>周期结束时间：</label>
+                <span>{:time_to_date($withdraw_info.settlement_info.end_time)}</span>
+            </div>
+            <div class="promotion-view-item">
+                <label>结算订单总额：</label>
+                <span>{$withdraw_info.settlement_info.order_money}</span>
+            </div>
+
+            <div class="promotion-view-item">
+                <label>结算总分销佣金：</label>
+                <span>{$withdraw_info.settlement_info.commission}</span>
+            </div>
+        </div>
+    </div>
+</div>
+{/if}
+<div class="form-row sm">
+	<button class="layui-btn layui-btn-primary" onclick="backStockWithdrawList()">返回</button>
+</div>
+<script>
+	function backStockWithdrawList() {
+        location.hash = ns.hash("store://shop/withdraw/lists");
+	}
+</script>

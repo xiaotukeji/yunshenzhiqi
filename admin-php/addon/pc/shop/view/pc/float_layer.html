@@ -1,0 +1,138 @@
+<div class="layui-form form-wrap">
+	<div class="layui-form-item">
+		<label class="layui-form-label"><span class="required">*</span>浮窗名称：</label>
+		<div class="layui-input-block">
+			<input name="title" type="text" lay-verify="required" class="layui-input len-mid" {if $float_layer} value="{$float_layer.title}" {/if}>
+		</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label">链接地址：</label>
+		<div class="layui-input-block len-mid">
+			<select name="link" lay-filter="link">
+				<option value="">请选择</option>
+				{foreach $link as $k => $v}
+				<option value="{$v.url}" {if $float_layer && $float_layer.url && json_decode($float_layer.url,true)['title'] == $v.title}selected{/if}>{$v.title}</option>
+				{/foreach}
+				<option value="diy" {if $float_layer && $float_layer.url && json_decode($float_layer.url,true)['title'] == '自定义'}selected{/if}>自定义</option>
+			</select>
+			<input name="url" type="hidden" {if $float_layer} value="{$float_layer.url}" {/if}>
+		</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label">是否显示：</label>
+		<div class="layui-input-block">
+			<input type="checkbox" name="is_show" value="1" lay-skin="switch" {if condition="$float_layer && $float_layer.is_show == 1"} checked {/if} />
+		</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label"><span class="required">*</span>显示次数：</label>
+		<div class="layui-input-block">
+			<input name="number" type="text" lay-verify="required" class="layui-input len-short" {if $float_layer} value="{$float_layer.number}" {/if}>
+		</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label">浮窗图片：</label>
+		<div class="layui-input-block">
+			<div class="upload-img-block img-upload">
+				<div class="upload-img-box {notempty name="$float_layer['img_url']"}hover{/notempty}">
+					<div class="upload-default" id="imgUpload">
+						{if condition="$float_layer.img_url"}
+						<div id="preview_imgUpload" class="preview_img">
+							<img layer-src src="{:img($float_layer.img_url)}" class="img_prev"/>
+						</div>
+						{else/}
+						<div class="upload">
+							<i class="iconfont iconshangchuan"></i>
+							<p>点击上传</p>
+						</div>
+						{/if}
+					</div>
+					<div class="operation">
+						<div>
+							<i title="图片预览" class="iconfont iconreview js-preview" style="margin-right: 20px;"></i>
+							<i title="删除图片" class="layui-icon layui-icon-delete js-delete"></i>
+						</div>
+						
+						<div class="replace_img js-replace">点击替换</div>
+					</div>
+					<input type="hidden" name="img_url" value="{$float_layer.img_url}">
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="form-row">
+		<button class="layui-btn" lay-submit lay-filter="save">保存</button>
+	</div>
+
+</div>
+
+<script>
+	layui.use(['form'], function() {
+		var form = layui.form,
+			repeat_flag=false;
+		form.render();
+
+		form.on('select(link)', function(data){
+			var title = $(data.elem).find("option:selected").text();
+			if(data.value != 'diy'){
+				$("input[name='url']").val(JSON.stringify({
+					title : title,
+					url:data.value
+				}));
+			}else{
+				var value = $("input[name='url']").val();
+				if(value) value = JSON.parse(value).url;
+				layer.prompt({
+					formType: 2,
+					value :value,
+					title: '自定义链接地址',
+					area: ['450px', '100px'],
+					cancel : function () {
+						$("input[name='url']").val("");
+					}
+				}, function(value, index, elem){
+					$("input[name='url']").val(JSON.stringify({
+						title : title,
+						url:value
+					}));
+					layer.close(index);
+				});
+			}
+		});
+
+		// 普通图片上传
+		var logo_upload = new Upload({
+			elem: '#imgUpload'
+		});
+
+		form.on('submit(save)', function(data) {
+			if(!data.field.url){
+				layer.msg("请输入链接地址");
+				return;
+			}
+			if(!data.field.img_url){
+				layer.msg("请上传浮层图片");
+				return;
+			}
+
+			if (repeat_flag) return;
+			repeat_flag = true;
+
+			$.ajax({
+				url: ns.url("pc://shop/pc/floatLayer"),
+				data: data.field,
+				dataType: 'JSON',
+				type: 'POST',
+				success: function(res) {
+					repeat_flag = false;
+					layer.msg(res.message);
+				}
+			});
+		});
+	});
+</script>

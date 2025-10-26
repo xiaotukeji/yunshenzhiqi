@@ -1,0 +1,52 @@
+.stock-body tr:first-child:hover td {
+	background-color: #FFF;
+}
+
+.stock-body, .stock-body tr, .stock-body tr td {
+	background-color: #FFF;
+}
+
+.stock-view {
+	padding: 20px;
+}
+
+.stock-search-block {
+	position: relative;
+}
+
+.action-btn {
+	cursor: pointer;
+}
+
+.empty-data {
+	text-align: center;
+	padding: 30px !important;
+	color: rgba(0, 0, 0, .25);
+}
+
+.total-data {
+	padding: 15px !important;
+	background: #fafafa;
+	color: #333;
+}
+
+.goods-money {
+	color: #ff4d4f;
+}
+
+.store-view {
+	margin-top: 10px;
+}
+
+.store-view .layui-form-label {
+	width: 97px;
+	text-align: center;
+}
+
+.store-view .layui-input-block {
+	margin-left: 97px;
+}
+
+.tips {
+	margin-bottom: 20px;
+}

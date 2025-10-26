@@ -1,0 +1,96 @@
+<div class="layui-form form-wrap">
+	
+	<div class="layui-form-item">
+		<label class="layui-form-label">分销概念：</label>
+		<div class="layui-input-block">
+			<input type="text" name="concept" lay-verify="required" {if condition="isset($config_info.concept)"} value='{$config_info.concept}' {/if} autocomplete="off" class="layui-input len-mid">
+		</div>
+		<div class="word-aux">
+			<p>更改分销概念的名称,在我的分销中心以及申请成为分销商页面，会用新的分销概念名称替换分销概念</p>
+		</div>
+	</div>
+	
+	<div class="layui-form-item">
+		<label class="layui-form-label">分销商名称：</label>
+		<div class="layui-input-block">
+			<input type="text" name="fenxiao_name" lay-verify="required" {if condition="isset($config_info.fenxiao_name)"} value='{$config_info.fenxiao_name}' {/if} autocomplete="off" class="layui-input len-mid">
+		</div>
+		<div class="word-aux">
+			<p>更改分销商的名称,在我的分销中心以及申请成为分销商页面，会用新的分销商名称替换分销商名称</p>
+		</div>
+	</div>
+	
+	<div class="layui-form-item">
+		<label class="layui-form-label">提现：</label>
+		<div class="layui-input-block">
+			<input type="text"  name="withdraw" lay-verify="required" {if condition="isset($config_info.withdraw)"} value='{$config_info.withdraw}' {/if} autocomplete="off" class="layui-input len-mid">
+		</div>
+		<div class="word-aux">
+			<p>更改提现名称,在我的分销中心以及申请成为分销商页面，会用新的提现名称替换提现</p>
+		</div>
+	</div>
+	
+	<div class="layui-form-item">
+		<label class="layui-form-label">佣金：</label>
+		<div class="layui-input-block">
+			<input type="text"  name="account" lay-verify="required" {if condition="isset($config_info.account)"} value='{$config_info.account}' {/if} autocomplete="off" class="layui-input len-mid">
+		</div>
+		<div class="word-aux">
+			<p>更改佣金名称,在我的分销中心以及申请成为分销商页面，会用新的分佣金名称替换佣金</p>
+		</div>
+	</div>
+	
+	<div class="layui-form-item">
+		<label class="layui-form-label">我的团队：</label>
+		<div class="layui-input-block">
+			<input type="text"  name="my_team" lay-verify="required" {if condition="isset($config_info.my_team)"} value='{$config_info.my_team}' {/if} autocomplete="off" class="layui-input len-mid">
+		</div>
+		<div class="word-aux">
+			<p>更改我的团队名称,在我的分销中心以及申请成为分销商页面，会用新的我的团队名称替换我的团队</p>
+		</div>
+	</div>
+	
+	<div class="layui-form-item">
+		<label class="layui-form-label">下线：</label>
+		<div class="layui-input-block">
+			<input type="text"  name="child" lay-verify="required" {if condition="isset($config_info.child)"} value='{$config_info.child}' {/if} autocomplete="off" class="layui-input len-mid">
+		</div>
+		<div class="word-aux">
+			<p>更改下线名称,在我的分销中心以及申请成为分销商页面，会用新的下线名称替换下线</p>
+		</div>
+	</div>
+	
+	<div class="form-row">
+		<button class="layui-btn" lay-submit lay-filter="save">保存</button>
+	</div>
+
+</div>
+
+<script>
+	layui.use(['form'], function() {
+		var form = layui.form,
+			repeat_flag = false;
+		form.render();
+		
+		/**
+		 * 表单提交
+		 */
+		form.on('submit(save)', function(data){
+			
+			if(repeat_flag) return;
+			repeat_flag = true;
+			
+			$.ajax({
+				type: 'POST',
+				dataType: 'JSON',
+				url: ns.url("fenxiao://shop/config/words"),
+				data: data.field,
+				async: false,
+				success: function(res){
+					repeat_flag = false;
+					layer.msg(res.message);
+				}
+			})
+		});
+	});
+</script>

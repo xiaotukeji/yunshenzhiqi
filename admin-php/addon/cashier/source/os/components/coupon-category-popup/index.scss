@@ -1,0 +1,42 @@
+.coupon-category-pop{
+	width: 7rem;
+	background-color: #fff;
+	border-radius: 0.06rem;
+	.header{
+		padding: 0.15rem 0.2rem;
+		font-size: 0.14rem;
+		border-bottom: 0.01rem solid #e6e6e6;
+		
+	}
+	.body{
+		padding: 0.2rem 0.3rem;
+		padding-bottom: 0.15rem;
+		box-sizing: border-box;
+		height: 4rem;
+		.tree{
+			height: 100%;
+		}
+	}
+	.footer{
+		padding: 0 0.3rem;
+		padding-bottom: 0.15rem;
+		 .btn {
+			margin: 0;
+		    display: inline-block;
+		    padding: 0 0.2rem;
+		    height: 0.36rem;
+		    line-height: .36rem;
+		    font-size: 0.14rem;
+		    border-radius: 3px;
+			
+			&.confirm{
+				background-color: var(--primary-color);
+				color: #fff;
+				margin-right: 0.15rem;
+				&::after{
+					border-width: 0;
+				}
+			}
+		}
+	}
+}

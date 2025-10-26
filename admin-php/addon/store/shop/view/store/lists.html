@@ -1,0 +1,249 @@
+<link rel="stylesheet" type="text/css" href="SHOP_CSS/store_lists.css" />
+<style>
+	.store-info{display: flex;align-items: center;}
+	.store-info img{margin-right: 10px;width: 40px;}
+	.store-info .store-tab-wrap{display: flex;flex-wrap: wrap;}
+	.store-info .store-content p{line-height: 1;margin-bottom: 5px;}
+	.store-info .store-tab-wrap span{font-size: 12px;border: 1px solid;border-radius: 2px;padding: 3px 4px;line-height: 1;margin-right: 5px;margin-top: 5px;}
+	.relation-info{display: flex;flex-direction: column;}
+	.relation-info p{white-space: break-spaces;line-height: 1.5;}
+	.single-filter-box{
+		padding: 0;
+	}
+</style>
+
+<!-- 搜索框 -->
+<div class="single-filter-box">
+	<button class="layui-btn" onclick="add()">添加{$title}</button>
+
+	<div class="layui-form">
+		<div class="layui-input-inline">
+			<input type="text" name="keyword" placeholder="请输入{$title}名称" autocomplete="off" class="layui-input">
+			<button type="button" class="layui-btn layui-btn-primary" lay-filter="search" lay-submit>
+				<i class="layui-icon">&#xe615;</i>
+			</button>
+		</div>
+	</div>
+</div>
+
+<div class="layui-tab table-tab"  lay-filter="store_tab">
+	<ul class="layui-tab-title">
+		<li class="layui-this" lay-id="" lay-typer="">全部{$title}</li>
+		<li lay-id="1" lay-type="1">营业中</li>
+		<li lay-id="0" lay-type="1">休息中</li>
+		<li lay-id="1" lay-type="2">已停业</li>
+	</ul>
+	<table id="store_list" lay-filter="store_list"></table>
+</div>
+
+<!-- 门店信息 -->
+<script type="text/html" id="store_info">
+	<div class="store-info">
+		{{# if(d.store_image){ }}
+		<img src="{{ns.img(d.store_image)}}" alt="" onerror="this.src = ns.img('{$default_img.store}')">
+		{{# }else{ }}
+		<img src="{{ns.img('{$default_img.store}')}}">
+		{{# } }}
+		<div class="store-content">
+			<p>{{d.store_name}}</p>
+			<div class="store-tab-wrap">
+				{{# if(d.is_default == 1){ }}
+				<span class="border-color text-color">总店</span>
+				{{# } }}
+				{{# if(d.is_pickup == 1){ }}
+				<span class="border-color text-color">门店自提</span>
+				{{# } }}
+				{{# if(d.is_o2o == 1){ }}
+				<span class="border-color text-color">同城配送</span>
+				{{# } }}
+				{{# if(d.is_express == 1){ }}
+				<span class="border-color text-color">物流配送</span>
+				{{# } }}
+			</div>
+		</div>
+	</div>
+</script>
+
+<!-- 联系信息 -->
+<script type="text/html" id="relation_info">
+	<div class="relation-info">
+		<p>联系方式：{{d.telphone || '--'}}</p>
+		<p>地址：{{d.full_address + ' ' + d.address}}</p>
+	</div>
+</script>
+
+<!-- 订单信息 -->
+<script type="text/html" id="order_info">
+	<div class="relation-info">
+		<p>订单金额：￥{{d.order_money}}</p>
+		<p>订单数量：{{d.order_num}}</p>
+	</div>
+</script>
+
+<!-- 门店信息 -->
+<script type="text/html" id="settlement_info">
+	<div class="relation-info">
+		{{# if(!d.is_settlement){ }}
+			<p>无需结算</p>
+		{{# }else{ }}
+			<p>抽成总额：￥{{(parseFloat(d.account) + parseFloat(d.account_withdraw) + parseFloat(d.account_apply)).toFixed(2)}}</p>
+			<p>待结算：￥{{parseFloat(d.account).toFixed(2)}}</p>
+			<p>结算中：￥{{parseFloat(d.account_apply).toFixed(2)}}</p>
+			<p>已结算：￥{{parseFloat(d.account_withdraw).toFixed(2)}}</p>
+		{{# } }}
+	</div>
+</script>
+
+<!-- 操作 -->
+<script type="text/html" id="operation">
+	<div class="table-btn">
+		<a class="layui-btn" lay-event="editStore">门店设置</a>
+		{{# if(d.is_default != 1){ }}
+			{{# if(d.is_frozen) { }}
+			<a class="layui-btn" lay-event="closeStore">开启</a>
+			{{# } else{ }}
+			<a class="layui-btn" lay-event="closeStore">停业</a>
+			{{# } }}
+		{{# } }}
+		<a class="layui-btn" lay-event="joinStore">进入门店</a>
+	</div>
+</script>
+
+<script>
+var table,form,element;
+	layui.use(['form','element'], function() {
+		form = layui.form;
+		element = layui.element;
+		form.render();
+		refreshTable();
+
+		// 搜索功能
+		form.on('submit(search)', function(data) {
+			refreshTable();
+		});
+
+		element.on('tab(store_tab)', function(){
+			refreshTable();
+		});
+		
+		// 监听工具栏操作
+		table.tool(function (obj) {
+			var data = obj.data;
+			switch (obj.event) {
+				case 'editStore':
+					editStore(data.store_id);
+					break;
+				case 'closeStore':
+					closeStore(data.store_id,data.is_frozen);
+					break;
+				case 'joinStore':
+					joinStore(data.store_id);
+					break;
+			}
+		});
+	});
+
+// 刷新表格列表
+function refreshTable(){
+	table = new Table({
+		id: 'store_list',
+		elem: '#store_list',
+		url: ns.url("store://shop/store/lists"),
+		cols: [
+			[ {
+				title: '门店信息',
+				unresize: 'false',
+				width: '23%',
+				templet: '#store_info'
+			}, {
+				title: '联系信息',
+				unresize: 'false',
+				width: '17%',
+				templet: '#relation_info'
+			}, {
+				title: '结算比率',
+				unresize: 'false',
+				width: '10%',
+				templet: function(data) {
+					let html = '';
+					if(data.is_settlement == 1){
+						html += "<p>"+ (data.settlement_rate == 0 ? '跟随系统' : (data.settlement_rate + '%')) +"</p>";
+					}
+					return html;
+				}
+			}, {
+				title: '门店结算',
+				unresize: 'false',
+				width: '16%',
+				templet: "#settlement_info"
+			}, {
+				title: '库存管理方式',
+				unresize: 'false',
+				width: '12%',
+				templet: function(data) {
+					let stockType = data.stock_type == 'all' ? '总部统一库存' : '门店独立库存';
+					return stockType;
+				}
+			},{
+				unresize:'false',
+				title: '门店状态',
+				width: '8%',
+				align: 'center',
+				templet: function(data){
+					let state = '--';
+					if(data.is_frozen == 1){
+						state = '<span style="color:red;">停业</span>';
+					}else{
+						state = data.status == 0 ? '<span style="color:#09bb07;">休息</span>' : '<span style="color:#105CFB;">正常</span>';
+					}
+					return state;
+				}
+			},{
+				title: '操作',
+				toolbar: '#operation',
+				unresize: 'false',
+				align: 'right',
+			}]
+		],
+		where: {
+			search_text: $("input[name='keyword']").val(),
+			status: $(".layui-tab.table-tab .layui-tab-title .layui-this").attr('lay-id'),
+			type: $(".layui-tab.table-tab .layui-tab-title .layui-this").attr('lay-type')
+		}
+	});
+}
+
+function joinStore(storeId) {
+	window.open(ns.href("cashier://shop/index/cashier", {store_id: storeId}))
+}
+
+function add() {
+	location.hash = ns.hash("store://shop/store/addStore");
+}
+
+function editStore(data) {
+	location.hash = ns.hash("store://shop/store/editStore",{"store_id":data});
+}
+
+function closeStore(store_id, is_frozen){
+	var msg = '{$title}已开始运营，确认要关闭吗?';
+	if(is_frozen == 1) {
+		msg = '确定要开启该{$title}吗？';
+	}
+	layer.confirm(msg, function(index) {
+		layer.close(index);
+		$.ajax({
+			url: ns.url("store://shop/store/frozenStore"),
+			data: {store_id:store_id, is_frozen:is_frozen},
+			dataType: 'JSON',
+			type: 'POST',
+			success: function(res) {
+				layer.msg(res.message);
+				if (res.code == 0) {
+					refreshTable();
+				}
+			}
+		});
+	});
+}
+</script>

@@ -1,0 +1,406 @@
+{
+	"pages": [
+		{
+			"path": "pages/billing/index",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "开单"
+			}
+		},
+		{
+			"path": "pages/reserve/index",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "预约"
+			}
+		},
+		{
+			"path": "pages/buycard/index",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "售卡"
+			}
+		},
+		{
+			"path": "pages/recharge/index",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "充值"
+			}
+		},
+		{
+			"path": "pages/verify/index",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "核销"
+			}
+		},
+		{
+			"path": "pages/verify/list",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "核销记录"
+			}
+		},
+		{
+			"path": "pages/index/loading",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "加载页",
+				"leftWindow": false,
+				"topWindow": false
+			}
+		},
+		{
+			"path": "pages/index/no_permission",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "对不起，您没有权限"
+			}
+		},
+		{
+			"path": "pages/index/change_shifts",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "交班",
+				"leftWindow": false,
+				"topWindow": false
+			}
+		},
+		{
+			"path": "pages/index/change_shiftsrecord",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "交班记录"
+			}
+		},
+		{
+			"path": "pages/login/login",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "登录",
+				"leftWindow": false,
+				"topWindow": false
+			}
+		},
+		{
+			"path": "pages/member/list",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "会员"
+			}
+		},
+		{
+			"path": "pages/order/orderrefund",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "退款维权"
+			}
+		},
+		{
+			"path": "pages/order/rechargeorder",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "充值订单"
+			}
+		},
+		{
+			"path": "pages/stat/index",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "营业数据"
+			}
+		},
+		{
+			"path": "pages/order/orderlist",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "订单列表"
+			}
+		},
+		{
+			"path": "pages/goods/goodslist",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "商品管理"
+			}
+		},
+		{
+			"path": "pages/goods/print_price_tag",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "打印价格标签"
+			}
+		},
+		{
+			"path": "pages/index/change_shiftssalelist",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "商品销售"
+			}
+		},
+		{
+			"path": "pages/refund/list",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "退款记录"
+			}
+		},
+		{
+			"path": "pages/user/list",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "员工管理"
+			}
+		},
+		{
+			"path": "pages/stock/wastage",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "出库单"
+			}
+		},
+		{
+			"path": "pages/stock/stockout",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "编辑出库单"
+			}
+		},
+		{
+			"path": "pages/stock/storage",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "入库单"
+			}
+		},
+		{
+			"path": "pages/stock/stockin",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "编辑入库单"
+			}
+		},
+		{
+			"path": "pages/stock/allocate",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "调拨单"
+			}
+		}, {
+			"path": "pages/stock/edit_allocate",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "编辑调拨单"
+			}
+		},
+		{
+			"path": "pages/stock/check",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "库存盘点"
+			}
+		},
+		{
+			"path": "pages/stock/edit_check",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "编辑库存盘点单"
+			}
+		},
+		{
+			"path": "pages/stock/manage",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "库存管理"
+			}
+		},
+		{
+			"path": "pages/stock/records",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "库存流水"
+			}
+		},
+		{
+			"path": "pages/reserve/config",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "预约设置"
+			}
+		},
+		{
+			"path": "pages/store/config",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "门店设置"
+			}
+		},
+		{
+			"path": "pages/store/index",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "门店信息"
+			}
+		},
+		{
+			"path": "pages/store/operate",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "运营设置"
+			}
+		},
+		{
+			"path": "pages/store/close",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "门店停业"
+			}
+		},
+		{
+			"path": "pages/store/settlement",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "门店结算"
+			}
+		},
+		{
+			"path": "pages/store/settlement_record",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "结算记录"
+			}
+		},
+		{
+			"path": "pages/store/acccount_record",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "账户记录"
+			}
+		},
+		{
+			"path": "pages/printer/list",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "小票打印"
+			}
+		},
+		{
+			"path": "pages/printer/add",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "打印机添加"
+			}
+		},
+		{
+			"path": "pages/store/deliver",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "配送员"
+			}
+		},
+		{
+			"path": "pages/collectmoney/config",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "收款设置"
+			}
+		},
+		{
+			"path": "pages/local/config",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "本机设置"
+			}
+		},
+		{
+			"path": "pages/scale/list",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "电子秤"
+			}
+		},
+		{
+			"path": "pages/scale/add",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "添加电子秤"
+			}
+		},
+		{
+			"path": "pages/marketing/coupon_list",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "优惠券"
+			}
+		},
+		{
+			"path": "pages/marketing/edit_coupon",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "编辑优惠券"
+			}
+		},
+		{
+			"path": "pages/marketing/coupon_detail",
+			"style": {
+				"navigationStyle": "custom",
+				"navigationBarTitleText": "优惠券详情"
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "uni-app",
+		"navigationBarBackgroundColor": "#EFF0F4",
+		"backgroundColor": "#EFF0F4",
+		"background": "#22243a",
+		"pageOrientation": "landscape",
+		"animationType": "none",
+		"style": {
+			"app-plus": {
+				"background": "#EFF0F4",
+				"bounceBackground": "#EFF0F4"
+			}
+		}
+	},
+	"tabBar": {
+		"custom": true,
+		"color": "#303133",
+		"selectedColor": "#fa5d14",
+		"backgroundColor": "#fff",
+		"borderStyle": "white",
+		"list": [{
+				"pagePath": "pages/billing/index",
+				"text": "开单"
+			},
+			{
+				"pagePath": "pages/reserve/index",
+				"text": "预约"
+			},
+			{
+				"pagePath": "pages/buycard/index",
+				"text": "售卡"
+			},
+			{
+				"pagePath": "pages/verify/index",
+				"text": "核销"
+			},
+			{
+				"pagePath": "pages/recharge/index",
+				"text": "充值"
+			}
+		]
+	},
+	"easycom": {
+		"autoscan": true,
+		"custom": {
+			"layout-(.*)": "@/layout/layout-$1/base-page.vue",
+			"uni-(.*)": "@/components/uni-$1/uni-$1.vue",
+			"nc-(.*)": "@/components/nc-$1/nc-$1.vue"
+		}
+	},
+	"leftWindow": {
+		"path": "layout/layout-default/components/layout-aside.vue"
+	}
+}

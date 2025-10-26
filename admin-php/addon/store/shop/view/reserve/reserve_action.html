@@ -1,0 +1,253 @@
+<script>
+	var show_link_box_flag = true;
+    function reserveEvent(event, data, callback) {
+        switch (event) {
+            case 'detail':
+				var url = ns.url("store://shop/reserve/detail");
+				if (show_link_box_flag) {
+					show_link_box_flag = false;
+					$.post(url, {
+						id: data.reserve_id
+					}, function (str) {
+						window.linkIndex = layer.open({
+							type: 1,
+							title: "预约详情",
+							content: str,
+							btn: [],
+							area: ['850px'], //宽高
+							maxWidth: 1920,
+							cancel: function (index, layero) {
+								show_link_box_flag = true;
+							},
+							end: function () {
+								show_link_box_flag = true;
+							}
+						});
+					});
+				}
+                break;
+            case 'confirm':
+                confirmReserve(data, callback);
+                break;
+            case 'update':
+                updateReserve(data);
+                break;
+            case 'tostore':
+                confirmToStore(data, callback);
+                break;
+            case 'complet':
+                confirmComplete(data, callback);
+                break;
+            case 'cancel':
+                cancelReserve(data, callback);
+                break;
+            case 'delete':
+                deleteReserve(data, callback);
+                break;
+        }
+    }
+
+    function getMemuData(state) {
+        var menuData = [{txt: '预约详情', event: 'detail'}];
+        switch (state) {
+            case 'wait_confirm':
+                menuData.push({txt: '确认预约', event: 'confirm'});
+                menuData.push({txt: '更改预约', event: 'update'});
+                menuData.push({txt: '取消预约', event: 'cancel'});
+                break;
+            case 'wait_to_store':
+                menuData.push({txt: '确认到店', event: 'tostore'});
+                menuData.push({txt: '更改预约', event: 'update'});
+                menuData.push({txt: '取消预约', event: 'cancel'});
+                break;
+            case 'arrived_store':
+                menuData.push({txt: '确认完成', event: 'complet'});
+                break;
+            case 'cancelled':
+                menuData.push({txt: '删除预约', event: 'delete'});
+                break;
+        }
+        return menuData;
+    }
+
+    var repeat = false;
+    function confirmReserve(data, callback) {
+        layer.confirm('是否要确认该预约?', function(index){
+            if (repeat) return;
+            repeat = true;
+			layer.close(index);
+            $.ajax({
+                url: ns.url("store://shop/reserve/confirm"),
+                data: {
+                    reserve_id: data.reserve_id
+                },
+                dataType: 'JSON',
+                type: 'POST',
+                success: function (res) {
+                    repeat = false;
+                    if (res.code == 0) {
+                        try {
+                            data.elem.attr('data-state', 'wait_to_store');
+                            data.elem.parents('.panel-item').attr('class', 'panel-item wait_to_store');
+                            data.elem.parents('.panel-item').find('.time').attr('class', 'time wait_to_store');
+                            var menuData = getMemuData('wait_to_store');
+                            _dropdown['reserve_id' + data.reserve_id].reload({
+                                data: menuData,
+                                show: false
+                            })
+                        } catch (e) {
+                        }
+                        typeof callback == 'function' && callback(data);
+                    } else {
+                        layer.msg(res.message)
+                    }
+                }
+            })
+        })
+    }
+
+    function confirmToStore(data, callback) {
+        layer.confirm('是否确认客户已经到店?', function(index){
+            if (repeat) return;
+            repeat = true;
+			layer.close(index);
+            $.ajax({
+                url: ns.url("store://shop/reserve/confirmtostore"),
+                data: {
+                    reserve_id: data.reserve_id
+                },
+                dataType: 'JSON',
+                type: 'POST',
+                success: function (res) {
+                    repeat = false;
+                    if (res.code == 0) {
+                        try {
+                            data.elem.attr('data-state', 'arrived_store');
+                            data.elem.parents('.panel-item').attr('class', 'panel-item arrived_store');
+                            data.elem.parents('.panel-item').find('.time').attr('class', 'time arrived_store');
+                            var menuData = getMemuData('arrived_store');
+                            _dropdown['reserve_id' + data.reserve_id].reload({
+                                data: menuData,
+                                show: false
+                            })
+                        } catch (e) {
+                        }
+                        typeof callback == 'function' && callback(data);
+                    } else {
+                        layer.msg(res.message)
+                    }
+                }
+            })
+        })
+    }
+
+    function confirmComplete(data, callback) {
+        layer.confirm('确认已完成预约?', function(index){
+            if (repeat) return;
+            repeat = true;
+			layer.close(index);
+            $.ajax({
+                url: ns.url("store://shop/reserve/complete"),
+                data: {
+                    reserve_id: data.reserve_id
+                },
+                dataType: 'JSON',
+                type: 'POST',
+                success: function (res) {
+                    repeat = false;
+                    if (res.code == 0) {
+                        try {
+                            data.elem.attr('data-state', 'completed');
+                            data.elem.parents('.panel-item').attr('class', 'panel-item completed');
+                            data.elem.parents('.panel-item').find('.time').attr('class', 'time completed');
+                            var menuData = getMemuData('completed');
+                            _dropdown['reserve_id' + data.reserve_id].reload({
+                                data: menuData,
+                                show: false
+                            })
+                        } catch (e) {
+                        }
+                        typeof callback == 'function' && callback(data);
+                    } else {
+                        layer.msg(res.message)
+                    }
+                }
+            })
+        })
+    }
+
+    function cancelReserve(data, callback) {
+        layer.confirm('确认要取消该预约?', function(index){
+            if (repeat) return;
+            repeat = true;
+			layer.close(index);
+            $.ajax({
+                url: ns.url("store://shop/reserve/cancel"),
+                data: {
+                    reserve_id: data.reserve_id
+                },
+                dataType: 'JSON',
+                type: 'POST',
+                success: function (res) {
+                    repeat = false;
+                    if (res.code == 0) {
+                        try {
+                            data.elem.attr('data-state', 'cancelled');
+                            data.elem.parents('.panel-item').attr('class', 'panel-item cancelled');
+                            data.elem.parents('.panel-item').find('.time').attr('class', 'time cancelled');
+                            var menuData = getMemuData('cancelled');
+                            _dropdown['reserve_id' + data.reserve_id].reload({
+                                data: menuData,
+                                show: false
+                            })
+                        } catch (e) {
+                        }
+                        typeof callback == 'function' && callback(data);
+                    } else {
+                        layer.msg(res.message)
+                    }
+                }
+            })
+        });
+    }
+
+    function deleteReserve(data, callback) {
+        layer.confirm('确认要删除该预约?', function(index){
+            if (repeat) return;
+            repeat = true;
+			layer.close(index);
+            $.ajax({
+                url: ns.url("store://shop/reserve/deletereserve"),
+                data: {
+                    reserve_id: data.reserve_id
+                },
+                dataType: 'JSON',
+                type: 'POST',
+                success: function (res) {
+                    repeat = false;
+                    if (res.code == 0) {
+                        try {
+                            data.elem.parents('.panel-item').remove();
+                        } catch (e) {
+                        }
+                        typeof callback == 'function' && callback(data);
+                    } else {
+                        layer.msg(res.message)
+                    }
+                }
+            })
+        });
+    }
+
+    function updateReserve(data) {
+		layer.open({
+			title: '修改预约',
+			type: 2,
+			content: ns.url('store://shop/reserve/updatereserve',{
+				request_mode: 'iframe',
+				id:data.reserve_id
+			}),
+			area: ['800px', '620px'],
+		})
+	}
+</script>

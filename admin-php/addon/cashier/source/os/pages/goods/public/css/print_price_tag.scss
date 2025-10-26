@@ -1,0 +1,215 @@
+.form-content {
+	display: flex;
+	flex-wrap: wrap;
+	margin-top: 0.2rem;
+
+	.store-info {
+		.form-inline {
+			padding-left: 0.05rem;
+		}
+
+	}
+
+	.form-item {
+		margin-bottom: 0.1rem;
+		display: flex;
+
+		.form-label {
+			width: 1.3rem;
+			text-align: right;
+			padding-right: 0.1rem;
+			box-sizing: border-box;
+			height: 0.32rem;
+			line-height: 0.32rem;
+
+			.required {
+				color: red;
+				margin-right: 0.03rem;
+			}
+		}
+
+		.form-inline {
+			width: 2.4rem;
+			line-height: 0.32rem;
+			margin-right: 0.1rem;
+			box-sizing: border-box;
+
+			&.input {
+				input {
+					padding: 0 0.1rem;
+				}
+			}
+
+			.form-input {
+				border-width: 0.01rem;
+				border-style: solid;
+				background-color: #fff;
+				color: rgba(0, 0, 0, 0.85);
+				border-radius: 0.02rem;
+				padding-left: 0.1rem;
+				height: 0.32rem;
+				line-height: 0.32rem;
+				font-size: 0.14rem;
+				border-color: #e6e6e6;
+			}
+		}
+	}
+}
+
+.stock-body{
+	position: relative;
+	height: 100%;
+	.common-form .common-btn-wrap {
+	     margin-left: 0;
+	}
+	.content-wrap {
+		
+		padding: 0.15rem;
+		background-color: #fff;
+		@extend %body-overhide;
+		box-sizing: border-box;
+
+		.title {
+			font-size: 0.18rem;
+			margin-bottom: 0.2rem;
+			text-align: center;
+		}
+		
+		.batch-action {
+		  .batch-item {
+		    margin-right: 0.15rem;
+		    border: 0.01rem solid rgba(0, 0, 0, 0.2);
+		    padding: 0.05rem;
+		    border-radius: 0.03rem;
+			cursor: pointer;
+		  }
+		}
+
+		.table-wrap {
+			position: relative;
+			margin-top: 40rpx;
+			border: 1rpx solid #dcdfe6;
+			
+			.iconcheckbox_weiquanxuan,
+			.iconfuxuankuang1,
+			.iconfuxuankuang2 {
+				color: $primary-color;
+				cursor: pointer;
+				font-size: 0.16rem;
+				transition: all 0.3s;
+			}
+			.iconfuxuankuang2{
+				color: #e6e6e6;
+			}
+
+			.table-head {
+				background-color: #f7f7f7;
+			}
+
+			.table-body {
+				@extend %body-overhide;
+				max-height: 6rem;
+
+				.table-tr {
+					&:last-of-type .table-td {
+						border-bottom: 0;
+					}
+				}
+			}
+
+			.table-tr {
+				display: flex;
+			}
+
+			.table-th,
+			.table-td {
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				padding: 0.07rem 0.3rem;
+				border-bottom: 0.01rem solid #dcdfe6;
+				border-right: 0.01rem solid #dcdfe6;
+				text-align: center;
+
+				&:last-of-type {
+					border-right: 0;
+					justify-content: flex-end;
+				}
+
+				&.goods-name {
+					justify-content: flex-start;
+					text-align: left;
+
+					image {
+						width: 0.45rem;
+						height: 0.45rem;
+						flex-shrink: 0;
+					}
+
+					.name {
+						margin-left: 0.1rem;
+					}
+				}
+			}
+
+			.delete {
+				margin: 0;
+				font-size: $uni-font-size-base;
+				background-color: $primary-color;
+				color: #fff;
+				line-height: 0.32rem;
+				height: 0.32rem;
+				&::after{
+					border-width: 0;
+				}
+			}
+
+			.table-empty {
+				justify-content: center;
+				padding: 0.1rem;
+				color: #999;
+				/* border: 0.01rem solid #dcdfe6;
+				border-top: 0; */
+			}
+		}
+	}
+	.action-wrap {
+		position: absolute;
+		bottom: 0;
+		left: 0;
+		right: 0;
+		display: flex;
+		justify-content: space-between;
+		padding: 0.24rem 0.2rem;
+		align-items: center;
+		background-color: #fff;
+		z-index: 10;
+		.btn-wrap {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			button {
+				margin: 0;
+				min-width: 1.2rem;
+				height: 0.4rem;
+				line-height: 0.4rem;
+				font-size: $uni-font-size-base;
+
+				&.stockout-btn {
+					margin-right: 0.15rem;
+					background-color: $primary-color;
+					color: #fff;
+					&::after{
+						border-width: 0;
+					}
+				}
+
+				&.remark {
+					margin-right: 0.15rem;
+					min-width: 1.2rem;
+				}
+			}
+		}
+	}
+}

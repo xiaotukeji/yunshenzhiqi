@@ -1,0 +1,144 @@
+<div class="layui-form form-wrap">
+    <div class="layui-card card-common card-brief">
+        <div class="layui-card-header">
+            <span class="card-title">提现设置</span>
+        </div>
+        <div class="layui-card-body">
+            
+            <div class="layui-form-item">
+                <label class="layui-form-label">提现审核：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="radio" name="withdraw_status" value="1"  title="手动审核" {if $withdraw_info.withdraw_status == 1} checked {/if} />
+                        <input type="radio" name="withdraw_status" value="2"  title="自动审核" {if $withdraw_info.withdraw_status == 2} checked {/if}/>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">自动转账：</label>
+                <div class="layui-input-block">
+                    <input type="checkbox" name="is_auto_transfer" lay-filter="is_auto_transfer" value="1" lay-skin="switch" {if !empty($withdraw_info.is_auto_transfer) && $withdraw_info.is_auto_transfer==1 } checked {/if} >
+                </div>
+                <div class="word-aux">只有微信和支付宝支付支持自动转账</div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">佣金提现手续费：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="number" name="withdraw_rate" lay-verify="positivEinteger" value="{$withdraw_info.withdraw_rate ?? 0}" autocomplete="off" class="layui-input len-short" >
+                    </div>
+                    <div class="layui-form-mid">%</div>
+                </div>
+                <div class="word-aux">比率必须为0-100的数且保留两位小数,提现到余额时没有手续费</div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">最低提现金额：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="number" name="withdraw" id="min" value="{if condition="!empty($withdraw_info.withdraw)"}{$withdraw_info.withdraw ?: 0}{else/}0{/if}" lay-verify="growthMinInteger" autocomplete="off" class="layui-input len-short">
+                    </div>
+                </div>
+                <div class="word-aux">最低提现金额必须大于0</div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">最高提现额度：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="number" name="max" value="{if condition="!empty($withdraw_info.max)"}{$withdraw_info.max ?: 0}{else/}0{/if}" lay-verify="growthMaxInteger" autocomplete="off" class="layui-input len-short">
+                    </div>
+                </div>
+                <div class="word-aux">额度设置为0为不限制</div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">转账方式：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        {foreach $transfer_type_list as $k => $v}
+                        <input type="checkbox" lay-filter="transfer_type" name="transfer_type[]" title="{$v}" lay-skin="primary" value="{$k}" {if !empty($withdraw_info.transfer_type) && stripos($withdraw_info.transfer_type, $k) !== false}checked{/if}>
+                        {/foreach}
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <button class="layui-btn" lay-submit lay-filter="save">保存</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+	layui.use(['form'], function() {
+		var form = layui.form,
+			repeat_flag = false; //防重复标识
+        form.render();
+   
+		form.on('submit(save)', function(data) {
+
+            if (repeat_flag) return;
+            repeat_flag = true;
+
+            $.ajax({
+				type: 'POST',
+				dataType: 'JSON',
+				url: ns.url("fenxiao://shop/config/settlement"),
+				data: data.field,
+				success: function(res) {
+					layer.msg(res.message);
+					repeat_flag = false;
+				}
+			});
+		});
+        /**
+         * 表单验证
+         */
+        form.verify({
+            max_no_fee: function(value){
+
+                var min_no_fee = $('input[name="min_no_fee"]').val();
+
+                if(parseFloat(min_no_fee) > parseFloat(value)){
+                    return '免手续费区间输入有误，区间最大值不能小于最小值';
+                }
+            },
+            positivEinteger: function(value){
+                if (parseFloat(value) < 0 || parseFloat(value) > 100) {
+                    return '请输入0-100之间的数';
+                }
+                if (value.split(".").length > 1) {
+                    var len = value.split(".")[1].length;
+                    if (len > 2) {
+                        return '门店抽成比率最多两位小数';
+                    }
+                }
+            },
+            growthMinInteger: function (value) {
+                if(value <= 0){
+                    return '最低提现金额必须大于0';
+                }
+                if (value.split(".").length > 1) {
+                    let len = value.split(".")[1].length;
+                    if (len > 2) {
+                        return '最低提现金额最多保留两位小数';
+                    }
+                }
+            },
+
+            growthMaxInteger: function (value) {
+                var min = $('#min').val();
+                if(parseFloat(value) < 0){
+                    return '最高提现额度不可为负数';
+                }
+
+                if(parseInt(min) > 0 && parseInt(value) > 0 && parseInt(value) < parseInt(min)){
+                    return '不能小于最低提现额度';
+                }
+            },
+        });
+
+    });
+</script>

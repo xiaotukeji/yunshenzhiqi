@@ -1,0 +1,343 @@
+<div class="layui-form form-wrap">
+
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="required">*</span>活动名称：</label>
+        <div class="layui-input-block">
+            <input type="text" name="name" value="{$hongbao_info.name}" lay-verify="required|len" class="layui-input len-long" autocomplete="off" maxlength="40">
+        </div>
+        <div class="word-aux">
+            <p>活动名称最多为25个字符</p>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="required">*</span>活动内容：</label>
+        <div class="layui-input-block">
+            <div class="layui-input-inline len-short">
+                <input type="number" name="divide_num" value="{$hongbao_info.divide_num}" placeholder="" autocomplete="off" class="layui-input len-short" lay-verify="required|count"  {if $hongbao_info.status == 1}disabled {/if}>
+            </div>
+            <div class="layui-form-mid">名好友，瓜分</div>
+            <div class="layui-input-inline len-short">
+                <input type="number" name="money" value="{$hongbao_info.money}" placeholder="" autocomplete="off" class="layui-input len-short" lay-verify="required|money"  {if $hongbao_info.status == 1}disabled {/if}>
+            </div>
+            <div class="layui-form-mid">元</div>
+        </div>
+        <div class="word-aux">
+            <p>瓜分人数建议5人以下，超过5人存在被微信封禁的风险。</p>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="required">*</span>红包总量：</label>
+        <div class="layui-input-block">
+            <div class="layui-input-inline">
+                <input type="number" name="inventory" value="{$hongbao_info.inventory}" lay-verify="required|grantcount" autocomplete="off" class="layui-input len-short">
+            </div>
+            <span class="layui-form-mid">张</span>
+        </div>
+        <div class="word-aux">
+            <p>修改总量时只能增加不能减少，请谨慎设置</p>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="required">*</span>瓜分有效期：</label>
+        <div class="layui-input-block">
+            <div class="layui-input-inline">
+                <input type="number" name="divide_time"  value="{$hongbao_info.divide_time}" lay-verify="required|divide_time" autocomplete="off" class="layui-input len-short">
+            </div>
+            <span class="layui-form-mid">小时</span>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="required">*</span>活动开始时间：</label>
+        <div class="layui-input-block len-mid">
+            <input type="text" class="layui-input" value="{:date('Y-m-d H:i:s',$hongbao_info.start_time)}" name="start_time" lay-verify="required" id="start_time" autocomplete="off" readonly {if $hongbao_info.status == 1}disabled {/if} >
+            <i class=" iconrili iconfont calendar"></i>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="required">*</span>活动结束时间：</label>
+        <div class="layui-input-block len-mid end_time">
+            <input type="text" class="layui-input" value="{:date('Y-m-d H:i:s',$hongbao_info.end_time)}" name="end_time" lay-verify="required|time|overtime" id="end_time" autocomplete="off" readonly>
+            <i class=" iconrili iconfont calendar"></i>
+        </div>
+        <div class="word-aux">
+            <p>结束时间不能小于开始时间，也不能小于当前时间</p>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="required">*</span>是否模拟好友：</label>
+        <div class="layui-input-block">
+            <input type="radio" name="is_simulation" value="1" title="是" {if $hongbao_info.is_simulation==1} checked {/if}>
+            <input type="radio" name="is_simulation" value="0" title="否" {if $hongbao_info.is_simulation==0} checked {/if}>
+        </div>
+        <div class="word-aux">
+            <p>说明：模拟好友指在规定时间未成团时，系统会在截止时间补充虚拟会员促使成团，该团不会组合失败。</p>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="required">*</span>仅新人参与限制：</label>
+        <div class="layui-input-block">
+            <input type="radio" name="is_new" value="1" title="是" {if $hongbao_info.is_new==1} checked {/if}>
+            <input type="radio" name="is_new" value="0" title="否" {if $hongbao_info.is_new==0} checked {/if}>
+        </div>
+        <div class="word-aux">
+            <p>说明：新人指未参与过该活动的会员。</p>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="required">*</span>瓜分方式：</label>
+        <div class="layui-input-block">
+            <input type="radio" name="divide_type" value="0" title="固定金额" {if $hongbao_info.divide_type==0} checked {/if}>
+            <input type="radio" name="divide_type" value="1" title="随机金额" {if $hongbao_info.divide_type==1} checked {/if}>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="required">*</span>余额设置：</label>
+        <div class="layui-input-block">
+            <input type="radio" name="balance_set" value="1" title="储值余额" {if $hongbao_info.balance_set==1} checked {/if}>
+            <input type="radio" name="balance_set" value="2" title="现金余额" {if $hongbao_info.balance_set==2} checked {/if}>
+        </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label">红包图片：</label>
+        <div class="layui-input-block img-upload">
+            <div class="upload-img-block">
+                <div class="upload-img-box {notempty name=" $hongbao_info['image']"}hover{/notempty}">
+                <div class="upload-default " id="couponImg">
+                    {if condition="$hongbao_info.image"}
+                    <div id="preview_couponImg" class="preview_img">
+                        <img layer-src src="{:img($hongbao_info.image)}" class="img_prev" />
+                    </div>
+                    {else/}
+                    <div class="upload">
+                        <i class="iconfont iconshangchuan"></i>
+                        <p>点击上传</p>
+                    </div>
+                    {/if}
+                </div>
+                <div class="operation">
+                    <div>
+                        <i title="图片预览" class="iconfont iconreview js-preview" style="margin-right: 20px;"></i>
+                        <i title="删除图片" class="layui-icon layui-icon-delete js-delete"></i>
+                    </div>
+                    <div class="replace_img js-replace">点击替换</div>
+                </div>
+                <input type="hidden" class="layui-input" name="image" value="{$hongbao_info.image}" />
+            </div>
+        </div>
+    </div>
+    <div class="word-aux">
+        <p>建议尺寸：325*95像素，图片上传默认不限制大小</p>
+    </div>
+    </div>
+
+    <div class="layui-form-item">
+        <label class="layui-form-label"><span class="required">*</span>活动规则：</label>
+        <div class="layui-input-inline">
+            <textarea name="remark" class="layui-textarea len-long"  lay-verify="required" maxlength="150">{$hongbao_info.remark}</textarea>
+        </div>
+    </div>
+
+    <div class="form-row">
+        <button class="layui-btn" lay-submit lay-filter="save">保存</button>
+        <button class="layui-btn layui-btn-primary" onclick="backHongbaoList()">返回</button>
+        <a id="image"></a>
+    </div>
+
+    <input type="hidden" name="site_id" value="{$hongbao_info.site_id}" />
+    <input type="hidden" name="hongbao_id" value="{$hongbao_info.hongbao_id}" />
+</div>
+
+<script>
+    var inventory = {$hongbao_info.inventory};
+    var overtime = {$hongbao_info.end_time};
+    var saveData = null;
+    var totalUploadNum = 0;
+    var completeUploadNum = 0;
+    var upload;
+
+    layui.use(['form', 'laydate', 'form'], function () {
+        var form = layui.form,
+            laydate = layui.laydate,
+            repeat_flag = false; //防重复标识
+        currentDate = new Date();  //当前时间
+        form.render();
+
+        currentDate.setDate(currentDate.getDate() + 10);  //10天后的日期
+
+        var now_time = (new Date()).getTime();
+        var start_time = (new Date($("#start_time").val())).getTime();
+        var end_time = (new Date($("#end_time").val())).getTime();
+        if(start_time > now_time){
+            // 开始时间
+            laydate.render({
+                elem: '#start_time',//指定元素
+                type: 'datetime',
+            });
+        }
+        if( now_time < end_time){
+            //结束时间
+            laydate.render({
+                elem: '#end_time',//指定元素
+                type: 'datetime',
+            });
+        }
+
+        currentDate.setDate(currentDate.getDate() + 30);   //当前时间+30之后的时间戳
+
+        //监听瓜分次数限制
+        form.on('radio(divide_frequency)', function (data) {
+            var value = data.value;
+            if (value == 0) {
+                $('#divide_frequency_limit').hide();
+            }
+        });
+
+        /**
+         * 表单验证
+         */
+        form.verify({
+            len: function (value) {
+                if (value.length > 25) {
+                    return "活动名称最多为25个字符!";
+                }
+            },
+            money: function (value) {
+                var arrMen = value.split(".");
+                var val = 0;
+                if (arrMen.length == 2) {
+                    val = arrMen[1];
+                }
+                if (val.length > 2) {
+                    return '保留小数点后两位'
+                }
+            },
+            time: function (value) {
+                var now_time = (new Date()).getTime();
+                var start_time = (new Date($("#start_time").val())).getTime();
+                var end_time = (new Date(value)).getTime();
+                if (now_time > end_time) {
+                    return '结束时间不能小于当前时间!'
+                }
+                if (start_time > end_time) {
+                    return '结束时间不能小于开始时间!';
+                }
+            },
+            overtime:function(value){
+                var end_time = (new Date(value)).getTime() / 1000;
+                if(end_time < overtime){
+                    return '结束时间不能小于之前设置的时间';
+                }
+            },
+            count: function (value) {
+                if (value % 1 != 0) {
+                    return '请输入整数';
+                }
+                if (value <= 0) {
+                    return '不能小于0';
+                }
+            },
+            grantcount:function (value){
+				if(value<=0){
+					return "红包总量不能小于等于0"
+				}
+				if (value % 1 != 0) {
+				    return '请输入整数';
+				}
+                if(value < inventory){
+                    return '发放不能小于之前发放数量('+inventory+')只可增加';
+                }
+            },
+            divide_time:function (value){
+                if (value > 24) {
+                    return '有效期不能大于24小时';
+                }
+				if(value<=0){
+					 return '有效期不能小于等于0';
+				}
+				if (value % 1 != 0) {
+				    return '请输入整数';
+				}
+            }
+        });
+
+        upload = new Upload({
+            elem: '#couponImg',
+            auto:false,
+            bindAction:'#image',
+            callback: function(res) {
+                uploadComplete('image', res.data.pic_path);
+            }
+        });
+
+        function uploadComplete(field, pic_path) {
+            saveData.field[field] = pic_path;
+            completeUploadNum += 1;
+            if(completeUploadNum == totalUploadNum){
+                saveFunc();
+            }
+        }
+
+        function saveFunc(){
+            var data = saveData;
+            // 删除图片
+            if (!data.field.image) upload.delete();
+            $.ajax({
+                url: ns.url("hongbao://shop/hongbao/edit"),
+                data: data.field,
+                dataType: 'JSON',
+                type: 'POST',
+                success: function(res) {
+                    repeat_flag = false;
+
+                    if (res.code == 0) {
+                        layer.confirm('编辑成功', {
+                            title: '操作提示',
+                            btn: ['返回列表', '继续编辑'],
+                            yes: function(index, layero) {
+                                location.hash = ns.hash("hongbao://shop/hongbao/lists")
+								layer.close(index);
+                            },
+                            btn2: function(index, layero) {
+                                layer.close(index);
+                            }
+                        });
+                    } else {
+                        layer.msg(res.message);
+                    }
+                }
+            });
+        }
+        /**
+         * 监听提交
+         */
+        form.on('submit(save)', function(data) {
+            if (repeat_flag) return;
+            repeat_flag = true;
+
+            saveData = data;
+            var obj = $("img.img_prev[data-prev='1']");
+            totalUploadNum = obj.length;
+            if(totalUploadNum > 0){
+                obj.each(function(){
+                    var actionId = $(this).attr('data-action-id');
+                    $(actionId).click();
+                })
+            }else{
+                saveFunc();
+            }
+        });
+    });
+
+    function backHongbaoList() {
+        location.hash = ns.hash("hongbao://shop/hongbao/lists");
+    }
+</script>

@@ -1,0 +1,57 @@
+<nc-component :data="data[index]" class="diy-payment-qrcode-wrap">
+
+	<!-- 预览 -->
+	<template slot="preview">
+		<div class="payment-qrocde-box">
+			<div class="qrocde-left">
+				<div class="qrocde-desc">
+					<span>门店消费时使用，支付时点击下方展示付款码</span>
+<!--					<span class="iconfont iconshuaxin"></span>-->
+				</div>
+				<div class="qrocde-action">
+					<div>
+						<i class="iconfont iconfukuanma"></i>
+						<span class="action-name">付款码</span>
+					</div>
+					<div>
+						<i class="iconfont iconsaomafu"></i>
+						<span class="action-name">扫码付</span>
+					</div>
+				</div>
+			</div>
+			<div class="qrocde-right">
+				<span class="iconfont iconzhifu1"></span>
+				<span class="name">门店支付</span>
+			</div>
+		</div>
+	</template>
+
+	<!-- 内容编辑 -->
+	<template slot="edit-content">
+		<template v-if="nc.lazyLoad">
+			<diy-payment-qrcode-sources></diy-payment-qrcode-sources>
+			<div class="layui-form-item checkbox-wrap">
+				<label class="layui-form-label sm">展示开关</label>
+				<div class="layui-input-block">
+					<span v-if="nc.control == true">显示</span>
+					<span v-else>隐藏</span>
+					<div v-if="nc.control == true" @click="nc.control = false" class="layui-unselect layui-form-checkbox layui-form-checked" lay-skin="primary"><i class="layui-icon layui-icon-ok"></i></div>
+					<div v-else @click="nc.control = true" class="layui-unselect layui-form-checkbox" lay-skin="primary"><i class="layui-icon layui-icon-ok"></i></div>
+				</div>
+				<div class="word-aux diy-word-aux">安装收银台插件展示，用于收银台线下扫码</div>
+			</div>
+		</template>
+	</template>
+
+	<!-- 样式编辑 -->
+	<template slot="edit-style"></template>
+
+	<!-- 资源 -->
+	<template slot="resource">
+		<js>
+		</js>
+		<css src="{$resource_path}/css/design.css"></css>
+		<js src="{$resource_path}/js/design.js"></js>
+	</template>
+
+</nc-component>

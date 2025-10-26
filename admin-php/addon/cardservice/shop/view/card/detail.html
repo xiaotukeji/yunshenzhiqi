@@ -1,0 +1,247 @@
+<style>
+    .card-common {margin-top: 15px;margin-bottom: 0;box-shadow: initial;}
+    .card-common .layui-card-body{padding-top: 0;}
+    .promotion-view{display:flex;flex-wrap:wrap}
+    .promotion-view-item{width:33.3%;padding-right:10px;box-sizing:border-box;line-height:30px}
+    .promotion-view-item-line{padding-right:10px;box-sizing:border-box;line-height:30px;overflow: hidden;width: 100%}
+    .promotion-view-item-custom-label{float:left}
+    .promotion-view-item-custom-box{float:left}
+    .promotion-stat-view{display:flex;flex-wrap:wrap}
+    .promotion-stat-view .promotion-stat-item{width:25%;padding:0 15px 10px 15px;box-sizing:border-box}
+    .promotion-stat-view .promotion-stat-item .promotion-stat-item-title{color:#909399;font-size:14px;margin-top:5px}
+    .promotion-stat-view .promotion-stat-item .promotion-stat-item-value{color:#303133;font-size:26px;margin-top:10px}
+    .todo-list .promotion-stat-item{flex:1;width:0;cursor:pointer}
+    .layui-layout-admin .layui-body .body-content {background: 0 0;padding: 0;}
+    .gift-card-goods span{cursor: pointer; color: var(--base-color);}
+    .layui-tab-title{margin-bottom: 15px;}
+    .layui-layout-admin .single-filter-box.top {padding-top: 0 !important;}
+    .add-way .add-way-item{display: flex;margin: 8px 0;align-items: center;}
+    .add-way .add-way-item input{margin: 0 10px;}
+    .add-way .add-way-item .layui-form-radio{margin-right: 0;}
+    .disabled-click{pointer-events: none;color: #999 !important;}
+    #addFile{margin-left: 10px; cursor: pointer;color: var(--base-color);}
+    .card-goods .layui-table{margin-bottom: 0;margin-top: 0;}
+    #card_right_type_goods #goods{border: 0;}
+    .card-goods .layui-table .goods-title{display: flex;align-items: center;}
+    .card-goods .layui-table .goods-title .goods-img{width: 55px;height: 55px;line-height: 55px;flex-shrink: 0;margin-right: 10px;}
+    .card-goods .layui-table .goods-title .goods-img img{max-width: 100%;max-height: 100%;}
+    .card-goods .layui-table-body{overflow: auto;max-height: 425px;margin-bottom: 15px;border-bottom: 1px solid #e6e6e6;}
+    .card-goods .layui-table-body .layui-table{border: none;}
+    .card-goods .layui-table-body tbody tr:last-of-type td{border: none;}
+    .card-goods .layui-table-head tr th:last-of-type{text-align: right;}
+    .card-goods .layui-table-body tr td:last-of-type{text-align: right;}
+    .card-tab{margin-bottom: 15px;margin-top: 15px;}
+    /* 商品列表 */
+    .shop-information-table > p{padding-left: 5px;padding-bottom: 5px;}
+    .shop-information-table table {width: 100%;border: 1px solid rgb(238,238,238);}
+    .shop-information-table .table-body {max-height: 400px;overflow: auto;}
+    .table-trOne{height: 48px;background:rgb(245,245,245) ;}
+    .shop-information-table th{text-align: left;padding-left:28px;box-sizing: border-box;font-weight: 500;color:#333333;}
+    .shop-information-table th:last-child{border:none;}
+    .table-trTow{width:100%;height:60px;border-top:1px solid rgb(238,238,238);}
+    .table-trTow>td{text-align: left;padding-left:28px;box-sizing: border-box;font-weight: 500;color:#333333;border-right:1px solid rgb(238,238,238);}
+    .table-trTow>td:nth-child(5){color:var(--base-color)}
+    .layui-tab-content {
+        padding: 0;
+    }
+    .layui-layout-admin .screen {
+        margin-bottom: 15px;
+    }
+</style>
+
+<div class="layui-card card-common card-brief">
+	<div class="layui-card-header">
+        <span class="card-title">基本信息</span>
+	</div>
+	<div class="layui-card-body">
+		<div class="promotion-view">
+			<div class="promotion-view-item">
+				<label>卡项名称：</label>
+				<span>{$detail.goods_name}</span>
+            </div>
+            <div class="promotion-view-item grouping">
+                <label>价格：</label>
+                <span>￥{$detail.price}</span>
+            </div>
+            <div class="promotion-view-item grouping">
+                <label>所属会员：</label>
+                <span>{$detail.nickname}</span>
+            </div>
+            <div class="promotion-view-item grouping">
+                <label>卡类型：</label>
+                <span>{$detail.card_type_name}</span>
+            </div>
+            <div class="promotion-view-item grouping">
+                <label>总次数/已使用：</label>
+                <span>{if $detail.card_type == "timecard"}不限{else/}{$detail.total_num} {/if}/{$detail.total_use_num}</span>
+            </div>
+
+            <div class="promotion-view-item grouping">
+                <label>获取时间：</label>
+                <span>{:date('Y-m-d H:i:s',$detail.create_time)}</span>
+            </div>
+            <div class="promotion-view-item grouping">
+                <label>过期时间：</label>
+                {if $detail.end_time > 0}
+                <span>{:date('Y-m-d H:i:s',$detail.end_time)}</span>
+                {else /}
+                <span>永久有效</span>
+                {/if}
+            </div>
+            <div class="promotion-view-item grouping">
+                <label>卡状态：</label>
+                {$detail.status == 1 ? '正常' : '已失效'}
+            </div>
+        </div>
+	</div>
+</div>
+
+<div class="layui-card card-common card-brief">
+    <div class="layui-card-header">
+        <span class="card-title">卡项商品</span>
+    </div>
+    <div class="layui-card-body layui-tab layui-tab-brief" lay-filter="edit_user_tab">
+        <ul class="layui-tab-title">
+            <li class="layui-this" lay-id="basic_info">商品信息</li>
+            <li lay-id="basic_info">使用记录</li>
+
+        </ul>
+        <div class="layui-tab-content">
+
+            <div class="layui-tab-item layui-show">
+                <table id="data_list" lay-filter="data_list"></table>
+            </div>
+            <div class="layui-tab-item">
+                <table id="recrods_list" lay-filter="recrods_list"></table>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- 工具栏操作 -->
+<script type="text/html" id="operation">
+    <div class="table-btn">
+        <a class="layui-btn" lay-event="order">查看订单</a>
+    </div>
+</script>
+<script type="text/html" id="memberInfo">
+    <div class='table-title'>
+        <div class='title-pic'>
+            <img layer-src src="{{ns.img(d.headimg)}}" onerror="this.src = '{:img('public/static/img/default_img/head.png')}' ">
+        </div>
+        <div class='title-content' onclick="location.hash = ns.hash('shop/member/editmember?member_id={{d.member_id}}')">
+            <p class="layui-elip">{{d.nickname}}</p>
+            <p class="layui-elip">{{d.mobile}}</p>
+        </div>
+    </div>
+</script>
+<script type="text/html" id="operation">
+    <div class="table-btn">
+        {{# if(d.status == 'to_activate'){  }}
+        <a class="layui-btn" lay-event="delete">删除</a>
+        {{# } }}
+        {{# if(d.status != 'to_activate'){  }}
+        <a class="layui-btn" lay-event="info">详情</a>
+        {{# } }}
+    </div>
+</script>
+<script>
+var table,element,form,laytpl,repeat_flag=false,records_table;
+layui.use(['form', 'element', 'laytpl','laydate'], function () {
+    laytpl = layui.laytpl;
+    element = layui.element;
+    form = layui.form;
+    form.render();
+
+    table = new Table({
+        elem: '#data_list',
+        url: ns.url("cardservice://shop/card/getcarditem", {'card_id':"{$detail['card_id']}"}),
+        cols: [
+            [{
+                field: 'goods_name',
+                title: '商品名称',
+                unresize: 'false',
+                width: '50%',
+            }, {
+                field: '',
+                title: '总次数',
+                unresize: 'false',
+                templet: function (data) {
+                    var totalNum = data.card_type == 'timecard' ? '不限' : data.num;
+                    return totalNum;
+                }
+            }, {
+                field: '',
+                title: '已使用',
+                unresize: 'false',
+                templet: function (data) {
+                    return data.use_num;
+                }
+            }]
+        ]
+    });
+
+    records_table = new Table({
+        elem: '#recrods_list',
+        url: ns.url("cardservice://shop/card/records", {'card_id':"{$detail['card_id']}"}),
+        cols: [
+            [{
+                field: 'sku_name',
+                title: '卡项名称',
+                unresize: 'false',
+                width: '20%',
+            },{
+                field: 'store_name',
+                title: '使用门店',
+                unresize: 'false',
+                width: '15%',
+            }, {
+                field: '',
+                title: '使用次数',
+                unresize: 'false',
+                width: '15%',
+                templet: function (data) {
+                    return data.num;
+                }
+            }, {
+                title: '使用时间',
+                unresize: 'false',
+                width: '15%',
+                templet: function (data) {
+                    return ns.time_to_date(data.create_time);
+                }
+            }, {
+                title: '操作',
+                toolbar: '#operation',
+                unresize: 'false',
+                align : 'right'
+            }]
+        ]
+    });
+
+     /**
+     * 监听工具栏操作
+     */
+     records_table.tool(function(obj) {
+        var data = obj.data;
+        switch (obj.event) {
+            case 'order':
+                window.open(ns.href("shop/order/detail?order_id=" + data.order_id));
+                break;
+        }
+    });
+
+    /**
+     * 搜索功能
+     */
+    form.on('submit(search)', function (data) {
+        records_table.reload({
+            page: {curr: 1},
+            where: data.field
+        });
+        return false;
+    });
+
+})
+</script>

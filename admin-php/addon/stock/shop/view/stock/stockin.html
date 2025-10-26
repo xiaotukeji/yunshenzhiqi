@@ -1,0 +1,213 @@
+<link rel="stylesheet" type="text/css" href="ADDON_STOCK_CSS/stock.css" />
+<style>
+	.stock-title-body {
+		position: relative;
+	}
+
+	.stock-title-body span {
+		position: absolute;
+		top: 5px;
+		right: 5px;
+		background-color: #fff;
+		z-index: 10;
+		cursor: pointer;
+	}
+
+	.stock-title-body input {
+		padding-right: 25px;
+	}
+
+	input.stock-search {
+		border-width: 0;
+	}
+
+	input.stock-search:focus {
+		border-width: 1px;
+	}
+
+	.layui-table th,
+	.layui-table td {
+		padding: 7px 30px !important;
+	}
+
+	.layui-table .layui-input {
+		height: 28px !important;
+	}
+	.remark{
+		width: 611px;
+	}
+	button[lay-filter='save'] .layui-icon-loading {
+		animation: loding-rotate 1s linear infinite;
+		/* 设置动画效果 */
+		transform-origin: center;
+		display: inline-block;
+	}
+
+	@keyframes loding-rotate {
+		0% {
+			transform: rotate(0);
+		}
+
+		/* 起始位置 */
+		100% {
+			transform: rotate(360deg);
+		}
+
+		/* 结束位置，旋转一周 */
+	}
+</style>
+
+<div class="layui-form form" lay-filter="formTest">
+
+	<div class="stock-view">
+		{if $stock_config.is_audit == 1}
+		<div class="tips text-color">说明：待审核状态下只有经办人允许修改，只有变为已审核状态后才会使库存发生变化，已审核状态的单据不允许再修改。</div>
+		{/if}
+		<div class="store-view">
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">入库单号：</label>
+					<div class="layui-input-block len-mid">
+						{if isset($document_info)}
+							<input type="text" value="{$document_info['document_no']}" name="document_no" class="layui-input len-mid">
+						{else /}
+							<input type="text" value="{$document_no}" name="document_no" class="layui-input len-mid">
+						{/if}
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label"><span class="required">*</span>入库门店：</label>
+					<div class="layui-input-block len-mid">
+						<select name="store_id" lay-verify="required" lay-filter="store_list" class="len-mid">
+							{foreach $store_list as $store_k => $store_v}
+								{if isset($document_info)}
+								<option value="{$store_v.store_id}" {if $document_info['store_id']==$store_v['store_id']}selected {php} $default_store_id=$store_v['store_id']; {/php}{/if}>{$store_v.store_name}</option>
+								{else /}
+								<option value="{$store_v.store_id}" {if $store_k==0}selected {php} $default_store_id=$store_v['store_id']; {/php}{/if}>{$store_v.store_name}</option>
+								{/if}
+							{/foreach}
+						</select>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">入库时间：</label>
+					<div class="layui-input-block len-mid">
+						<input type="text" class="layui-input" name="date_time" value="{$document_info ? time_to_date($document_info['time']) : date('Y-m-d H:i:s')}" placeholder="入库时间" id="date_time" readonly>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">当前操作人：</label>
+					<div class="layui-input-block len-mid">
+						<span>{$user_info['username']}</span>
+					</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label"><span class="required"></span>备注：</label>
+					<div class="layui-input-block remark">
+						 <textarea class="layui-textarea" maxlength="100" name="remark" placeholder="请输入备注">{$document_info['remark'] ?? ''}</textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+		<table class="layui-table" lay-size="lg">
+			<colgroup>
+				<col width="350">
+				<col width="120">
+				<col width="90">
+				<col>
+				<col>
+				<col width="120">
+				<col width="90">
+			</colgroup>
+			<thead>
+				<tr>
+					<th>产品名称</th>
+					<th>当前库存</th>
+					<th>单位</th>
+					<th>数量</th>
+					<th>成本价</th>
+					<th>总金额</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody class="stock-body">
+				<tr class="stock-search-line">
+					<td class="stock-search-block">
+						<div class="stock-title-body">
+							<input type="text" class="layui-input stock-search" placeholder="请输入产品名称/规格/编码" />
+							<span class="iconfont icontuodong" onclick="editBtn('btn')"></span>
+						</div>
+					</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+			</tbody>
+			<tfoot>
+				<tr>
+					<td colspan="7" class="total-data">合计: 共<span class="kinds-num">0</span>种，<span class="count-num">0</span>件产品，合计金额：<span class="goods-money">0</span></td>
+				</tr>
+			</tfoot>
+		</table>
+
+		{notempty name="$document_info"}
+		<input type="hidden" name="document_id" value="{$document_info['document_id']}">
+		<input type="hidden" name="document_goods_list" value='{:json_encode($document_info["goods_list"])}'>
+		{/notempty}
+
+		<div class="form-row">
+			<button class="layui-btn" lay-submit lay-filter="save"><span class="layui-icon"></span>入库</button>
+			<button class="layui-btn layui-btn-primary" onclick="backStockAction()">返回</button>
+		</div>
+	</div>
+
+</div>
+<script type="text/html" id="stock_goods_info">
+	<tr class="stock-tr" data-key='{{ d.index }}'>
+		<td>
+			{{d.sku_name}}
+		</td>
+		<!-- 库存 -->
+		<td>{{ d.real_stock || 0 }}</td>
+		<!-- 单位 -->
+		<td>{{ d.unit || '件' }}</td>
+		<!-- 数量 -->
+		<td>
+			<input type="number" class="layui-input stock-num" name="goods_num" value="{{ d.goods_num || 0 }}" placeholder="0" onchange="dataChange(this)"/>
+		</td>
+		<!-- 成本价 -->
+		<td>
+			<input type="number" class="layui-input stock-cost-price" name="goods_price" value="{{ d.goods_price || 0 }}" onchange="dataChange(this)"/>
+		</td>
+		<!-- 成本总价 -->
+		<td>
+			<span class="total-cost-money">{{ d.goods_money || 0 }}</span>
+		</td>
+		<td>
+			<a class="text-color action-btn" onclick="delTr(this)">删除</a>
+		</td>
+	</tr>
+</script>
+
+<script>
+	var stockDataObj = JSON.parse($("input[name='document_goods_list']").val() || '{}');// 库存数据
+	var stockData = Object.values(stockDataObj)
+	var defaultStoreId = {$default_store_id ?? 0};
+	var stockConfig = {:json_encode($stock_config) };
+	var stockAction = {
+		id: 'document_id',
+		listRoute: 'storage', // 库存操作标识，storage：入库，wastage：出库
+		saveRoute: 'stockin', // 保存地址
+		params:{
+			'document_no':$('input[name="document_no"]'),
+			'time':$('input[name="date_time"]'),
+			'remark':$('textarea[name="remark"]')
+		}
+	};
+</script>
+<script src="ADDON_STOCK_JS/stock_action.js?time=20250113"></script>

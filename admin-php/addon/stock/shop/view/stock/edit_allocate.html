@@ -1,0 +1,661 @@
+<style>
+	.stock-body tr:first-child:hover td {
+		background-color: #fff
+	}
+
+	.stock-body,
+	.stock-body tr,
+	.stock-body tr td {
+		background-color: #fff
+	}
+
+	.stock-view {
+		padding: 20px
+	}
+
+	.stock-search-block {
+		position: relative
+	}
+
+	.action-btn {
+		cursor: pointer
+	}
+
+	.total-data {
+		padding: 15px !important;
+		background: #fafafa;
+		color: #333
+	}
+
+	.goods-money {
+		color: #ff4d4f;
+	}
+
+	.store-view {
+		margin-top: 10px
+	}
+
+	.store-view .layui-form-label {
+		width: 100px;
+		text-align: center
+	}
+
+	.store-view .layui-input-block {
+		margin-left: 100px
+	}
+
+	.stock-title-body {
+		position: relative;
+	}
+
+	.stock-title-body span {
+		position: absolute;
+		top: 5px;
+		right: 5px;
+		background-color: #fff;
+		z-index: 10;
+		cursor: pointer;
+	}
+
+	.stock-title-body input {
+		padding-right: 25px;
+	}
+
+	input.stock-search {
+		border-width: 0;
+	}
+
+	input.stock-search:focus {
+		border-width: 1px;
+	}
+
+	.layui-table th,
+	.layui-table td {
+		padding: 7px 30px !important;
+	}
+
+	.layui-table .layui-input {
+		height: 28px !important;
+	}
+	button[lay-filter='save'] .layui-icon-loading {
+        animation: loding-rotate 1s linear infinite; /* 设置动画效果 */
+		 transform-origin: center;
+		 display: inline-block;
+    }
+    .remark{
+		width: 614px;
+	}
+    @keyframes loding-rotate {
+        0% { transform: rotate(0); } /* 起始位置 */
+        100% { transform: rotate(360deg); } /* 结束位置，旋转一周 */
+    }
+</style>
+
+<div class="layui-form form" lay-filter="formTest">
+
+	<div class="stock-view">
+
+		<div class="store-view">
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">调拨单号：</label>
+					<div class="layui-input-block len-mid">
+						{if isset($allot_info)}
+						<input type="text" value="{$allot_info['allot_no']}" name="allot_no" class="layui-input len-mid">
+						{else /}
+						<input type="text" value="{$allot_no}" name="allot_no" class="layui-input len-mid">
+						{/if}
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label"><span class="required">*</span>出库门店：</label>
+					<div class="layui-input-block len-mid">
+						<select name="output_store_id" lay-verify="required" lay-filter="store_list" class="len-mid">
+							{foreach $store_list as $store_k => $store_v}
+							{if isset($allot_info)}
+							<option value="{$store_v.store_id}" {if $allot_info['output_store_id']==$store_v['store_id']} {php} $default_store_id=$store_v['store_id']; {/php} selected {/if}>{$store_v.store_name}</option>
+							{else /}
+							<option value="{$store_v.store_id}" {if $store_k==0} {php} $default_store_id=$store_v['store_id']; {/php} selected {/if}>{$store_v.store_name}</option>
+							{/if}
+							{/foreach}
+						</select>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">当前操作人：</label>
+					<div class="layui-input-block len-mid">
+						<span>{$user_info['username']}</span>
+					</div>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label"><span class="required">*</span>入库门店：</label>
+					<div class="layui-input-block len-mid">
+						<select name="input_store_id" class="len-mid"></select>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label"><span class="required">*</span>调拨时间：</label>
+					<div class="layui-input-block len-mid">
+						<input type="text" name="allot_time" class="layui-input" id="allot_time" placeholder="调拨日期" value="{$allot_info ? time_to_date($allot_info['allot_time']) : date('Y-m-d H:i:s')}">
+					</div>
+				</div>
+
+			</div>
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label"><span class="required"></span>备注：</label>
+					<div class="layui-input-block remark">
+						<textarea class="layui-textarea" maxlength="100" name="remark" placeholder="请输入备注">{$allot_info['remark'] ?? ''}</textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+		<table class="layui-table" lay-size="lg">
+			<colgroup>
+				<col width="350">
+				<col width="120">
+				<col width="90">
+				<col width="110">
+				<col width="110">
+				<col width="120">
+				<col width="90">
+			</colgroup>
+			<thead>
+				<tr>
+					<th>产品名称/规格/编码</th>
+					<th>当前库存</th>
+					<th>单位</th>
+					<th>数量</th>
+					<th>成本价</th>
+					<th>总金额</th>
+					<th>操作</th>
+				</tr>
+			</thead>
+			<tbody class="stock-body">
+				<tr class="stock-search-line">
+					<td class="stock-search-block">
+						<div class="stock-title-body">
+							<input type="text" class="layui-input stock-search" placeholder="请输入产品名称/规格/编码" />
+							<span class="iconfont icontuodong" onclick="editBtn('btn')"></span>
+						</div>
+					</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+			</tbody>
+			<tfoot>
+				<tr>
+					<td colspan="7" class="total-data">合计: 共<span class="kinds-num">0</span>种，<span class="count-num">0</span>件产品，合计金额：<span class="goods-money">0</span></td>
+				</tr>
+			</tfoot>
+		</table>
+
+		{notempty name="$allot_info"}
+		<input type="hidden" name="allot_id" value="{$allot_info['allot_id']}">
+		<input type="hidden" name="allot_goods_list" value='{:json_encode($allot_info["goods_list"])}'>
+		{/notempty}
+
+		<div class="form-row">
+			<button class="layui-btn" lay-submit lay-filter="save"><span class="layui-icon"></span>确认调拨</button>
+			<button class="layui-btn layui-btn-primary" onclick="backStockAllocate()">返回</button>
+		</div>
+	</div>
+
+</div>
+
+<script type="text/html" id="stock_goods_info">
+	<tr class="stock-tr" data-key='{{ d.index }}' >
+		<td>
+			{{d.sku_name}}
+		</td>
+		<!-- 库存 -->
+		<td>{{ d.real_stock || 0 }}</td>
+		<!-- 单位 -->
+		<td>{{ d.unit || '件' }}</td>
+		<!-- 数量 -->
+		<td>
+			<input type="number" class="layui-input stock-num" name="goods_num" value="{{ d.goods_num || 0 }}" placeholder="0" onchange="dataChange(this)"/>
+		</td>
+		<!-- 成本价 -->
+		<td>
+			<span>{{ d.cost_price || 0 }}</span>
+		</td>
+		<!-- 成本总价 -->
+		<td>
+			<span class="total-cost-money">{{ d.goods_money || 0 }}</span>
+		</td>
+		<td>
+			<a class="text-color action-btn" onclick="delTr(this)">删除</a>
+		</td>
+	</tr>
+</script>
+
+<script>
+	var count = 0;
+	var stockDataObj = JSON.parse($("input[name='allot_goods_list']").val() || '{}');// 库存数据
+	var stockData = Object.values(stockDataObj)
+	var laytpl, form, laydate;
+	var defaultStoreId = {$default_store_id ?? 0};
+	var store_list = {:json_encode($store_list, true) };
+
+	layui.use(['form', 'laytpl', 'table', 'laydate'], function () {
+		form = layui.form, laytpl = layui.laytpl, table = layui.table, laydate = layui.laydate;
+		form.render();
+		fetch()
+		var repeat_flag = false;
+		laydate.render({
+			elem: '#allot_time'
+			, type: 'datetime'
+			, max: '{$start_time}'
+			, value: $('#allot_time').val() ? $('#allot_time').val() : '{$default_time}'
+		});
+
+		setStore();
+
+		{if isset($allot_info)}
+		$('[name="input_store_id"]').val("{$allot_info['input_store_id']}");
+		{/if}
+
+		$('.stock-search').focus()
+		form.render('select');
+		//门店选择
+		form.on('select(store_list)', function (data) {
+			var store_id = data.value;
+			if (defaultStoreId > 0) {
+				layer.confirm('更改门店，将清除已录入的单报明细，确定吗?\n', {
+					title: '操作提示',
+					btn: ['是', '否'],
+					closeBtn: 0,
+					yes: function () {
+						defaultStoreId = store_id;
+						reset();
+						layer.closeAll()
+						stockData = []
+						fetch()
+						setStore()
+					},
+					btn2: function () {
+						form.val("formTest", { output_store_id: defaultStoreId })
+					}
+				});
+			} else {
+				defaultStoreId = store_id
+			}
+
+		});
+		form.render('select');
+		form.on('submit(save)', function (data) {
+
+			var field = data.field;
+			if (!field.input_store_id) {
+				layer.msg('请选择入库门店');
+				return false;
+			}
+			var stock_json = [];
+			var check_return = true;
+			if ($('.stock-tr').length <= 0) {
+				layer.msg('请选择产品');
+				return false;
+			}
+
+			$('.stock-tr').each(function (index) {
+				var obj = $(this);
+				var goods_num = Number(obj.find('input[name=goods_num]').val() || 0);
+				var real_stock = Number(stockData[index].real_stock);
+				var goods_class = stockData[index].goods_class;
+				var error_msg = '';
+				if(goods_class == 6 && !(ns.getRegexp('>0float3')).test(goods_num)){
+					error_msg = '称重商品调拨数量必须为正数且最多保留三位小数';
+				}else if(goods_class != 6 && !(ns.getRegexp('>0num')).test(goods_num)){
+					error_msg = '调拨数量必须为正整数';
+				}else if (goods_num > real_stock) {
+					error_msg = '可调拨数量不足';
+				}
+				if(error_msg){
+					check_return = false;
+					obj.find('input[name=goods_num]').focus();
+					layer.msg(error_msg);
+					return false;
+				}
+				stockData[index].goods_sku_id = stockData[index].sku_id;
+			});
+
+			if (!check_return) return false;
+
+			if (repeat_flag) return false;
+			repeat_flag = true;
+
+			field.goods_sku_list = JSON.stringify(stockData);
+			var btn = $('button[lay-filter="save"]')
+			btn.addClass('layui-btn-disabled');
+			btn.find('.layui-icon').addClass('layui-icon-loading');
+			btn.prop('disabled', true);
+			$.ajax({
+				type: 'post',
+				dataType: 'JSON',
+				url: ns.url("stock://shop/stock/editallocate"),
+				async: true,
+				data: field,
+				success: function (res) {
+					if (res.code >= 0) {
+						location.hash = ns.hash("stock://shop/stock/allocate");
+					} else {
+						repeat_flag = false;
+						btn.removeClass('layui-btn-disabled');
+						btn.find('.layui-icon').removeClass('layui-icon-loading');
+						btn.prop('disabled', false);
+						layer.msg(res.message);
+					}
+					return false;
+				}
+			})
+		});
+
+	});
+
+	function backStockAllocate() {
+		location.hash = ns.hash("stock://shop/stock/allocate")
+	}
+
+	$(".stock-search").on('keyup', function (e) {
+		//空白行回车
+		if (e.keyCode == 13) {
+			var val = $(this).val();
+			$('.stock-search').blur()
+			if (carriage(-1, val)) {
+				goodsSelectByAllocate(function (res) {
+					res.forEach(el => {
+						el.goods_num = 1
+						el.goods_price = el.cost_price || 0
+						//库存盘点空白行无需判断是否替换某行，只需判断是否存在
+						var index = stockData.length ? stockData.findIndex(v => v.sku_id === el.sku_id) : -1
+						if (index != -1) {
+							stockData[index].goods_num += 1
+						} else {
+							stockData.push(el)
+						}
+					});
+					fetch()
+				}, [], { minNum: 1, search_text: val, store_id: defaultStoreId, })
+			}
+
+		}
+	});
+	//数据渲染（任何来源）
+	function fetch() {
+		//重新渲染
+		var template = $("#stock_goods_info").html();
+		$('.stock-body tr').not('.stock-search-line').remove();
+
+		if (ns.checkIsNotNull(stockData)) {
+			$.each(stockData, function (index, value) {
+				value.index = index
+				laytpl(template).render(value, function (html) {
+					$('.stock-search-line').before(html);
+					$(".stock-search-" + value.sku_id).on('keyup', function (e) {
+						//更新dom事件需要重新绑定
+						if (e.keyCode == 13) {
+							var val = $(this).val();
+							if (val != '') {
+
+								$('.stock-search').blur()
+								if (carriage(index, val)) {
+									goodsSelectByAllocate(function (res) {
+										res.forEach((el, resIndex) => {
+											el.goods_num = 1
+											el.goods_price = el.cost_price || 0
+											//库存盘点
+											var indexs = stockData.findIndex(v => v.sku_id === el.sku_id)
+											if (indexs != -1) {
+												//库存不可出现相同类目
+												stockData[indexs].goods_num += 1
+												//列表已有数量加一
+											} else if (!resIndex) {
+												//选择的数据第一条在没有相同类目的情况下才替换列表选中行
+												stockData.splice(index, 1, el)
+											} else {
+												stockData.push(el)
+												//非第一条并且列表不存在直接加入列表
+											}
+										});
+										fetch()
+									}, [], { minNum: 1, search_text: val, store_id: defaultStoreId, })
+								}
+							} else {
+								layer.msg('请输入内容');
+							}
+						}
+					});
+					$('.stock-search').val('').focus()
+					form.render();
+				})
+			})
+		}
+
+		form.render();
+		syncData();
+	}
+	//输入回车后的处理,查询到单条的处理
+	function carriage(index, val) {
+		var num = true
+		$.ajax({
+			url: ns.url("stock://shop/stock/getskulist"),
+			data: { search: val, store_id: defaultStoreId },
+			dataType: 'JSON',
+			type: 'POST',
+			async: false,
+			success: function (res) {
+
+				if (res.data.length != 1) {
+					//不是一条数据返回true，打开弹框
+					num = true
+					return false
+				}
+				num = false
+				var data = res.data[0]
+				data.goods_num = 1
+				data.goods_price = data.cost_price || 0
+				var indexs = stockData.length ? stockData.findIndex(v => v.sku_id === data.sku_id) : -1
+				if (index != -1) {
+					//数据行
+					if (indexs != -1) {
+						//库存盘点/先判断是否存在
+						stockData[indexs].goods_num += 1
+						//存在数量累加
+					} else {
+						stockData.splice(index, 1, data)
+					}
+
+				} else {
+					//空白行
+					var indexs = stockData.length ? stockData.findIndex(v => v.sku_id === data.sku_id) : -1
+					if (indexs != -1) {
+						//库存盘点/先判断是否存在
+						stockData[indexs].goods_num += 1
+						//存在数量累加
+					} else {
+						stockData.push(data)
+					}
+
+				}
+				fetch()
+			}
+		})
+		return num
+	}
+	function dataChange(obj) {
+		syncData();
+	}
+
+	function syncData() {
+		var count_num = 0, goods_money = 0;
+		var kinds_data = [];
+		$('.stock-tr').each(function (index) {
+			var obj = $(this);
+			var goods_sku_id = stockData[index].sku_id;
+
+			var goods_num = parseFloat(obj.find('input[name=goods_num]').val()) || 0;
+			if (kinds_data.indexOf(goods_sku_id) == -1) {
+				kinds_data.push(goods_sku_id)
+			}
+			//重新采集数据
+			//库存数量
+
+			stockData[index].goods_num = goods_num;
+			//库存价格
+			var goods_price = stockData[index].cost_price;
+
+			count_num += goods_num;
+			goods_money += goods_num * goods_price;
+			obj.find('.total-cost-money').text(parseFloat(goods_num * goods_price).toFixed(2));
+		});
+		$(".kinds-num").text(parseInt(kinds_data.length));
+		$(".count-num").text(parseFloat(count_num));
+		$(".goods-money").text(parseFloat(goods_money).toFixed(2));
+	}
+
+	function reset() {
+		stockData = [];
+		fetch();
+		syncData();
+	}
+
+	function delTr(obj) {
+		var parent = $(obj).parents('.stock-tr');
+		// parent.remove();
+
+		var key = parent.data('key');
+		//唯一值  (sku_id不承担)
+		stockData.splice(key, 1);
+		//由于key使用index，index不会随dom操作变换移除行会出错需要在删除时重新渲染
+		fetch()
+	}
+	function editBtn(val) {
+		goodsSelectByAllocate(function (res) {
+			if (val === 'btn') {
+				//空白行btn选择
+				res.forEach(el => {
+					el.goods_num = 1
+					el.goods_price = el.price || 0
+
+					var index = stockData.length ? stockData.findIndex(v => v.sku_id === el.sku_id) : -1
+					if (index != -1) {
+						//库存盘点/先判断是否存在
+						stockData[index].goods_num += 1
+						//存在数量累加
+					} else {
+						stockData.push(el)
+					}
+				});
+			} else {
+				//数据行btn选择
+				var parent = $(val).parents('.stock-tr');
+				var key = parent.data('key');
+				//唯一值  (sku_id不承担)
+				res.forEach((el, index) => {
+					//循环选中的数据
+					el.goods_num = 1
+					el.goods_price = el.price || 0
+					//库存盘点
+					var indexs = stockData.length ? stockData.findIndex(v => v.sku_id === el.sku_id) : -1
+					if (indexs != -1) {
+						//优先判断是否存在
+						stockData[indexs].goods_num += 1
+					} else if (!index) {
+						//不存在选中数据第一条替换btn点击行
+						stockData.splice(key, 1, el)
+					} else {
+						stockData.push(el)
+						//其它直接加入
+					}
+				});
+			}
+			fetch()
+		}, [], { minNum: 1, search_text: '', store_id: defaultStoreId, })
+
+	}
+	/**
+		 * 商品选择器
+		 * @param callback 回调函数
+		 * @param selectId 已选商品id
+		 * @param params mode：模式(spu、sku), max_num：最大数量，min_num 最小数量, is_virtual 是否虚拟 0 1, disabled: 开启禁用已选 0 1，promotion：营销活动标识 pintuan、groupbuy、fenxiao （module 表示组件） is_disabled_goods_type: 1表示关闭商品类型筛选 0表示开启商品类型筛选  goods_type: 1 实物商品 2虚拟商品 3电子商品 不传查全部
+		 */
+	function goodsSelectByAllocate(callback, selectId, params = {}) {
+		layui.use(['layer'], function () {
+			localStorage.removeItem('goods_select_id'); // 删除选中id 本地缓存
+			if (selectId.length) {
+				localStorage.setItem('goods_select_id', selectId.toString());
+			}
+
+			params.mode = params.mode ? params.mode : 'spu';
+			if (params.disabled == undefined || params.disabled == 0) {
+				params.disabled = 0;
+			} else {
+				params.disabled = 1;
+			}
+			params.site_id = ns_url.siteId;
+			params.app_module = ns_url.appModule;
+			params.is_disabled_goods_type = params.is_disabled_goods_type || 0;
+			params.goods_type = params.goods_type || "";
+			params.max_num = params.max_num || 200; // 最多选择数量
+			params.search_text = params.search_text || ''
+			// if(!params.post) params.post = 'shop';
+
+			// if (params.post == 'store') params.post += '://store';
+
+			var url = ns.url("stock://shop/stock/goodsSelect?request_mode=iframe", params);
+			layer.open({
+				title: "商品选择",
+				type: 2,
+				area: ['1000px', '720px'],
+				fixed: false, //不固定
+				btn: ['选中', '返回'],
+				content: url,
+				btn1: function (index, layero) {
+					var iframeWin = document.getElementById(layero.find('iframe')[0]['name']).contentWindow;//得到iframe页的窗口对象，执行iframe页的方法：
+					iframeWin.selectGoodsListener(function (obj) {
+						if (typeof callback == "string") {
+							try {
+								eval(callback + '(obj)');
+								if (!obj.length) return false
+								layer.close(index);
+							} catch (e) {
+								console.error('回调函数' + callback + '未定义');
+							}
+						} else if (typeof callback == "function") {
+							callback(obj);
+							if (!obj.length) return false
+							layer.close(index);
+						}
+
+					});
+					return false
+				},
+				btn2: function (index, layero) {
+					layer.close(index);
+					return false
+				}
+			});
+
+		});
+	}
+
+	function setStore() {
+		var output_store_id = $('[name="output_store_id"]').val();
+		let html = '';
+		$.each(store_list, function (i, e) {
+			if (e.store_id != output_store_id) {
+				html += '<option value="' + e.store_id + '">' + e.store_name + '</option>';
+			}
+		});
+
+		$('[name="input_store_id"]').html(html);
+		form.render();
+	}
+</script>

@@ -1,0 +1,38 @@
+<style>
+    .change_shifts-box .layui-card-header .layui-form-switch{
+        margin-top: -4px;
+        margin-left: 5px;
+    }
+</style>
+<div class="layui-card card-common card-brief change_shifts-box">
+    <div class="layui-card-header">
+        <span class="card-title">收银交班打印
+        <input type="checkbox" name="change_shifts_open" lay-filter="change_shifts_open" value="1" lay-skin="switch" {if empty($printer_info) || (!empty($printer_info) && $printer_info['change_shifts_open'])} checked {/if} />
+        </span>
+    </div>
+    <div class="layui-card-body change_shifts-content {if (!empty($printer_info) && !$printer_info['change_shifts_open'])} layui-hide {/if}">
+        <div class="layui-form-item express_company change_shifts_item">
+            <label class="layui-form-label"><span class="required">*</span>打印模板：</label>
+            <div class="layui-input-block len-short">
+                <select name="change_shifts_template_id" {if empty($printer_info) || (!empty($printer_info) && $printer_info['change_shifts_open'])} lay-verify="required" {/if} lay-filter="change_shifts_template_id">
+                    <option value="">请选择</option>
+                    {foreach $template_list as $k=>$v}
+                    {if $v['type'] == 'change_shifts'}
+                    <option value="{$v.template_id}" {if !empty($printer_info) && $printer_info['change_shifts_template_id'] == $v['template_id']} selected {/if}>{$v.template_name}</option>
+                    {/if}
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+
+        <div class="layui-form-item change_shifts_item">
+            <label class="layui-form-label"><span class="required">*</span>打印联数：</label>
+            <div class="layui-input-block">
+                <input type="radio"  name="change_shifts_print_num" value="1" {if empty($printer_info) || $printer_info['change_shifts_print_num'] == 1} checked {/if} lay-verify="required" autocomplete="off" title="1" class="layui-input len-long">
+                <input type="radio"  name="change_shifts_print_num" value="2" {if !empty($printer_info) && $printer_info['change_shifts_print_num'] == 2} checked {/if} lay-verify="required" autocomplete="off" title="2" class="layui-input len-long">
+                <input type="radio"  name="change_shifts_print_num" value="3" {if !empty($printer_info) && $printer_info['change_shifts_print_num'] == 3} checked {/if} lay-verify="required" autocomplete="off" title="3" class="layui-input len-long">
+                <input type="radio"  name="change_shifts_print_num" value="4" {if !empty($printer_info) && $printer_info['change_shifts_print_num'] == 4} checked {/if} lay-verify="required" autocomplete="off" title="4" class="layui-input len-long">
+            </div>
+        </div>
+    </div>
+</div>

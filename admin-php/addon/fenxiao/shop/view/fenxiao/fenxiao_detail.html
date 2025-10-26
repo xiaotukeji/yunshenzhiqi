@@ -1,0 +1,177 @@
+<link rel="stylesheet" type="text/css" href="__STATIC__/ext/layui/extend/cascader/cascader.css"/>
+<style>
+	.layui-layer-page .layui-layer-content {overflow-y: auto!important;}
+	.layui-layout-admin .layui-body .body-content {background: none;padding: 0}
+	.info-wrap {display: flex}
+	.info-wrap .layui-card {flex: 1;margin-top: 0}
+	.info-wrap .layui-card:first-child {margin-right: 15px}
+	.member-info {display: flex}
+	.member-info .headimg {margin-right: 15px;width: 70px;height: 70px;display: flex;align-items: center;justify-content: center;overflow: hidden}
+	.member-info .headimg img {max-width: 100%;height: auto}
+	.member-info .info {flex: 1;width: 0;display: flex;flex-wrap: wrap}
+	.member-info .info .data-item {width: 50%;padding-right: 10px;box-sizing: border-box;line-height: 30px}
+	.member-info .data-item .layui-icon {cursor: pointer}
+	.layui-tab-content {padding: 0}
+	.card-brief .layui-card-header{padding-top: 5px !important;}
+	.card-common .layui-card-body{padding-top: 10px;}
+</style>
+
+<div class="info-wrap">
+	<div class="layui-card card-common card-brief head top">
+		<div class="layui-card-header">
+            <span class="card-title">基础信息</span>
+		</div>
+		<div class="layui-card-body">
+			<div class="member-info">
+				<div class="info">
+					<div class="data-item">
+						<span>分销商编号：</span>
+						<span>{$info.fenxiao_no}</span>
+					</div>
+					<div class="data-item">
+						<span>分销商：</span>
+						<span>{$info.fenxiao_name}</span>
+					</div>
+					<div class="data-item">
+						<span>会员账号：</span>
+						<span><a href="{:href_url('shop/member/editmember?member_id=')}{$info.member_id}" target="_blank" class="text-color">{$info.username}</a></span>
+					</div>
+					<div class="data-item">
+						<span>上级分销商：</span>
+						<span>{if $info.parent_name == ''} 无 {else /}{$info.parent_name} {/if}</span>
+					</div>
+					<div class="data-item">
+						<span>分销商等级：</span>
+						<span>{$level.level_name}</span>
+					</div>
+					<div class="data-item">
+						<span>当前佣金：</span>
+						<span>{$info.account} 元</span>
+					</div>
+					<div class="data-item">
+						<span>已提现佣金：</span>
+						<span>{$info.account_withdraw} 元</span>
+					</div>
+					<div class="data-item">
+						<span>提现中佣金：</span>
+						<span>{$info.account_withdraw_apply} 元</span>
+					</div>
+					<div class="data-item">
+						<span>当前状态：</span>
+						<span>{$status[$info['status']]}</span>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="layui-card card-common card-brief head top">
+		<div class="layui-card-header">
+            <span class="card-title">账户信息</span>
+		</div>
+		<div class="layui-card-body">
+			<div class="member-info">
+				<div class="info">
+					<div class="data-item">
+						<span>一级分销订单总数：</span>
+						<span id="member_balance">{$info.one_fenxiao_order_num}</span>
+					</div>
+					<div class="data-item">
+						<span>一级分销订单总额：</span>
+						<span>{$info.one_fenxiao_total_order} 元</span>
+					</div>
+					<div class="data-item">
+						<span>下线总人数：</span>
+						<span>{$info.team_num.num} 人</span>
+					</div>
+					<div class="data-item">
+						<span>下线总分销商：</span>
+						<span>{$info.team_num.fenxiao_num} 人</span>
+					</div>
+					{if $info.team_num.level >= 1}
+					<div class="data-item">
+						<span>一级下线人数：</span>
+						<span>{$info.team_num.num_1} 人</span>
+					</div>
+					<div class="data-item">
+						<span>一级下线分销商：</span>
+						<span>{$info.team_num.fenxiao_num_1} 人</span>
+					</div>
+					{/if}
+					{if $info.team_num.level >= 2}
+					<div class="data-item">
+						<span>二级下线人数：</span>
+						<span>{$info.team_num.num_2} 人</span>
+					</div>
+					<div class="data-item">
+						<span>二级下线分销商：</span>
+						<span>{$info.team_num.fenxiao_num_2} 人</span>
+					</div>
+					{/if}
+					{if $info.team_num.level >= 3}
+					<div class="data-item">
+						<span>三级下线人数：</span>
+						<span>{$info.team_num.num_3} 人</span>
+					</div>
+					<div class="data-item">
+						<span>三级下线分销商：</span>
+						<span>{$info.team_num.fenxiao_num_3} 人</span>
+					</div>
+					{/if}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="layui-card card-common card-brief head top">
+	<div class="layui-card-header">
+        <span class="card-title">分销商信息</span>
+	</div>
+
+	<div class="layui-card-body layui-tab layui-tab-brief" lay-filter="fenxiao_tab">
+		<ul class="layui-tab-title">
+			<li lay-id="fenxiao_team" class="layui-this" >分销商团队</li>
+			<li lay-id="fenxiao_account">账户流水记录</li>
+			<li lay-id="fenxiao_order">订单管理</li>
+		</ul>
+		<div class="layui-tab-content">
+			<div class="layui-tab-item layui-show">
+				{include file="fenxiao/fenxiao_team" /}
+			</div>
+			<div class="layui-tab-item">
+				{include file="fenxiao/fenxiao_account" /}
+			</div>
+			<div class="layui-tab-item">
+				{include file="fenxiao/order_lists" /}
+			</div>
+		</div>
+	</div>
+</div>
+<script>
+	layui.use(['element', 'laytpl', 'form', 'laydate'], function () {
+		var element = layui.element;
+		var tab = 'fenxiao_team';
+
+		var hash_arr = getHashArr();
+		$.each(hash_arr, function (index, itemobj) {
+			var item_arr = itemobj.split("=");
+			if (item_arr.length == 2) {
+				if (item_arr[0].indexOf("tab") != "-1") {
+					tab = item_arr[1];
+				}
+			}
+		});
+
+		element.tabChange('fenxiao_tab', tab);
+
+		element.on('tab(fenxiao_tab)', function () {
+			localStorage.setItem('formSubmit','search'); // 表单搜索标识，防止页面重新加载
+			var hash = location.hash;
+			if (hash.indexOf('tab=') != -1) {
+				location.hash = hash.replace('tab=' + tab, '');
+			}
+		});
+
+	});
+</script>

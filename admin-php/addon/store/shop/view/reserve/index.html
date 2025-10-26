@@ -1,0 +1,461 @@
+<link rel="stylesheet" href="ADDON_STORE_CSS/reserve_index.css">
+<style>
+    .layui-layer-loading {
+        box-shadow: unset!important;
+    }
+    .screen.reserve {
+        padding: 0;
+        margin-top: 20px;
+    }
+    {foreach name="reserve_state" item="vo"}
+    .{$vo.state} {
+        background-color: {$vo.color};
+        border-color: {$vo.color};
+    }
+    .{$vo.state}-color {
+        color: {$vo.color};
+    }
+    {/foreach}
+</style>
+
+
+<div class="layui-card layui-form reserve-data">
+    <div class="uni-flex panel-head">
+        <button class="layui-btn" onclick="addReserve()">添加预约</button>
+        <div class="status uni-flex">
+            {foreach name="reserve_state" item="vo"}
+            <div class="color {$vo.state}"></div>
+            <div>{$vo.name}</div>
+            {/foreach}
+        </div>
+    </div>
+    <div class="screen reserve">
+        <div class="layui-colla-item">
+            <div class="layui-colla-content layui-form layui-show">
+                <div class="layui-form-item">
+                    <div class="layui-inline">
+                        <label class="layui-form-label">客户：</label>
+                        <div class="layui-input-inline">
+                            <input type="text" name="search_text" placeholder="请输入客户名称/客户手机号" autocomplete="off" class="layui-input ">
+                        </div>
+                    </div>
+
+                    <div class="layui-inline">
+                        <label class="layui-form-label">预约门店：</label>
+                        <div class="layui-input-inline">
+                            <select name="store_id">
+                                <option value="">全部</option>
+                                {foreach $store_list as $k=> $v}
+                                <option value="{$v.store_id}">{$v.store_name}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <button class="layui-btn bg-color" lay-submit lay-filter="search">筛选</button>
+                    <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel-body">
+        <!-- 看板类型 -->
+<!--        <div class="time-type">-->
+<!--            <span class="on" data-type="week">周</span>-->
+<!--            <span data-type="month">月</span>-->
+<!--        </div>-->
+        <!-- 看板数据 -->
+        <div class="time-data" id="time-data">
+            <div class="uni-flex time-wrap">
+                <span class="iconfont iconback_light" onclick="prevWeek()"></span>
+                <div class="date">{$data[0]['date']} - {$data[6]['date']}</div>
+                <span class="iconfont iconyoujiantou" onclick="nextWeek()"></span>
+            </div>
+            <div class="head uni-flex">
+                {foreach name="$data" item="item"}
+                <div>
+                    <button class="layui-btn {if $item.currday eq 0}layui-btn-primary{/if}">{$item.week}<span>{$item.date}</span></button>
+                </div>
+                {/foreach}
+            </div>
+            <div class="body uni-flex">
+                {foreach name="$data" item="item"}
+                <div class="common-scrollbar" data-page="1" data-total="{$item.data.page_count}" data-start="{$item.start}" data-end="{$item.end}">
+                    <div class="box">
+                        {notempty name="item.data.list"}
+                        {foreach name="item.data.list" item="vo"}
+                        <div class="panel-item {$vo.reserve_state}">
+                            <div class="username">{$vo.nickname}</div>
+                            <div class="time {$vo.reserve_state}">{:date('H:i', $vo.reserve_time)}</div>
+                            {php}
+                            $vo['reserve_item'] = explode(',', $vo['reserve_item']);
+                            {/php}
+                            {foreach name="$vo.reserve_item" item="goods_name"}
+                            <div class="service">{$goods_name}</div>
+                            {/foreach}
+                            <div class="action" data-state="{$vo.reserve_state}" data-id="{$vo.reserve_id}">
+                                <span class="iconfont iconyuandian"></span>
+                            </div>
+                        </div>
+                        {/foreach}
+                        {/notempty}
+                    </div>
+                </div>
+                {/foreach}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 周看板数据 -->
+<script type="text/html" id="dataTpl">
+    <div class="uni-flex time-wrap">
+        <span class="iconfont iconback_light" onclick="prevWeek()"></span>
+        <div class="date">{{ d[0].date }} - {{ d[6].date }}</div>
+        <span class="iconfont iconyoujiantou" onclick="nextWeek()"></span>
+    </div>
+    <div class="head uni-flex">
+        {{# layui.each(d, function(index, item){ }}
+        <div>
+            <button class="layui-btn {{# if(item.currday == 0){ }}layui-btn-primary{{# } }}">{{ item.week }}<span>{{ item.date }}</span></button>
+        </div>
+        {{# }); }}
+    </div>
+    <div class="body uni-flex">
+        {{# layui.each(d, function(index, item){ }}
+        <div class="common-scrollbar" data-page="0" data-total="1" data-start="{{item.start}}" data-end="{{item.end}}">
+            <div class="box"></div>
+        </div>
+        {{# }); }}
+    </div>
+</script>
+
+<script type="text/html" id="reserveTpl">
+    {{# layui.each(d, function(vindex, vo){ }}
+    <div class="panel-item {{ vo.reserve_state }}">
+        <div class="username">{{ vo.nickname }}</div>
+        <div class="time {{ vo.reserve_state }}">{{ ns.time_to_date(vo.reserve_time, 'H:i') }}</div>
+        {{# vo.reserve_item.split(',').forEach(function(goods_name){ }}
+        <div class="service">{{ goods_name }}</div>
+        {{# }); }}
+        <div class="action" data-state="{{ vo.reserve_state }}" data-id="{{ vo.reserve_id }}">
+            <span class="iconfont iconyuandian"></span>
+        </div>
+    </div>
+    {{# }); }}
+</script>
+
+<!-- 月看板日期模板 -->
+<script type="text/html" id="month-table-tpl">
+    <div class="uni-flex time-wrap">
+        <span class="iconfont iconback_light" onclick="prevMonth()"></span>
+        <div class="date">{{ data_year }}/{{ data_month < 10 ? '0' + data_month : data_month }}</div>
+        <span class="iconfont iconyoujiantou" onclick="nextMonth()"></span>
+    </div>
+    <div class="month-table">
+        <div class="table-head">
+            <div class="table-tr">
+                <div class="table-td">周一</div>
+                <div class="table-td">周二</div>
+                <div class="table-td">周三</div>
+                <div class="table-td">周四</div>
+                <div class="table-td">周五</div>
+                <div class="table-td">周六</div>
+                <div class="table-td">周日</div>
+            </div>
+        </div>
+        <div class="table-body">
+            {{# d.forEach(function(week_days, week_index){ }}
+            <div class="table-tr">
+                {{# week_days.forEach(function(item, index){ }}
+                <div class="table-td {{ item.is_curr_month ? '' : 'not-curr-month' }}">
+                    <div class="top">{{ item.day }}</div>
+                    <div class="bottom" id="{{item.month}}_month_{{item.day}}_day">
+                        <!-- 每日数据 -->
+                    </div>
+                </div>
+                {{# }) }}
+            </div>
+            {{# }) }}
+        </div>
+    </div>
+</script>
+
+<!-- 月看板每日数据模板 -->
+<script type="text/html" id="month-table-td-tpl">
+    {{# d.list.forEach(function(item, index){ }}
+        <div class="item-box">
+            <div class="item" data-reserve_id="{{ item.reserve_id }}">
+                <span class="{{ item.reserve_state }}"></span>
+                <span>{{ item.reserve_item }}</span>
+            </div>
+            <div class="detail-card">
+                <div class="username">{{ item.nickname }}</div>
+                <div class="time {{ item.reserve_state }}">{{ ns.time_to_date(item.reserve_time, 'H:i') }}</div>
+                {{# item.reserve_item.split(',').forEach(function(goods_name){ }}
+                <div class="service">{{ goods_name }}</div>
+                {{# }); }}
+                <div class="state {{ item.reserve_state }}-color">{{ item.reserve_state_name }}</div>
+            </div>
+        </div>
+    {{# }) }}
+    {{# if(d.count > d.list.length){ }}
+    {{# let more_url = ns.href('store://shop/reserve/lists', {start_time:d.start_time, end_time:d.end_time}); }}
+    <div class="more"><a href="{{ more_url }}" target="_blank">查看全部{{ d.count }}条预约 ></a></div>
+    {{# } }}
+</script>
+
+{include file="reserve/reserve_action"}
+<script>
+    var dropdown, laytpl, form, _dropdown = {};
+    var data_year = (new Date()).getFullYear();
+    var data_month = (new Date()).getMonth() + 1;
+
+    layui.use(['form', 'laytpl', 'dropdown'], function(){
+
+        dropdown = layui.dropdown;
+        laytpl = layui.laytpl;
+        form = layui.form;
+
+        init();
+
+        /**
+         * 搜索功能
+         */
+        form.on('submit(search)', function(data) {
+            curr = 0;
+            getWeekData();
+            return false;
+        });
+    });
+
+    // 触底加载
+    $('.panel-body .common-scrollbar').scroll(function () {
+        var top = $(this).scrollTop();
+        var windowHeight = $(this).height();
+        var documentHeight = $(this).find('.box').height();
+
+        if (documentHeight - top - windowHeight < 20) {
+            loadinfo($(this))
+        }
+    });
+
+    function addReserve() {
+        layer.open({
+            title: '添加预约',
+            type: 2,
+            content: ns.url('store://shop/reserve/addreserve?request_mode=iframe'),
+            area: ['800px', '690px'],
+            success: function (layero, index) {
+            }
+        })
+    }
+
+    var curr = 0, repeat = false;
+    function prevWeek() { curr -= 1; getWeekData(); }
+    function nextWeek() { curr += 1; getWeekData(); }
+
+    function getWeekData() {
+        if (repeat) return;
+        repeat = true;
+
+        layer.load(3,{shade: [0.8, '#fff']});
+
+        $.ajax({
+            url: ns.url("store://shop/reserve/getweekday"),
+            data: {
+                length: curr
+            },
+            dataType: 'JSON',
+            type: 'POST',
+            success: function (res) {
+                repeat = false;
+                if (res.code == 0) {
+                    laytpl($('#dataTpl').html()).render(res.data, function(string){
+                        $('#time-data').html(string);
+                        layer.closeAll();
+                        $('.panel-body .common-scrollbar').scroll(function () {
+                            var top = $(this).scrollTop();
+                            var windowHeight = $(this).height();
+                            var documentHeight = $(this).find('.box').height();
+                            if (documentHeight - top - windowHeight < 20) {
+                                loadinfo($(this))
+                            }
+                        });
+
+                        $('.panel-body .common-scrollbar').each(function (index, item) {
+                            loadinfo($(item))
+                        })
+
+                    });
+
+                } else {
+                    layer.msg('请求错误');
+                }
+            }
+        });
+    }
+
+    function loadinfo(elem) {
+        var page = parseInt(elem.attr('data-page')),
+            total = elem.attr('data-total');
+
+        if (page >= total) return;
+        page += 1;
+
+        $.ajax({
+            url: ns.url("store://shop/reserve/lists"),
+            data: {
+                page: page,
+                start_time: elem.attr('data-start'),
+                end_time: elem.attr('data-end'),
+                store_id: $('[name="store_id"]').val(),
+                search_text: $('[name="search_text"]').val(),
+            },
+            dataType: 'JSON',
+            type: 'POST',
+            success: function (res) {
+                if (res.code == 0 && res.data.list.length) {
+                    elem.attr('data-page', page);
+                    laytpl($('#reserveTpl').html()).render(res.data.list, function(string) {
+                        elem.find('.box').append(string);
+                        init();
+                    })
+                }
+            }
+        });
+    }
+
+    function getMonthDays() {
+        layer.load(3,{shade: [0.8, '#fff']});
+        $.ajax({
+            url: ns.url("store://shop/reserve/getMonthDays"),
+            data: {
+                year : data_year,
+                month : data_month,
+            },
+            dataType: 'JSON',
+            type: 'POST',
+            success: function (res) {
+                if (res.code == 0) {
+                    var month_data = [];
+                    var week_data = [];
+                    var month_day_num = res.data.length;
+                    res.data.forEach(function(item, index){
+                        week_data.push(item);
+                        if(week_data.length === 7 || index === month_day_num - 1){
+                            month_data.push(week_data);
+                            week_data = [];
+                        }
+                    });
+                    laytpl($('#month-table-tpl').html()).render(month_data, function(string){
+                        $("#time-data").html(string);
+                        layer.closeAll();
+                        res.data.forEach(function(item, index){
+                            getDayData(item);
+                        })
+                    });
+                }
+            }
+        });
+    }
+
+    function getDayData(item) {
+        $.ajax({
+            url: ns.url("store://shop/reserve/lists"),
+            data: {
+                page: 1,
+                page_size:3,
+                start_time: ns.date_to_time(item.start_time),
+                end_time: ns.date_to_time(item.end_time),
+                store_id: $('[name="store_id"]').val(),
+                search_text: $('[name="search_text"]').val(),
+            },
+            dataType: 'JSON',
+            type: 'POST',
+            success: function (res) {
+                if (res.code == 0 && res.data.list.length) {
+                    res.data.start_time = item.start_time;
+                    res.data.end_time = item.end_time;
+                    laytpl($('#month-table-td-tpl').html()).render(res.data, function(string) {
+                        $(`#${item.month}_month_${item.day}_day`).html(string);
+                        init();
+                    })
+                }
+            }
+        });
+    }
+
+    $("#time-data").on('click', '.table-td .bottom .item', function(){
+        let reserve_id = $(this).attr('data-reserve_id');
+        reserveEvent('detail', {reserve_id: reserve_id});
+    });
+
+    function prevMonth(){
+        if(data_month > 1){
+            data_month --;
+        }else{
+            data_month = 12;
+            data_year --;
+        }
+        getMonthDays();
+    }
+
+    function nextMonth(){
+        if(data_month < 12){
+            data_month ++;
+        }else{
+            data_month = 1;
+            data_year ++;
+        }
+        getMonthDays();
+    }
+
+    $(".time-type span").on('click', function(){
+        $(this).addClass('on').siblings().removeClass('on');
+        var type = $(this).attr('data-type');
+        if(type === 'week'){
+            curr = 0;
+            getWeekData();
+        }else{
+            data_year = (new Date()).getFullYear();
+            data_month = (new Date()).getMonth() + 1;
+            getMonthDays();
+        }
+    });
+
+    function init(){
+        $('body .panel-item .action').each(function () {
+            var state = $(this).attr('data-state');
+            var reserveId = $(this).attr('data-id');
+            var menuData = getMemuData(state);
+            var elem = $(this);
+            let id = $(elem).attr('id');
+            if(id == '' || id == undefined){
+                id = ns.gen_non_duplicate(5);
+                $(elem).attr('id', id)
+            }
+
+            if (!_dropdown['reserve_id' + reserveId]) {
+                dropdown.suite("#"+id, {
+                    menus: menuData,
+                    success: function ($dom) {
+                        $dom.addClass('border-color').css({
+                            'outline':'none',
+                            'border':'2px solid'
+                        });
+                    },
+                    onItemClick: function (event, menu) {
+                        let data_id = $('#'+id).attr('data-id');
+                        reserveEvent(event, {reserve_id: data_id}, function (res) {
+                            getWeekData()
+                        });
+                    },
+                });
+            }
+        })
+    }
+</script>

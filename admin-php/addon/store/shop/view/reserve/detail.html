@@ -1,0 +1,75 @@
+<style>
+    .align-right {text-align: right!important;}
+    .service-table {width: 600px!important;}
+</style>
+<div class="main-wrap">
+    <div class="layui-form-item">
+        <label class="layui-form-label">预约客户：</label>
+        <div class="layui-input-inline">
+            <a href="{:href_url('shop/member/editmember?member_id='.$info.member_id)}" target="_blank">{$info.nickname} {$info.mobile}</a>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">预约门店：</label>
+        <div class="layui-input-inline">{$info.store_name ? $info.store_name : ''}</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">预约状态：</label>
+        <div class="layui-input-inline">{$info.reserve_state_name}</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">预约到店时间：</label>
+        <div class="layui-input-inline">{:date('Y-m-d H:i', $info.reserve_time)}</div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">创建时间：</label>
+        <div class="layui-input-inline">{:date('Y-m-d H:i', $info.create_time)}</div>
+    </div>
+    {if $info.to_store_time}
+    <div class="layui-form-item">
+        <label class="layui-form-label">到店时间：</label>
+        <div class="layui-input-inline">{:date('Y-m-d H:i', $info.to_store_time)}</div>
+    </div>
+    {/if}
+    {if $info.cancel_time}
+    <div class="layui-form-item">
+        <label class="layui-form-label">取消时间：</label>
+        <div class="layui-input-inline">{:date('Y-m-d H:i', $info.cancel_time)}</div>
+    </div>
+    {/if}
+    <div class="layui-form-item">
+        <label class="layui-form-label">预约项目：</label>
+        <div class="layui-input-inline service-table">
+            <table class="layui-table" lay-skin="line">
+                <colgroup>
+                    <col width="62%">
+                    <col width="18%">
+                    <col>
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>项目</th>
+                        <th>技师</th>
+                        <th class="align-right">项目时长</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach name="info.item" item="item"}
+                    <tr>
+                        <td>{$item.goods_name}</td>
+                        <td>{if $item.reserve_user_id}{$item.username}{else/}未选择员工{/if}</td>
+                        <td class="align-right">{$item.service_length}分钟</td>
+                    </tr>
+                    {/foreach}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="layui-form-item">
+        <label class="layui-form-label">备注：</label>
+        <div class="layui-input-inline">{$info.remark ? $info.remark : '-'}</div>
+    </div>
+    <div class="form-row">
+        <button class="layui-btn layui-btn-primary" onclick="layer.closeAll();">返回</button>
+    </div>
+</div>

@@ -1,0 +1,81 @@
+<link rel="stylesheet" href="STATIC_CSS/promotion_detail.css">
+
+<div class="layui-card card-common card-brief">
+    <div class="layui-card-header">
+        <span class="card-title">基本信息</span>
+    </div>
+    <div class="layui-card-body">
+        <div class="promotion-view">
+            <div class="promotion-view-item">
+                <label>活动名称：</label>
+                <span>{$info.name}</span>
+            </div>
+            <div class="promotion-view-item">
+                <label>活动状态：</label>
+                <span>{$info.status_name}</span>
+            </div>
+            <div class="promotion-view-item">
+                <label>开始时间：</label>
+                <span>{:date('Y-m-d H:i:s',$info.start_time)}</span>
+            </div>
+            <div class="promotion-view-item">
+                <label>结束时间：</label>
+                <span>{:date('Y-m-d H:i:s',$info.end_time)}</span>
+            </div>
+
+            <div class="promotion-view-item">
+                <label>活动内容：</label>
+                <span>
+                    {$info.divide_num}名好友，瓜分{$info.money}元
+                </span>
+            </div>
+            <div class="promotion-view-item">
+                <label>红包总量：</label>
+                <span>{$info.inventory}张</span>
+            </div>
+            <div class="promotion-view-item">
+                <label>瓜分有效期：</label>
+                <span>{$info.divide_time}小时</span>
+            </div>
+
+            <div class="promotion-view-item">
+                <label>是否模拟好友：</label>
+                <span>{if $info.is_simulation==1}是{else/}否{/if}</span>
+            </div>
+            <div class="promotion-view-item">
+                <label>仅新人参与限制：</label>
+                <span>{if $info.is_new==1}是{else/}否{/if}</span>
+            </div>
+            <div class="promotion-view-item">
+                <label>瓜分方式：</label>
+                <span>{if $info.divide_type == 0}固定金额{else/}随机金额{/if}</span>
+            </div>
+            <div class="promotion-view-item">
+                <label>余额设置：</label>
+                <span>{if $info.balance_set == 1}储值余额{else/}现金余额{/if}</span>
+            </div>
+        </div>
+        <div class="promotion-view-item-line">
+            <label class="promotion-view-item-custom-label">横幅图片：</label>
+            <div class="promotion-view-item-custom-box img-upload">
+                <div class="upload-img-block icon">
+                    <div class="upload-img-box">
+                        {if condition="$info.image"}
+                        <img layer-src  src="{:img($info.image)}" >
+                        {else/}
+                        <img layer-src src="__STATIC__/img/shape.png" />
+                        {/if}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {if !empty($info.remark)}
+        <div class="promotion-view">
+            <div class="promotion-view-item-line">
+                <label class="promotion-view-item-custom-label">活动说明：</label>
+                <div class="promotion-view-item-custom-box">{$info.remark}</div>
+            </div>
+        </div>
+        {/if}
+    </div>
+</div>

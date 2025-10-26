@@ -1,0 +1,679 @@
+<style>
+	#container{ width: 650px; height: 500px; }
+	#container > div {z-index: 500!important}
+	.empty-address{ display: none; }
+	.address-content {display: inline-block;vertical-align: top;}
+	.empty-address-text{font-size: 14px;color: #f43530;height: 34px;line-height: 34px;}
+    .tag-wrap{overflow: auto;height: 140px;}
+    .upload-img-block .upload-img-box .preview_img{width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;}
+    .upload-img-block .upload-img-box .preview_img img{max-width: 100%; max-height: 100%;}
+</style>
+
+<div class="layui-form form-wrap" lay-filter="storeform" >
+    <input type="hidden" name="store_id" value="{$store_id}"/>
+	<div class="layui-form-item">
+		<label class="layui-form-label"><span class="required">*</span>{$title}名称：</label>
+		<div class="layui-input-block">
+			<input type="text" name="store_name" autocomplete="off" lay-verify="store_name" class="layui-input len-mid" value="{$info.store_name}">
+		</div>
+		<div class="word-aux">{$title}的名称（招牌）</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label"><span class="required">*</span>{$title}类型：</label>
+		<div class="layui-input-inline len-mid">
+			<select name="store_type" lay-verify="required">
+				<option value="">请选择门店类型</option>
+				{foreach $store_type as $k => $v}
+				<option value="{$v.type}" {if $info.store_type eq $v.type}selected{/if}>{$v.name}</option>
+				{/foreach}
+			</select>
+		</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label">{$title}Logo：</label>
+		<div class="layui-input-block img-upload">
+			<div class="upload-img-block icon">
+				<div class="upload-img-box logo-image-box {if !empty($info.store_image)}hover{/if}" >
+					<input type="hidden" name="store_image" value="{$info.store_image}">
+				</div>
+			</div>
+		</div>
+		<div class="word-aux">
+			<p>{$title}Logo在PC及移动端对应页面及列表作为{$title}标志出现。</p>
+			<p>建议图片尺寸：100 * 100像素，图片格式：jpg、png、jpeg。</p>
+		</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label">{$title}图片：</label>
+		<div class="layui-input-block">
+			<div class="js-store-image"></div>
+		</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label">{$title}简介：</label>
+		<div class="layui-input-block">
+			<script id="editor" type="text/plain" class="special-length" style="height:300px;"></script>
+		</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label">{$title}电话：</label>
+		<div class="layui-input-block">
+			<input type="text" name="telphone" value="{$info.telphone}" lay-verify="tel" autocomplete="off" class="layui-input len-mid">
+		</div>
+	</div>
+
+	{if $category_status == 1}
+	<div class="layui-form-item store-category">
+		<label class="layui-form-label"><span class="required">*</span>门店分类：</label>
+		<div class="layui-input-inline len-mid">
+			<select name="category_id" lay-verify="required">
+				{foreach $category_list as $k => $v}
+				<option value="{$v.category_id}" {if $info.category_id eq $v.category_id}selected{/if}>{$v.category_name}</option>
+				{/foreach}
+			</select>
+		</div>
+	</div>
+	{/if}
+
+	<div class="layui-form-item label-list">
+		<label class="layui-form-label"><span class="required">*</span>门店标签：</label>
+		<div class="layui-input-inline len-long">
+			{foreach $label_list as $k => $v}
+			<input type="checkbox" name="label_id" value="{$v.label_id}" title="{$v.label_name}" lay-skin="primary" {if strpos($info.label_id, ','.$v['label_id'].',')  !== false}checked{/if}/>
+			{/foreach}
+		</div>
+	</div>
+
+	<!--自提点地址-->
+	<div class="layui-form-item">
+		<label class="layui-form-label"><span class="required">* </span>{$title}地址：</label>
+		<div class="layui-input-inline area-select">
+			<select name="province_id" lay-filter="province_id" lay-verify="province_id">
+				{foreach $province_list as $k => $v}
+				<option value="{$v.id}" {if $info.province_id == $v.id}select{/if}>{$v.name}</option>
+				{/foreach}
+			</select>
+		</div>
+		
+		<div class="layui-input-inline area-select">
+			<select name="city_id"  lay-filter="city_id" lay-verify="city_id">
+				<option value="">请选择城市</option>
+			</select>
+		</div>
+		
+		<div class="layui-input-inline area-select">
+			<select name="district_id"  lay-filter="district_id" lay-verify="district_id">
+				<option value="">请选择区/县</option>
+			</select>
+		</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label"></label>
+		<div class="layui-input-block">
+			<input type="text" name="address"  placeholder="请填写{$title}的具体地址" value="{$info.address}" lay-verify="required" autocomplete="off" class="layui-input len-long address-content">
+			<input type = "hidden" name="longitude" lay-verify="required" class="layui-input" value="{$info.longitude}"/>
+			<input type = "hidden" name="latitude" lay-verify="required" class="layui-input" value="{$info.latitude}"/>
+			<button class='layui-btn-primary layui-btn' onclick="refreshFrom();">查找地址</button>
+		</div>
+		<div class="word-aux">点击查找地址可在地图上显示输入的地理位置</div>
+	</div>
+
+	<div class="layui-form-item">
+		<label class="layui-form-label">地图定位：</label>
+		{if $tencent_map_key}
+			{if $check_map_key.status == 0}
+			<div class="layui-input-block">
+				<div id="container" class="selffetch-map"></div>
+			</div>
+			{else/}
+			<div class="empty-local-map">
+				<div class="word-aux empty-address-text">{$check_map_key.message}。<a href="{:href_url('shop/config/map')}" class="text-color">重新配置</a></div>
+			</div>
+			{/if}
+		{else/}
+		<div class="empty-local-map">
+			<div class="word-aux empty-address-text">腾讯地图尚未配置，无法定位地址。<a href="{:href_url('shop/config/map')}" class="text-color">点击配置</a></div>
+		</div>
+		{/if}
+		<span class="layui-word-aux empty-address">请选择地理位置！在地图上点击得到的地理位置会自动填入到对应的输入框中</span>
+	</div>
+
+	{if $is_exit == 1}
+
+	<div class="layui-form-item layui-hide">
+		<label class="layui-form-label">同城配送：</label>
+		<div class="layui-input-block">
+			<input type="checkbox" name="is_o2o" value="1" lay-skin="switch" {if $info['is_o2o'] == 1} checked {/if}>
+		</div>
+		<div class="word-aux ">开启同城配送需要门店设置配送费用以及配送员</div>
+	</div>
+	<div class="layui-form-item layui-hide">
+		<label class="layui-form-label">门店自提：</label>
+		<div class="layui-input-block">
+			<input type="checkbox" name="is_pickup" value="1" lay-skin="switch" {if $info['is_pickup'] == 1} checked {/if} lay-filter="pickup">
+		</div>
+	</div>
+	{/if}
+
+	<div class="layui-form-item time-view layui-hide">
+		<div class="layui-inline">
+			<label class="layui-form-label">自提日期：</label>
+			<div class="layui-input-inline">
+				<input type="radio" name="time_type" value="0" title="每天"  lay-filter="time_type" {if $info.time_type == 0 || !isset($info.time_type)}checked{/if}/>
+				<input type="radio" name="time_type" value="1" title="自定义"  lay-filter="time_type" {if $info.time_type == 1 }checked{/if}/>
+			</div>
+		</div>
+	</div>
+
+	<div class="time-view layui-hide">
+		<div class="layui-form-item time-type-view" lay-verify="time_week">
+			<div class="layui-inline">
+				<label class="layui-form-label"></label>
+				<div class="layui-input-inline">
+					<input type="checkbox" value="1" class='time-week' name="time_week[]" title="周一" lay-skin="primary" {if !empty($info.time_week) && in_array(1,$info.time_week)} checked {/if}>
+					<input type="checkbox" value="2" class='time-week' name="time_week[]" title="周二" lay-skin="primary" {if !empty($info.time_week) && in_array(2,$info.time_week)} checked {/if}>
+					<input type="checkbox" value="3" class='time-week' name="time_week[]" title="周三" lay-skin="primary" {if !empty($info.time_week) && in_array(3,$info.time_week)} checked {/if}>
+					<input type="checkbox" value="4" class='time-week' name="time_week[]" title="周四" lay-skin="primary" {if !empty($info.time_week) && in_array(4,$info.time_week)} checked {/if}>
+					<input type="checkbox" value="5" class='time-week' name="time_week[]" title="周五" lay-skin="primary" {if !empty($info.time_week) && in_array(5,$info.time_week)} checked {/if}>
+					<input type="checkbox" value="6" class='time-week' name="time_week[]" title="周六" lay-skin="primary" {if !empty($info.time_week) && in_array(6,$info.time_week)} checked {/if}>
+					<input type="checkbox" value="0" class='time-week' name="time_week[]" title="周日" lay-skin="primary" {if !empty($info.time_week) && in_array(0,$info.time_week)} checked {/if}>
+				</div>
+			</div>
+		</div>
+		<div class="layui-form-item time-type-view-all" >
+			<label class="layui-form-label">自提时间：</label>
+			<div class="layui-input-inline">
+				<input type="text" class="layui-input" id="startTime" lay-verify="start_time" placeholder="自提开始时间" value="" readonly >
+				<input type="hidden" class="layui-input" name="start_time" placeholder="自提开始时间" value="{$info.start_time}">
+			</div>
+			<div class="layui-form-mid layui-word-aux">~</div>
+			<div class="layui-input-inline">
+				<input type="text" class="layui-input" id="endTime" lay-verify="end_time" placeholder="自提结束时间" value="" readonly >
+				<input type="hidden" class="layui-input" name="end_time" placeholder="自提结束时间" value="{$info.end_time}">
+			</div>
+		</div>
+	</div>
+	{if $is_exit == 1}
+	<div class="layui-form-item layui-hide">
+		<div class="layui-inline">
+			<label class="layui-form-label">库存设置：</label>
+			<div class="layui-input-inline">
+				<input type="radio" name="stock_type" value="all" title="总部统一库存" {if $info['stock_type'] == 'all'} checked {/if}>
+				<input type="radio" name="stock_type" value="store" title="{$title}独立库存"  {if $info['stock_type'] == 'store'} checked {/if}>
+			</div>
+		</div>
+		<div class="word-aux">总部统一库存：门店不用入库，商品查询以及销售由总部进行出入库<br>门店独立库存：门店自提以及收银扣除门店库存，门店需要入库</div>
+	</div>
+	{/if}
+
+	<div class="form-row">
+		<button class="layui-btn" lay-submit lay-filter="save">保存</button>
+		<button class="layui-btn layui-btn-primary" onclick="backStockList()">返回</button>
+		<a id="storeImage"></a>
+	</div>
+</div>
+
+<script type="text/html" id="storeLogoImageTpl">
+	{{# if(d.list){ }}
+        <div class="preview_img">
+            <img layer-src src="{{ns.img(d.list)}}" class="img_prev"/>
+        </div>
+        <div class="operation">
+            <div>
+                <i title="图片预览" class="iconfont iconreview js-preview" style="margin-right: 20px;"></i>
+                <i title="删除图片" class="layui-icon layui-icon-delete js-delete" ></i>
+            </div>
+            <div class="replace_img js-replace js-add-logo-image">点击替换</div>
+        </div>
+        <input type="hidden" name="store_image" value="{{d.list}}">
+    {{# }else{ }}
+    <div class="upload-default">
+        <div class="upload js-add-logo-image" >
+            <i class="iconfont iconshangchuan"></i>
+            <p>点击上传</p>
+        </div>
+    </div>
+	{{# } }}
+</script>
+<script type="text/html" id="storeImageTpl">
+	{{# if(d.list.length){ }}
+	{{# for(var i=0;i<d.list.length;i++){ }}
+	<div class="item upload_img_square_item" data-index="{{i}}">
+		<div class="img-wrap">
+			<img src="{{ns.img(d.list[i])}}" layer-src>
+		</div>
+		<div class="operation">
+			<i title="图片预览" class="iconfont iconreview js-preview"></i>
+			<i title="删除图片" class="layui-icon layui-icon-delete js-delete" data-index="{{i}}"></i>
+			<div class="replace_img" data-index="{{i}}">点击替换</div>
+		</div>
+	</div>
+	{{# } }}
+	{{# if(d.list.length < d.max){ }}
+	<div class="item js-add-image upload_img_square">+</div>
+	{{# } }}
+	{{# }else{ }}
+	<div class="item js-add-image upload_img_square">+</div>
+	{{# } }}
+</script>
+<script type="text/javascript" charset="utf-8" src="STATIC_EXT/ueditor/ueditor.config.js?time=20240614"></script>
+<script type="text/javascript" charset="utf-8" src="STATIC_EXT/ueditor/ueditor.all.js?time=20240614"></script>
+<script type="text/javascript" charset="utf-8" src="STATIC_EXT/ueditor/lang/zh-cn/zh-cn.js"></script>
+<script src="__STATIC__/ext/drag-arrange.js"></script>
+<script type="text/javascript" src="SHOP_JS/address.js"></script>
+<script src="https://map.qq.com/api/gljs?v=1.exp&libraries=service&key={$tencent_map_key}"></script>
+<script src="https://map.qq.com/api/js?v=2.exp&key={$tencent_map_key}"></script>
+<script src="https://mapapi.qq.com/jsapi_v2/2/4/148/main.js"></script>
+<script type="text/javascript" src="STATIC_JS/qq_map.js?time=20240601"></script>
+<script>
+	var form,laytpl, repeat_flag, map_class;
+	var saveData = null;
+	var completeUploadNum = 0;
+	var storeImage = [];
+	{notempty name="$info.store_images"}
+	storeImage = '{$info.store_images}'.split(',');
+	{/notempty}
+	var STORE_IMAGE_MAX = 5;
+	var ue = UE.getEditor('editor');
+	{notempty name="$info.store_introduce"}
+	ue.ready(function() {
+		ue.setContent(`{:html_entity_decode($info.store_introduce)}`);
+	});
+	{/notempty}
+
+	layui.use(['form','laydate','laytpl'], function() {
+		var laydate = layui.laydate;
+		form = layui.form;
+		laytpl = layui.laytpl;
+		repeat_flag = false;//防重复标识
+		
+		form.render();
+		
+		//时间选择器
+		laydate.render({
+			elem: '#startTime'
+			, type: 'time'
+			,value: "{:date('H:i:s', strtotime(date('Y-m-d')) + $info.start_time)}"
+			,done: function(value, date, endDate){
+				var time = date.hours * 3600 + date.minutes * 60 + date.seconds;
+				$("input[name=start_time]").val(time);
+			}
+
+		});
+		//时间选择器
+		laydate.render({
+			elem: '#endTime'
+			, type: 'time'
+			,value: "{:date('H:i:s', strtotime(date('Y-m-d')) + $info.end_time)}"
+			,done: function(value, date, endDate){
+				var time = date.hours * 3600 + date.minutes * 60 + date.seconds;
+				$("input[name=end_time]").val(time);
+			}
+		});
+
+        form.verify({
+			start_time: function(value, item){
+				var end_time = $("input[name=end_time]").val();
+				var start_time = $("input[name=start_time]").val();
+				if(parseInt(start_time) > parseInt(end_time)){
+					return '营业开始时间不能大于自提结束时间';
+				}
+
+			},
+			end_time: function(value, item){
+				var end_time = $("input[name=end_time]").val();
+				var start_time = $("input[name=start_time]").val();
+
+				if(parseInt(end_time) < parseInt(start_time)){
+					return '营业结束时间不能小于自提开始时间';
+				}
+			},
+        });
+
+        timeTypeChange($("input[name=time_type]:checked").val());
+        
+        form.on('radio(time_type)', function(data){
+			timeTypeChange(data.value);
+		});
+		form.on('switch(pickup)', function(data){
+			if(data.elem.checked){
+				$('.time-view').removeClass('layui-hide')
+			}else{
+				$('.time-view').addClass('layui-hide')
+			}
+		});
+
+		var initdata = {province_id : '{$info.province_id}', city_id : '{$info.city_id}', district_id : '{$info.district_id}'};
+		initAddress(initdata, "storeform");
+
+        if('{$info.latitude}' == "" || '{$info.longitude}' == ""){
+            var latlng = {lat:'',lng:''};
+        }else{
+            var latlng = {lat:'{$info.latitude}',lng:'{$info.longitude}'};
+        }
+
+        if($("#container").length) {
+			//地图展示
+	        setTimeout(function () {
+				map_class = new mapClass("container", latlng);
+			},200);
+		}
+
+		/**
+		 * 验证码
+		 */
+		form.verify({
+			required : function(value, item){
+				var msg = $(item).attr("placeholder") != undefined ? $(item).attr("placeholder") : '';
+				if(value == '') return msg;
+			},
+			province_id : function(value, item){
+				if(value == ''){
+					return '请选择省份';
+				}
+			},
+			city_id : function(value, item){
+				if(value == ''){
+					return '请选择城市';
+				}
+			},
+			// district_id : function(value, item){
+			// 	if(value == ''){
+			// 		return '请选择区/县';
+			// 	}
+			// },
+			tel : function(value, item) {
+				if (value != '') {
+					if (!ns.parse_telephone(value) && !ns.parse_mobile(value)) {
+						return '请输入正确的电话号码或手机号！';
+					}
+				}
+			},
+			store_name : function (value,item) {
+				if(value == ""){
+					return '请输入{$title}名称';
+				}
+			},
+			time_week: function(){
+				var supportTradeType = [];
+				$('[name="support_trade_type"]:checked').each(function () {
+					supportTradeType.push($(this).val())
+				})
+
+				if (supportTradeType.indexOf('store') != -1 && $('[name="time_type"]:checked').val() == 1 && !$('.time-week:checked').length)
+					return '请选择可配送日期';
+			}
+		});
+
+		function saveFunc(){
+			var data = saveData;
+
+			var full_address  = [];
+			full_address.push($("select[name=province_id] option:selected").text());
+			full_address.push($("select[name=city_id] option:selected").text());
+			full_address.push($("select[name=district_id] option:selected").text());
+
+			data.field.full_address = full_address.toString();
+
+			var supportTradeType = [];
+			$('[name="support_trade_type"]:checked').each(function () {
+				supportTradeType.push($(this).val())
+			})
+			{if $is_exit}
+			data.field.support_trade_type = supportTradeType.toString();
+			{else /}
+				data.field.support_trade_type = 'store';
+			{/if}
+
+			if(repeat_flag) return;
+			repeat_flag = true;
+
+			$.ajax({
+				type : "POST",
+				dataType: 'JSON',
+				url : ns.url("store://shop/store/editStore"),
+				async : true,
+				data : data.field,
+				success : function(res) {
+					repeat_flag = false;
+
+					if (res.code == 0) {
+						layer.confirm('编辑成功', {
+							title: '操作提示',
+							btn: ['返回列表', '继续操作'],
+							yes: function(index, layero) {
+								location.hash = ns.hash("store://shop/store/lists");
+								layer.close(index);
+							},
+							btn2: function(index, layero) {
+								layer.close(index);
+							}
+						});
+					} else {
+						layer.msg(res.message);
+					}
+				}
+			})
+		}
+		/**
+		 * 监听提交
+		 */
+		form.on('submit(save)', function(data){
+
+			var labelLen = $("input[name='label_id']:checked").length;
+			var labelId = [];
+			var labelName = [];
+			if(!labelLen){
+				layer.msg("请至少选择一个门店标签");
+				return false;
+			}
+			for(var i = 0; i < labelLen; i++){
+				labelId.push($("input[name='label_id']:checked").eq(i).val());
+				labelName.push($("input[name='label_id']:checked").eq(i).attr('title'));
+			}
+			data.field.label_id = labelLen ? (',' + labelId.toString() + ',') : '';
+			data.field.label_name = labelLen ? (',' + labelName.toString() + ',') : '';
+			data.field.category_name = $("select[name='category_id'] option:selected").text();
+			data.field.store_images = storeImage.toString();
+			data.field.store_introduce = ue.getContent();
+
+			saveData = data;
+
+			if( data.field.longitude == "" || data.field.latitude == ""){
+				layer.msg('请确认地理位置!');
+				$(".empty-address").show();
+				return;
+			}else{
+				$(".empty-address").hide();
+			}
+            saveFunc();
+        });
+        
+        // 添加logo图片
+        let storeLogoImage = '{$info.store_image}';
+		$("body").off("click", ".js-add-logo-image").on("click", ".js-add-logo-image", function () {
+			openAlbum(function (data) {
+                storeLogoImage = data[0].pic_path;
+				refreshLogoStoreImage();
+			}, 1, 1);
+        });
+
+        //渲染logo图片
+		function refreshLogoStoreImage() {
+
+			var store_image_template = $("#storeLogoImageTpl").html();
+			var data = {
+				list: storeLogoImage
+			};
+
+			laytpl(store_image_template).render(data, function (html) {
+
+				$(".logo-image-box").html(html);
+
+				//加载图片放大
+				loadImgMagnify();
+
+				if (storeLogoImage.length) {
+					//预览
+					$(".logo-image-box .js-preview").click(function () {
+						$(this).parent().parent().prev().find("img").click();
+					});
+
+					//图片删除
+					$(".logo-image-box .js-delete").click(function () {
+						storeLogoImage = '';
+						refreshLogoStoreImage();
+					});
+				}
+			});
+        }
+        refreshLogoStoreImage();
+
+		// 添加门店图片
+		$("body").off("click", ".js-add-image").on("click", ".js-add-image", function () {
+			openAlbum(function (data) {
+				for (var i = 0; i < data.length; i++) {
+					if (storeImage.length < STORE_IMAGE_MAX) storeImage.push(data[i].pic_path);
+				}
+				refreshStoreImage();
+			}, 5, 1);
+		});
+
+		//渲染门店图片
+		function refreshStoreImage() {
+			var store_image_template = $("#storeImageTpl").html();
+			var data = {
+				list: storeImage,
+				max: STORE_IMAGE_MAX
+			};
+
+			laytpl(store_image_template).render(data, function (html) {
+
+				$(".js-store-image").html(html);
+
+				//加载图片放大
+				loadImgMagnify();
+
+				if (storeImage.length) {
+
+					//预览
+					$(".js-store-image .js-preview").click(function () {
+						$(this).parent().prev().find("img").click();
+					});
+
+					//图片删除
+					$(".js-store-image .js-delete").click(function () {
+						var index = $(this).attr("data-index");
+						storeImage.splice(index, 1);
+						refreshStoreImage();
+					});
+
+					// 拖拽
+					$('.js-store-image .upload_img_square_item').arrangeable({
+						//拖拽结束后执行回调
+						callback: function (e) {
+							var indexBefore = $(e).attr("data-index");//拖拽前的原始位置
+							var indexAfter = $(e).index();//拖拽后的位置
+							var temp = storeImage[indexBefore];
+							storeImage[indexBefore] = storeImage[indexAfter];
+							storeImage[indexAfter] = temp;
+							refreshStoreImage();
+						}
+					});
+				}
+
+				//最多传十张图
+				if (storeImage.length < STORE_IMAGE_MAX) {
+					$(".js-add-image").show();
+				} else {
+					$(".js-add-image").hide();
+				}
+			});
+		}
+		refreshStoreImage();
+	});
+
+	function backStockList() {
+		location.hash = ns.hash("store://shop/store/lists");
+	}
+	
+	/**
+	 * 重新渲染表单
+	 */
+	function refreshFrom(){
+		form.render();
+		orderAddressChange();//改变地址
+		map_class.mapChange();
+	}
+
+	//动态改变订单地址赋值
+	function orderAddressChange(){
+		map_class.address.province = $("select[name=province_id]").val();
+		map_class.address.province_name = $("select[name=province_id] option:selected").text();
+		map_class.address.city = $("select[name=city_id]").val();
+		map_class.address.city_name = $("select[name=city_id] option:selected").text();
+		map_class.address.district = $("select[name=district_id]").val();
+		map_class.address.district_name = $("select[name=district_id] option:selected").text();
+		map_class.address.detail_address = $("input[name='address']").val();
+	}
+	
+	/**
+	 * 地址下拉框（主要用于坐标记录）
+	 */
+	function selectCallBack(){
+		$("input[name=longitude]").val(map_class.address.longitude);//坐标
+		$("input[name=latitude]").val(map_class.address.latitude);//坐标
+	}
+
+	//地图点击回调事件
+	function mapChangeCallBack(){
+		$("input[name=address]").val(map_class.address.address);//详细地址
+		$("input[name=longitude]").val(map_class.address.longitude);//坐标
+		$("input[name=latitude]").val(map_class.address.latitude);//坐标
+
+		$.ajax({
+			type : "POST",
+			dataType: 'JSON',
+			url : ns.url("shop/address/getGeographicId"),
+			async : true,
+			data : {
+				"address" : map_class.address.area
+			},
+			success : function(data) {
+				map_class.address.province = data.province_id;
+				map_class.address.city = data.city_id;
+				map_class.address.district = data.district_id;
+				map_class.address.township = data.subdistrict_id;
+				map_class.map_change = false;
+				form.val("storeform", {
+					"province_id": data.province_id
+				});
+				$("select[name=province_id]").change();
+				form.val("storeform", {
+					"city_id": data.city_id
+				});
+				$("select[name=city_id]").change();
+				form.val("storeform", {
+					"district_id": data.district_id
+				});
+				refreshFrom();//重新渲染form
+				map_class.map_change = true;
+			}
+		})
+
+	}
+
+	function timeTypeChange(type){
+         if(type == 1){
+			$('.time-type-view').show();
+		}else{
+            $('.time-type-view').hide();
+        }
+	}
+</script>

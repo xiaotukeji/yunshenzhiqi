@@ -1,0 +1,316 @@
+<style>
+    .layui-form-label{width: 160px;}
+    .layui-form-label + .layui-input-block{margin-left: 160px;}
+    .word-aux{margin-left: 160px;}
+    .form-row{margin-left: 160px;}
+    .confirm-popup.prompt-block span{height:18px;}
+    .confirm-popup.prompt-block .prompt {display: inline-block;width: auto;margin-left: 5px;}
+    .confirm-popup.prompt-block .prompt-box{width: 230px;left: 42px;}
+    .confirm-popup.prompt-block .prompt img{width: 200px;}
+</style>
+
+<div class="layui-form">
+    <div class="layui-card card-common card-brief">
+        <div class="layui-card-header">
+            <span class="card-title">运营设置</span>
+        </div>
+        <div class="layui-card-body">
+            <div class="layui-form-item">
+                <label class="layui-form-label">门店运营模式：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="radio" name="store_business" value="shop" title="平台运营模式" {if $business_config.store_business eq 'shop'}checked{/if} />
+                        <input type="radio" name="store_business" value="store" title="连锁门店模式" {if $business_config.store_business eq 'store'}checked{/if} />
+                    </div>
+                </div>
+                <div class="word-aux">
+                    <p>平台运营模式：展示平台整体页面，商品全部展示，考虑门店库存</p>
+                    <p>连锁门店模式：只会展示门店独立页面，商品查询只需查询对应门店</p>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">门店切换：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="radio" name="is_allow_change" value="1" title="允许用户切换门店" {if $business_config.is_allow_change eq 1}checked{/if} />
+                        <input type="radio" name="is_allow_change" value="0" title="禁止用户切换门店" {if $business_config.is_allow_change eq 0}checked{/if} />
+                    </div>
+                </div>
+                <div class="word-aux">禁止切换门店，会锁定距离用户最近的门店，定位失败进入默认总店</div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">门店确认弹窗：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="radio" name="confirm_popup_control" value="1" title="开启" {if $business_config.confirm_popup_control eq 1}checked{/if} />
+                        <input type="radio" name="confirm_popup_control" value="0" title="关闭" {if $business_config.confirm_popup_control eq 0}checked{/if} />
+                    </div>
+                </div>
+                <div class="word-aux prompt-block confirm-popup">
+                    <span>开启后，每次进入门店时弹窗提示当前门店信息</span>
+                    <div class="prompt">
+                        <span class="text-color">示例</span>
+                        <div class="growth-box reason-box reason-growth prompt-box">
+                            <div class="prompt-con">
+                                <img src="STORE_IMG/store_confirm_popup_preview.png">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item" style="display: none;">
+                <label class="layui-form-label">功能设置：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="checkbox" name="store_auth" lay-filter="store_auth" value="config" title="是否允许门店设置" lay-skin="primary" {if strpos($business_config['store_auth'], 'config')  !== false}checked{/if} />
+                        <input type="checkbox" name="store_auth" lay-filter="store_auth" value="balance" title="是否允许调整会员余额" lay-skin="primary" {if strpos($business_config['store_auth'], 'balance')  !== false}checked{/if} />
+                        <input type="checkbox" name="store_auth" lay-filter="store_auth" value="point" title="是否允许调整会员积分" lay-skin="primary" {if strpos($business_config['store_auth'], 'point')  !== false}checked{/if} />
+                        <input type="checkbox" name="store_auth" lay-filter="store_auth" value="coupon" title="是否允许发放优惠券" lay-skin="primary" {if strpos($business_config['store_auth'], 'coupon')  !== false}checked{/if} />
+                        <input type="checkbox" name="store_auth" lay-filter="store_auth" value="adjust" title="是否允许会员改价" lay-skin="primary" {if strpos($business_config['store_auth'], 'adjust')  !== false}checked{/if} />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="layui-card card-common card-brief">
+        <div class="layui-card-header">
+            <span class="card-title">结算设置</span>
+        </div>
+        <div class="layui-card-body">
+            <div class="layui-form-item">
+                <label class="layui-form-label">是否需要结算：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="radio" name="is_settlement" lay-filter="is_settlement" value="0" title="总部直营，无需结算"  {if $withdraw_config.is_settlement eq 0}checked{/if} />
+                        <input type="radio" name="is_settlement" lay-filter="is_settlement" value="1" title="总部收款，周期性自动结算" {if $withdraw_config.is_settlement eq 1}checked{/if} />
+                        <input type="radio" name="is_settlement" lay-filter="is_settlement" value="2" title="总部收款，门店申请结算" {if $withdraw_config.period_type eq 4}checked{/if}  />
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item period-type layui-hide">
+                <label class="layui-form-label">结算周期：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="radio" name="period_type" value="1" title="每日结算" {if $withdraw_config.period_type eq 1 || $withdraw_config.period_type eq 4}checked{/if} />
+                        <input type="radio" name="period_type" value="2" title="每周结算" {if $withdraw_config.period_type eq 2}checked{/if} />
+                        <input type="radio" name="period_type" value="3" title="每月结算" {if $withdraw_config.period_type eq 3}checked{/if} />
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item settlement-rate">
+                <label class="layui-form-label">门店抽成比率：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="number" name="settlement_rate" lay-verify="positivEinteger" placeholder="0" class="layui-input len-short" autocomplete="off" value="{$withdraw_config.settlement_rate}">
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">%</div>
+                </div>
+                <div class="word-aux">门店抽成比率需是0-100,且保存两位小数</div>
+            </div>
+            <div class="layui-form-item is-withdraw">
+                <label class="layui-form-label">是否提现：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="checkbox" name="is_withdraw" value="1" lay-filter="third_party" lay-skin="switch" {if $withdraw_config.is_withdraw eq 1}checked{/if}>
+                    </div>
+                </div>
+            </div>
+            {notempty name="$pay_type_list"}
+            <div class="layui-form-item settlement-pay-type">
+                <label class="layui-form-label">结算付款控制：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        {foreach name="$pay_type_list" item="vo" key="k"}
+                        <input type="checkbox" name="settlement_pay_type" value="{$k}" title="{$vo}" lay-skin="primary" {if strpos($withdraw_config['settlement_pay_type'], $k)  !== false}checked{/if} />
+                        {/foreach}
+                    </div>
+                </div>
+            </div>
+            {/notempty}
+            <div class="layui-form-item settlement-cost">
+                <label class="layui-form-label">结算成本控制：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="checkbox" name="settlement_cost" lay-filter="settlement_cost" value="coupon" title="结算优惠券" lay-skin="primary" {if strpos($withdraw_config['settlement_cost'], 'coupon')  !== false}checked{/if} />
+                        <input type="checkbox" name="settlement_cost" lay-filter="settlement_cost" value="point" title="结算积分抵扣" lay-skin="primary" {if strpos($withdraw_config['settlement_cost'], 'point')  !== false}checked{/if} />
+                        <input type="checkbox" name="settlement_cost" lay-filter="settlement_cost" value="fenxiao_commission" title="结算扣除佣金" lay-skin="primary" {if strpos($withdraw_config['settlement_cost'], 'fenxiao_commission')  !== false}checked{/if} />
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item is-audit">
+                <label class="layui-form-label">是否提现审核：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="checkbox" name="is_audit" value="1" lay-skin="switch" {if $withdraw_config.is_audit eq 1}checked{/if}>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item is-audit">
+                <label class="layui-form-label">是否自动转账：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="checkbox" name="is_auto_transfer" value="1" lay-skin="switch" {if $withdraw_config.is_auto_transfer eq 1}checked{/if}>
+                    </div>
+                </div>
+                <div class="word-aux">只有微信和支付宝支付支持自动转账</div>
+            </div>
+            <div class="layui-form-item withdraw-least">
+                <label class="layui-form-label">最低提现金额：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="number" name="withdraw_least" lay-verify="withdrawLeast" placeholder="0" class="layui-input len-short" autocomplete="off" value="{$withdraw_config.withdraw_least}">
+                    </div>
+                </div>
+                <div class="word-aux">最低提现金额必须大于0</div>
+            </div>
+        </div>
+    </div>
+    <div class="form-row">
+        <button class="layui-btn" lay-submit lay-filter="save">保存</button>
+    </div>
+</div>
+
+<script>
+    var form,
+        repeat_flag = false,  //防重复标识
+        submitIsSettlement;
+    layui.use(['form'], function() {
+        form = layui.form;
+        form.render();
+        initFn();
+
+        // 是否出现结算周期
+        form.on('radio(is_settlement)', function(data){
+            submitIsSettlement = data.value;
+            if(parseFloat(data.value) == 0){
+                $(".settlement-rate").addClass("layui-hide");
+                $(".period-type").addClass("layui-hide");
+                $('.settlement-pay-type').addClass("layui-hide");
+                $(".settlement-cost").addClass("layui-hide");
+                $(".is-withdraw").addClass("layui-hide");
+                $(".withdraw-least").addClass("layui-hide");  
+                $(".is-audit").addClass("layui-hide");
+            }else if(parseFloat(data.value) == 1){
+                $(".is-withdraw").addClass("layui-hide");  
+                $(".settlement-rate").removeClass("layui-hide");
+                $(".period-type").removeClass("layui-hide");
+                $('.settlement-pay-type').removeClass("layui-hide");
+                $(".settlement-cost").removeClass("layui-hide");  
+                $(".withdraw-least").addClass("layui-hide");  
+                $(".is-audit").removeClass("layui-hide");   
+            }else if(parseFloat(data.value) == 2){
+                $('.settlement-pay-type').removeClass("layui-hide");
+                $(".settlement-cost").removeClass("layui-hide");
+                $(".is-withdraw").removeClass("layui-hide");  
+                $(".settlement-rate").removeClass("layui-hide");
+                $(".period-type").addClass("layui-hide");
+                $(".withdraw-least").removeClass("layui-hide");  
+                $(".is-audit").removeClass("layui-hide");   
+            }
+        });
+
+        // 验证正整数
+		form.verify({
+			positivEinteger: function(value) {
+                if (parseFloat(value) < 0 || parseFloat(value) > 100) {
+                    return '请输入0-100之间的数';
+                }
+                if (value.split(".").length > 1) {
+                    let len = value.split(".")[1].length;
+                    if (len > 2) {
+                        return '门店抽成比率最多两位小数';
+                    }
+                }
+            },
+            withdrawLeast: function(value){
+			    if(value <= 0){
+                    return '最低提现金额必须大于0';
+                }
+                if (value.split(".").length > 1) {
+                    let len = value.split(".")[1].length;
+                    if (len > 2) {
+                        return '最低提现金额最多保留两位小数';
+                    }
+                }
+            }
+		});
+
+        form.on('submit(save)', function(data) {
+            if (repeat_flag) return;
+            repeat_flag = true;
+            
+            let field = data.field;
+
+            if($('input[name="settlement_pay_type"]').length) {
+                field.settlement_pay_type = [];
+                $('input[name="settlement_pay_type"]:checked').each(function () {
+                    field.settlement_pay_type.push($(this).val());
+                });
+                field.settlement_pay_type = field.settlement_pay_type.toString();
+            }
+
+            field.settlement_cost = [];
+            $('input[name="settlement_cost"]:checked').each(function () {
+                field.settlement_cost.push($(this).val());
+            });
+            field.settlement_cost = field.settlement_cost.toString();
+
+            field.store_auth = [];
+            $('input[name="store_auth"]:checked').each(function () {
+                field.store_auth.push($(this).val());
+            });
+            field.store_auth = field.store_auth.toString();
+
+            if(submitIsSettlement == 2){
+                field.is_settlement = 1;    
+                field.period_type = 4;
+            }
+
+            $.ajax({
+                type: 'POST',
+                dataType: 'JSON',
+                url: ns.url("store://shop/config/index"),
+                data: field,
+                success: function(res) {
+                    layer.msg(res.message);
+                    repeat_flag = false;
+                }
+            });
+        });
+    });
+
+    function initFn(){
+        // 是否展示结算周期
+        var isSettlement = '{$withdraw_config.is_settlement}';
+        var periodType = '{$withdraw_config.period_type}';
+
+        if(parseFloat(isSettlement) == 0){
+            $(".settlement-rate").addClass("layui-hide");
+            $(".period-type").addClass("layui-hide");
+            $('.settlement-pay-type').addClass("layui-hide");
+            $(".settlement-cost").addClass("layui-hide");
+            $(".is-withdraw").addClass("layui-hide");  
+        }else if(parseFloat(isSettlement) == 1){
+            $(".is-withdraw").addClass("layui-hide");  
+            $(".settlement-rate").removeClass("layui-hide");
+            $(".period-type").removeClass("layui-hide");
+            $('.settlement-pay-type').removeClass("layui-hide");
+            $(".settlement-cost").removeClass("layui-hide");
+            $(".is-audit").removeClass("layui-hide");   
+            $(".withdraw-least").addClass("layui-hide");
+        }
+
+        if(parseFloat(periodType) == 4){
+            submitIsSettlement = 2;
+            $('.settlement-pay-type').removeClass("layui-hide");
+            $(".settlement-cost").removeClass("layui-hide");
+            $(".is-withdraw").removeClass("layui-hide");  
+            $(".settlement-rate").removeClass("layui-hide");
+            $(".period-type").addClass("layui-hide");
+            $(".is-audit").removeClass("layui-hide");   
+            $(".withdraw-least").removeClass("layui-hide");
+        }
+
+    }
+</script>

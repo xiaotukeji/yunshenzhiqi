@@ -1,0 +1,373 @@
+<style>
+	.layui-layout-admin .layui-form-item .layui-input-inline {
+		background-color: #fff;
+	}
+	.table-btn .more-operation {
+		display: none;
+		font-size: 14px;
+		line-height: 20px;
+		background-color: #fff;
+		box-shadow: 0 2px 8px 0 rgba(200, 201, 204, .5);
+		position: absolute;
+		z-index: 2000;
+		border-radius: 2px;
+		padding: 13px 12px;
+		top: 40px;
+		right: 5px;
+		transform: translateX(10px);
+	}
+	.main-wrap{
+		padding-bottom: 20px;
+	}
+	.body-content {
+		padding-top: 0!important;
+	}
+	.table-btn .more-operation:before {
+		right: 7px;
+		top: -14px;
+		border: solid transparent;
+		content: "";
+		height: 0;
+		width: 0;
+		position: absolute;
+		pointer-events: none;
+		border-bottom-color: #fff;
+		border-width: 8px;
+	}
+
+	.table-btn .more-operation .operation {
+		display: block;
+		text-align: right;
+		margin-bottom: 12px;
+		cursor: pointer;
+	}
+
+	.table-btn .more-operation .operation:last-child {
+		margin-bottom: 0
+	}
+	.layui-table-view td:last-child>div {
+		overflow: inherit;
+	}
+	.operation-wrap {
+		position: relative;
+	}
+</style>
+
+<div class="main-wrap">
+	<div class="single-filter-box single-filter-box">
+		<button class="layui-btn" onclick="addReserve()">添加预约</button>
+	</div>
+
+	<div class="screen layui-collapse" lay-filter="selection_panel">
+		<div class="layui-colla-item">
+			<div class="layui-form layui-colla-content layui-form layui-show"  >
+
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">客户</label>
+						<div class="layui-input-inline">
+							<input type="text" name="search_text" placeholder="请输入客户名称/客户手机号" autocomplete="off" class="layui-input ">
+						</div>
+					</div>
+
+					<div class="layui-inline">
+						<label class="layui-form-label">预约门店</label>
+						<div class="layui-input-inline">
+							<select name="store_id">
+								<option value="">全部</option>
+								{foreach $store_list as $k=> $v}
+								<option value="{$v.store_id}">{$v.store_name}</option>
+								{/foreach}
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">预约时间</label>
+						<div class="layui-input-inline">
+							<input type="text" class="layui-input" name="start_time" placeholder="开始时间" id="start_time" readonly>
+							<i class=" iconrili iconfont calendar"></i>
+						</div>
+						<div class="layui-form-mid">-</div>
+						<div class="layui-input-inline">
+							<input type="text" class="layui-input" name="end_time" placeholder="结束时间" id="end_time" readonly>
+							<i class=" iconrili iconfont calendar"></i>
+						</div>
+						<button class="layui-btn layui-btn-primary date-picker-btn" onclick="datePick(7, this);return false;">近7天</button>
+						<button class="layui-btn layui-btn-primary date-picker-btn" onclick="datePick(30, this);return false;">近30天</button>
+					</div>
+				</div>
+
+				<div class="form-row">
+					<button class="layui-btn bg-color" lay-submit lay-filter="search">筛选</button>
+					<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 列表 -->
+	<div class="table-tab layui-tab" lay-filter="list_tab">
+		<div class="table-tab-list">
+			<ul class="layui-tab-title">
+				<li class="layui-this" lay-id="all">全部</li>
+				{foreach name="$reserve_state" item="vo"}
+				<li lay-id="{$vo.state}" data-type="reserve_state">{$vo.name}</li>
+				{/foreach}
+			</ul>
+		</div>
+		<div class="layui-tab-content">
+			<table id="reserve_list" lay-filter="reserve_list"></table>
+		</div>
+	</div>
+</div>
+
+<!-- 用户信息 -->
+<script type="text/html" id="detail">
+	<div class='table-title'>
+		<div class='title-pic'>
+			<img layer-src src="{{ns.img(d.headimg)}}" onerror="this.src = 'STATIC_IMG/default_img/head.png' ">
+		</div>
+		<div class='title-content'>
+			<p class="layui-elip" title="{{d.nickname}}">{{d.nickname}}</p>
+			{{# if(d.member_id != 0 && d.mobile){ }}
+			<p title="{{d.mobile}}">{{d.mobile}}</p>
+			{{# } }}
+		</div>
+	</div>
+</script>
+
+<!-- 工具栏操作 -->
+<script type="text/html" id="operation">
+	<div class="operation-wrap">
+		<div class="table-btn">
+			<a class="layui-btn" lay-event="detail">详情</a>
+			{{# if(d.reserve_state == 'cancelled'){ }} <a class="layui-btn" lay-event="delete">删除预约</a> {{# } }}
+			{{# if(d.reserve_state != 'completed' && d.reserve_state != 'cancelled'){ }} <a class="layui-btn" lay-event="more">更多</a>{{# } }}
+			<div class="more-operation">
+				{{# if(d.reserve_state == 'wait_confirm'){ }}
+				<a class="operation" lay-event="confirm">确认预约</a>
+				<a class="operation" lay-event="update">更改预约</a>
+				{{# } }}
+				{{# if(d.reserve_state == 'wait_to_store'){ }}
+				<a class="operation" lay-event="tostore">确认到店</a>
+				<a class="operation" lay-event="update">更改预约</a>
+				{{# } }}
+				{{# if(d.reserve_state == 'arrived_store'){ }} <a class="operation" lay-event="complet">确认完成</a> {{# } }}
+				{{# if(d.reserve_state == 'wait_confirm' || d.reserve_state == 'wait_to_store' || d.reserve_state == 'arrived_store'){ }} <a class="operation" lay-event="cancel">取消预约</a> {{# } }}
+			</div>
+		</div>
+	</div>
+</script>
+
+{include file="reserve/reserve_action"}
+
+<script type="text/javascript">
+	var table, form, laytpl, element, currentDate = new Date(), minDate = "",laydate;
+
+	layui.use(['form', 'element', 'laydate'], function() {
+		form = layui.form;
+		laydate = layui.laydate;
+		element = layui.element;
+		currentDate.setDate(currentDate.getDate() - 7);
+		form.render();
+
+		laydate.render({
+			elem: '#start_time'
+			,type: 'datetime'
+			,change: function(value, date, endDate){
+				$(".date-picker-btn").removeClass("selected");
+			}
+		});
+		laydate.render({
+			elem: '#end_time'
+			,type: 'datetime'
+			,change: function(value, date, endDate){
+				$(".date-picker-btn").removeClass("selected");
+			}
+		});
+
+		element.on('tab(list_tab)', function (data) {
+			var state = $(data.elem).find('li:eq('+ data.index + ')').attr('lay-id');
+			$('[name="reserve_state"]').val(state);
+			table.reload({
+				where: {
+					reserve_state: state,
+					search_text: $('input[name="search_text"]').val(),
+					store_id: $('select[name="store_id"]').val(),
+					start: $('input[name="start"]').val() ? new Date($('input[name="start"]').val()).valueOf / 100 : '',
+					end: $('input[name="end"]').val() ? new Date($('input[name="end"]').val()).valueOf / 100 : ''
+				},
+				page: {
+					curr: 1
+				}
+			});
+		});
+
+		var cols = [
+			[
+				{
+					title: '客户信息',
+					width: '15%',
+					templet: '#detail'
+				},
+                {
+                    field: 'service',
+                    title: '预约项目',
+					width: '15%',
+                    templet: function (data) {
+						var text = '';
+						data.reserve_item.split(',').forEach(function (goods_name) {
+							text += '<div class="goods-name">'+ goods_name +'</div>';
+						});
+                        return text;
+                    }
+                },
+				{
+					field: 'service',
+					title: '预约门店',
+					width: '15%',
+					templet: function (data) {
+						return data.store_name ? data.store_name : '';
+					}
+				},
+				{
+					title: '预约到店时间',
+					width: '10%',
+					templet: function (data) {
+						if (data.reserve_time) {
+							let time = ns.time_to_date(data.reserve_time).split(' ');
+							let text = '<div class="time-line-height"><p>'+ time[0] +'</p><p>'+ time[1] +'</p></div>';
+								if ((data.reserve_time == 'wait_confirm' || data.reserve_time == 'wait_to_store') && data.reserve_time < {:time()}) text += '<div class="error">已超时</div>';
+							return text;
+						} else {
+							return '';
+						}
+					}
+				},
+				{
+					title: '下单时间',
+					width: '10%',
+					templet: function (data) {
+						let time = ns.time_to_date(data.create_time).split(' ');
+						return '<div class="time-line-height"><p>'+ time[0] +'</p><p>'+ time[1] +'</p></div>';
+					}
+				},
+                {
+                    field: 'reserve_state_name',
+                    title: '预约状态',
+                    width: '10%',
+                    align: 'center',
+                },
+				{
+					title: '来源',
+					width: '10%',
+					align: 'center',
+					templet: function (data) {
+						return data.source == 'store' ? '门店添加' : '客户预约';
+					}
+				},
+				{
+					title: '操作',
+					width: '15%',
+					align: 'right',
+					toolbar: '#operation'
+				}
+            ]
+        ];
+
+		/**
+		 * 加载表格
+		 */
+		table = new Table({
+			elem: '#reserve_list',
+			url: ns.url("store://shop/reserve/lists"),
+			where:{
+				start_time : '{$start_time}',
+				end_time : '{$end_time}',
+			},
+			cols: cols
+		});
+
+		/**
+		 * 监听工具栏操作
+		 */
+		table.tool(function(obj) {
+			var data = obj.data;
+			switch (obj.event) {
+				case 'more': //更多
+					$('.more-operation').css('display', 'none');
+					$(obj.tr).find('.more-operation').css('display', 'block');
+					break;
+				default:
+					reserveEvent(obj.event, data, function () {
+						table.reload();
+					});
+					break;
+			}
+		});
+
+		$(document).click(function(event) {
+			if ($(event.target).attr('lay-event') != 'more' && $('.more-operation').not(':hidden').length) {
+				$('.more-operation').css('display', 'none');
+			}
+		});
+
+		/**
+		 * 搜索功能
+		 */
+		form.on('submit(search)', function(data) {
+			if (data.field.start_time && data.field.start_time != '') data.field.start_time = new Date(data.field.start_time).valueOf() / 1000;
+			if (data.field.end_time && data.field.end_time != '') data.field.end_time = new Date(data.field.end_time).valueOf() / 1000;
+			table.reload({
+				page: {
+					curr: 1
+				},
+				where: data.field
+			});
+			return false;
+		});
+	});
+
+	function addReserve() {
+		layer.open({
+			title: '添加预约',
+			type: 2,
+			content: ns.url('store://shop/reserve/addreserve', {request_mode: 'iframe'}),
+			area: ['800px', '690px']
+		})
+	}
+
+	/**
+	 * 七天时间
+	 */
+	function datePick(date_num,event_obj){
+		$(".date-picker-btn").removeClass("selected");
+		$(event_obj).addClass('selected');
+		var now_date = new Date();
+
+		Date.prototype.Format = function (fmt,date_num) { //author: meizz
+			this.setDate(this.getDate()-date_num);
+			var o = {
+				"M+": this.getMonth() + 1, //月份
+				"d+": this.getDate(), //日
+				"H+": this.getHours(), //小时
+				"m+": this.getMinutes(), //分
+				"s+": this.getSeconds(), //秒
+				"q+": Math.floor((this.getMonth() + 3) / 3), //季度
+				"S": this.getMilliseconds() //毫秒
+			};
+			if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+			for (var k in o)
+				if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+			return fmt;
+		};
+		// var now_time =  new Date().Format("yyyy-MM-dd HH:mm:ss",0);//当前日期
+		var now_time =  new Date().Format("yyyy-MM-dd 23:59:59",0);//当前日期
+		var before_time =  new Date().Format("yyyy-MM-dd 00:00:00",date_num-1);//前几天日期
+		$("input[name=start_time]").val(before_time,0);
+		$("input[name=end_time]").val(now_time,date_num-1);
+	}
+</script>

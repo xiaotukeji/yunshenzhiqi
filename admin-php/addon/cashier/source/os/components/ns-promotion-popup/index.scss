@@ -1,0 +1,76 @@
+.promotion-pop{
+	width: 7rem;
+	background-color: #fff;
+	border-radius: 0.06rem;
+	.header{
+		padding: 0.15rem 0.2rem;
+		font-size: 0.14rem;
+		border-bottom: 0.01rem solid #e6e6e6;
+		
+	}
+	.body{
+		width: 100%;
+		padding: 0.2rem 0.3rem;
+		box-sizing: border-box;
+		.alter{
+			height: 0.48rem;
+			line-height: 0.48rem;
+			font-size: 0.14rem;
+			padding: 0 0.2rem;
+			color: #666;
+			background-color: var(--primary-color-light-9);
+			margin-bottom: 0.2rem;
+		}
+		.content{
+			.qrCode{
+				width: 2rem;
+				height: 2rem;
+				background-color: #f8f8f8;
+				color: #333;
+				font-size: 0.14rem;
+				image{
+					width:1.6rem;
+					height:1.6rem;
+				}
+			}
+			.right{
+				margin-left: 0.2rem;
+				.form-item{
+					margin-bottom: 0.1rem;
+				}
+				.link {
+					
+					.form-inline{
+						margin-top: 0.1rem;
+					}
+				}
+				input{
+					width: 2rem;
+					height: 0.3rem;
+					border: 0.01rem solid #e6e6e6;
+					padding: 0 0.12rem;
+					font-size: 0.14rem;
+					border-radius: 0.02rem;
+					box-sizing: border-box;
+				}
+				.btn{
+					background-color: var(--primary-color);
+					    color: #fff;
+					    margin-left: .1rem;
+						font-size: 0.14rem;
+						height: 0.3rem;
+						line-height: 0.3rem;
+					&::after{
+						border: 0;
+					}
+				}
+				.download{
+					color:  var(--primary-color);
+					cursor: pointer;
+				}
+			}
+		}
+		
+	}
+	
+}

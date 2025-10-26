@@ -1,0 +1,153 @@
+<style>
+    .layui-table .layui-btn{
+        justify-content: flex-end;
+        padding-right: 0px;
+    }
+    .name{
+        display: flex;
+        align-content: center;
+    }
+    .name img{
+        max-width: inherit;
+        width: 60px;
+        height: 60px;
+        margin-right: 10px;
+    }
+</style>
+
+<div class="layui-form" lay-filter="storeform">
+  <div class="layui-card card-common card-brief">
+    <div class="layui-card-header">
+        <span class="card-title">基本信息</span>
+    </div>
+    <div class="layui-card-body">
+        <div class="layui-row">
+            <div class="layui-col-md3">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">制单人：</label>
+                    <div class="layui-input-block">{$document_detail.operater_name}</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">关联单据：</label>
+                    <div class="layui-input-block">{$document_detail.type_name}</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">制单时间：</label>
+                    <div class="layui-input-block">{$document_detail.create_time}</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">备注：</label>
+                    <div class="layui-input-block">{$document_detail.remark}</div>
+                </div>
+            </div>
+    
+            <div class="layui-col-md3">
+    
+                <div class="layui-form-item">
+                    <label class="layui-form-label">状态：</label>
+                    <div class="layui-input-block">{$document_detail.status_data.name}</div>
+                </div>
+                {if !empty($document_detail.verifier_name) }
+                <div class="layui-form-item">
+                    <label class="layui-form-label">审核人：</label>
+                    <div class="layui-input-block">{$document_detail.verifier_name}</div>
+                </div>
+                {/if}
+                {if !empty($document_detail.audit_time) }
+                <div class="layui-form-item">
+                    <label class="layui-form-label">审核时间：</label>
+                    <div class="layui-input-block">{$document_detail.audit_time}</div>
+                </div>
+                {/if}
+                {if $document_detail.status == -1}
+                <div class="layui-form-item">
+                    <label class="layui-form-label">拒绝理由：</label>
+                    <div class="layui-input-block">{$document_detail.refuse_reason}</div>
+                </div>
+                {/if}
+            </div>
+    
+            <div class="layui-col-md3">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">入库门店：</label>
+                    <div class="layui-input-block">{$document_detail.store_name}</div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">入库单号：</label>
+                    <div class="layui-input-block">{$document_detail.document_no}</div>
+                </div>
+
+                {if $document_detail.time > 0}
+                <div class="layui-form-item">
+                    <label class="layui-form-label">入库时间：</label>
+                    <div class="layui-input-block">{$document_detail.time}</div>
+                </div>
+                {/if}
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="layui-card card-common card-brief">
+    <div class="layui-card-header">
+        <span class="card-title">商品明细</span>
+    </div>
+    <div class="layui-card-body">
+        <table class="layui-table order_goods_list" lay-filter="order_goods" lay-skin="line">
+            <colgroup>
+              <col width="30%" />
+              <col width="10%" />
+              <col width="10%" />
+              <col width="10%" />
+              <col width="10%" />
+              <col width="10%" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th>商品名称/条形码</th>
+                <th>规格</th>
+                <th>单位</th>
+                <th>数量</th>
+                <th>成本价(元)</th>
+                <th>金额(元)</th>
+              </tr>
+            </thead>
+      </table>
+      <table class="layui-table order_goods_list order_goods_list-bottom" lay-skin="line" lay-filter="order_goods_list">
+            <colgroup>
+              <col width="30%" />
+              <col width="10%" />
+              <col width="10%" />
+              <col width="10%" />
+              <col width="10%" />
+              <col width="10%" />
+            </colgroup>
+            <tbody>
+                {foreach $document_detail.goods_sku_list_array as $k => $v}
+                <tr class="table-tr">
+                    <td class="name">
+                      <img src="{:img($v.goods_sku_img,'small')}" alt="">
+                      <span>{$v.goods_sku_name}</span>
+                    </td>
+                    {if $v.goods_sku_spec && $v.goods_sku_spec !=''}
+                      <td>{$v.goods_sku_spec}</td>
+                      {else/}
+                      <td>-</td>
+                      {/if}
+                      {if $v.goods_unit && $v.goods_unit !=''}
+                      <td>{$v.goods_unit}</td>
+                      {else/}
+                      <td>件</td>
+                      {/if}
+                    <td>{$v.goods_num}</td>
+                    <td>{$v.goods_price}</td>
+                    <td>{$v.goods_sum}</td>
+                </tr>
+                {/foreach}
+            </tbody>
+      </table>
+      <label style="display: flex;justify-content: flex-end;padding-right: 13px;">合计：共{$document_detail.goods_count}种商品{$document_detail.goods_price}件,合计金额：<span style="color: #ff0000;">{$document_detail.goods_total_price}</span></label>
+    </div>
+</div>
+</div>

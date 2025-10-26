@@ -1,0 +1,577 @@
+<style>
+    .layui-card-body .content{width: 33.3%;}
+    .layui-layout-admin .screen{margin-bottom: 15px;}
+</style>
+
+<div class="layui-card panel-content card-common card-brief">
+    <div class="layui-card-header simple">
+        <span class="card-title">结算概况</span>
+    </div>
+    <div class="layui-card-body">
+
+        <div class="content">
+            <p class="title">待结算（元）</p>
+            <p class="money">{$stat.total_account}</p>
+        </div>
+        <div class="content">
+            <p class="title">已结算（元）</p>
+            <p class="money">{$stat.total_account_withdraw}</p>
+        </div>
+        <div class="content">
+            <p class="title">结算中（元）</p>
+            <p class="money">{$stat.total_account_apply}</p>
+        </div>
+
+    </div>
+</div>
+
+<!-- 搜索框 -->
+<div class="screen layui-collapse" lay-filter="selection_panel">
+    <div class="layui-colla-item">
+        <form class="layui-colla-content layui-form layui-show">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">门店</label>
+                    <div class="layui-input-inline">
+                        <select name="store_id" lay-filter="store_id">
+                            <option value="">全部</option>
+                            {foreach name="$store_list" item="store"}
+                            <option value="{$store['store_id']}">{$store['store_name']}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">结算方式</label>
+                    <div class="layui-input-inline">
+                        <select name="transfer_type">
+                            <option value="">全部</option>
+                            {foreach $transfer_type_list as $transfer_type_k=> $transfer_type_v}
+                            <option value="{$transfer_type_k}">{$transfer_type_v}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">结算类型</label>
+                    <div class="layui-input-inline">
+                        <select name="settlement_type">
+                            <option value="">全部</option>
+                            {foreach $settlement_type_list as $settlement_type_k=> $settlement_type_v}
+                            <option value="{$settlement_type_k}">{$settlement_type_v}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">状态</label>
+                    <div class="layui-input-inline">
+                        <select name="status">
+                            <option value="all">全部</option>
+                            {foreach $status_list as $status_k=> $status_v}
+                            <option value="{$status_k}">{$status_v}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">申请时间</label>
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" name="start_date" id="start_time" placeholder="请输入开始时间" autocomplete="off" readonly>
+                    </div>
+                    <div class="layui-input-inline split">-</div>
+                    <div class="layui-input-inline end-time">
+                        <input type="text" class="layui-input" name="end_date" id="end_time" placeholder="请输入结束时间" autocomplete="off" readonly>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">转账时间</label>
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" name="transfer_start_date" id="transfer_start_time" placeholder="请输入开始时间" autocomplete="off" readonly>
+                    </div>
+                    <div class="layui-input-inline split">-</div>
+                    <div class="layui-input-inline end-time">
+                        <input type="text" class="layui-input" name="transfer_end_date" id="transfer_end_time" placeholder="请输入结束时间" autocomplete="off" readonly>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <button class="layui-btn" lay-submit lay-filter="search">筛选</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 列表 -->
+<table id="withdraw_list" lay-filter="withdraw_list"></table>
+
+<script type="text/html" id="status">
+    {{# if(d.status == 0){ }}
+    <div class="layui-elip text-color">{{ d.status_name }}</div>
+    {{# }else if(d.status == 1){ }}
+    <div class="layui-elip text-color">{{ d.status_name }}</div>
+    {{# }else if(d.status == 2){ }}
+    <div class="layui-elip" style="color: green">{{ d.status_name }}</div>
+    {{# }else if(d.status == 3){ }}
+    <div class="layui-elip" style="color: gray">{{ d.status_name }}</div>
+    {{# }else if(d.status == -1){ }}
+    <div class="layui-elip text" style="color: red">{{ d.status_name }}</div>
+    <div class="layui-elip text" style="color: gray">{{d.refuse_reason}}</div>
+    {{# }else if(d.status == -2){ }}
+    <div class="layui-elip text" style="color: red">{{ d.status_name }}</div>
+    <div class="layui-elip text" style="color: gray">{{d.refuse_reason}}</div>
+    {{# } }}
+</script>
+
+<!--操作-->
+<script type="text/html" id="operation">
+    <div class="table-btn">
+        <a class="layui-btn" lay-event="detail">查看</a>
+        {{# if(d.status == 0){ }}
+        <a href="javascript:;" class="layui-btn" lay-event="agree">同意</a>
+        <a href="javascript:;" class="layui-btn" lay-event="refuse">拒绝</a>
+        {{# }else if(d.status == 1){ }}
+            {{#  if((d.transfer_type != "bank" && (d.transfer_type != 'wechatpay' || (d.transfer_type ==  'wechatpay' && !transfer_v3_type))   )){ }}
+            <a href="javascript:;" class="layui-btn" lay-event="transfer">在线转账</a>
+            {{#  } }}
+           {{#  if(d.transfer_type != 'wechatpay' || (d.transfer_type == 'wechatpay' && !transfer_v3_type)){ }}
+            <a href="javascript:;" class="layui-btn" lay-event="actiontransfer">手动转账</a>
+           {{#  } }}
+            <a href="javascript:;" class="layui-btn" lay-event="refuse">拒绝</a>
+        {{# } }}
+    </div>
+</script>
+
+<!--时间-->
+<script type="text/html" id="apply_time">
+    <div class="layui-elip" title="{{ns.time_to_date(d.apply_time)}}">{{ns.time_to_date(d.apply_time)}}</div>
+</script>
+
+<script>
+    var table,upload;
+    var transfer_v3_type = "{$transfer_v3_type}"
+    layui.use(['form', 'laydate','laytpl'], function() {
+        var form = layui.form,
+            laydate = layui.laydate,
+            currentDate = new Date(),
+            laytpl = layui.laytpl,
+            minDate = "";
+        form.render();
+
+        currentDate.setDate(currentDate.getDate() - 7);
+
+        //开始时间
+        laydate.render({
+            elem: '#start_time',
+			type: 'datetime'
+        });
+        //结束时间
+        laydate.render({
+            elem: '#end_time',
+			type: 'datetime'
+        })
+
+        laydate.render({
+            elem: '#transfer_start_time',
+            type: 'datetime'
+        });
+        laydate.render({
+            elem: '#transfer_end_time',
+            type: 'datetime'
+        });
+
+        /**
+         * 重新渲染结束时间
+         */
+        function reRender(){
+            $("#end_time").remove();
+            $(".end-time").html('<input type="text" class="layui-input" placeholder="结束时间" name="end_date" id="end_time" >');
+            laydate.render({
+                elem: '#end_time',
+                type: 'datetime',
+                min: minDate
+            });
+        }
+
+        /**
+         * 表格加载
+         */
+        table = new Table({
+            elem: '#withdraw_list',
+            url: ns.url("store://shop/withdraw/lists"),
+            cols: [
+                [{
+					field: 'store_name',
+					title: '门店',
+                    width: '13%',
+					unresize: 'false',
+				},{
+                    field: 'telphone',
+                    title: '联系人',
+                    width: '11%',
+                    unresize: 'false',
+                    templet: function(data) {
+                        return data.telphone || '--';
+                    }
+                }, {
+					field: 'transfer_type_name',
+					title: '结算方式',
+					width: '10%',
+					unresize: 'false',
+				},  {
+                    field:'settlement_type_name',
+                    title: '结算类型',
+                    unresize: 'false',
+                    width: '10%',
+                }, {
+					field: 'money',
+					title: '结算金额',
+					width: '10%',
+					unresize: 'false',
+					align: 'right',
+					templet: function(data) {
+						return '￥'+ data.money
+					}
+				},{
+                    field: 'status_name',
+                    title: '结算状态',
+                    width: '10%',
+                    unresize: 'false',
+					templet: '#status'
+                },  {
+					title: '申请时间',
+					unresize: 'false',
+					width: '15%',
+					templet: '#apply_time'
+				},  {
+                    title: '转账时间',
+                    unresize: 'false',
+                    width: '13%',
+                    templet: function(data) {
+                        return `<div class="layui-elip" title="`+ ns.time_to_date(data.transfer_time) +`">`+ ns.time_to_date(data.transfer_time) +`</div>`
+                    }
+                }, {
+					title: '操作',
+					toolbar: '#operation',
+					unresize: 'false',
+					align:'right'
+				}]
+            ]
+        });
+
+        /**
+         * 搜索功能
+         */
+        form.on('submit(search)', function(data) {
+            table.reload({
+                page: {
+                    curr: 1
+                },
+                where: data.field
+            });
+            return false;
+        });
+
+        /**
+         * 监听工具栏操作
+         */
+        table.tool(function(obj) {
+            var data = obj.data;
+            switch(obj.event){
+                case 'detail':
+                    detail(data);
+                    break;
+                case 'detail_refuse':
+                    layer.open({
+                        title: '拒绝理由',
+                        content: data.refuse_reason,
+                    })
+                    break;
+                case 'agree':
+                    agree(data);
+                    break;
+                case 'refuse':
+                    refuse(data);
+                    break;
+                case 'transfer':
+                    transfer(data);
+                    break;
+                case 'actiontransfer':
+                    laytpl($("#actiontransfer_html").html()).render(data, function(html) {
+                        layer_pass = layer.open({
+                            title: '结算转账',
+                            skin: 'layer-tips-class',
+                            type: 1,
+                            area: ['800px'],
+                            content: html,
+                        });
+                    });
+
+                    //转账凭证
+                    upload = new Upload({
+                        elem: '#voucher_img'
+                    });
+                    break;
+            }
+        });
+        
+        //提交
+        form.on('submit(actiontransfer)', function(data) {
+            actiontransfer(data.field);
+            return false;
+        });
+    });
+    
+    /**
+     * 查看详情
+     */
+    function detail(field) {
+        location.hash = ns.hash("store://shop/withdraw/detail",{withdraw_id:field.withdraw_id});
+    }
+
+    /**
+     * 自动转账
+     */
+    var transfer_repeat_flag = false;
+    function transfer(field) {
+        if(transfer_repeat_flag) return false;
+        transfer_repeat_flag = true;
+
+        layer.confirm('确定要进行自动转账吗?', function(index) {
+            $.ajax({
+                url: ns.url("store://shop/withdraw/transfer"),
+                data: field,
+                dataType: 'JSON', //服务器返回json格式数据
+                type: 'POST', //HTTP请求类型
+                success: function(res) {
+                    transfer_repeat_flag = false;
+                    if (res.code >= 0) {
+                        table.reload({
+                            page: {
+                                curr: 1
+                            }
+                        });
+                        layer.closeAll();
+                    } else {
+                        layer.closeAll();
+                        layer.msg(res.message);
+                    }
+                }
+            });
+        }, function () {
+            layer.close();
+            transfer_repeat_flag = false;
+        });
+    }
+
+    /**
+     * 手动转账
+     */
+    var actiontransfer_repeat_flag = false;
+    function actiontransfer(field) {
+		if(actiontransfer_repeat_flag) return false;
+		actiontransfer_repeat_flag = true;
+
+        // 删除图片
+        // if(!data.field.certificate) upload.delete();
+
+        $.ajax({
+            url: ns.url("store://shop/withdraw/transferfinish"),
+            data: field,
+            dataType: 'JSON', //服务器返回json格式数据
+            type: 'POST', //HTTP请求类型
+            success: function(res) {
+                actiontransfer_repeat_flag = false;
+                if (res.code >= 0) {
+                    // table.reload({
+                    //     page: {
+                    //         curr: 1
+                    //     }
+                    // });
+                    layer.closeAll();
+                    listenerHash(); // 刷新页面
+                }else{
+                    layer.msg(res.message);
+                }
+            }
+        });
+        
+    }
+
+    /**
+     * 同意
+     */
+    var agree_repeat_flag = false;
+    function agree(field) {
+        if(agree_repeat_flag) return false;
+        agree_repeat_flag = true;
+
+		layer.confirm('确定要通过该转账申请吗?', function(index) {
+			layer.close(index);
+			$.ajax({
+			    url: ns.url("store://shop/withdraw/agree"),
+			    data: field,
+			    dataType: 'JSON', //服务器返回json格式数据
+			    type: 'POST', //HTTP请求类型
+			    success: function(res) {
+			        agree_repeat_flag = false;
+
+                    layer.closeAll();
+			        if (res.code >= 0) {
+                        listenerHash(); // 刷新页面
+			        } else {
+						layer.msg(res.message);
+					}
+			    }
+			});
+		}, function () {
+			layer.closeAll();
+			agree_repeat_flag = false;
+		});
+        
+    }
+
+    /**
+     * 拒绝
+     */
+    var refuse_repeat_flag = false;
+    function refuse(field) {
+        layer.prompt({
+			title: '拒绝理由', 
+			formType: 2,
+			yes: function(index, layero) {
+				var value = layero.find(".layui-layer-input").val();
+				
+				if (value) {
+					if(refuse_repeat_flag) return false;
+					refuse_repeat_flag = true;
+
+					field.refuse_reason = value;
+					$.ajax({
+						url: ns.url("store://shop/withdraw/refuse"),
+						data: field,
+						dataType: 'JSON', //服务器返回json格式数据
+						type: 'POST', //HTTP请求类型
+						success: function(res) {
+							layer.msg(res.message);
+                            refuse_repeat_flag = false;
+							
+							if (res.code >= 0) {
+                                listenerHash(); // 刷新页面
+							}
+						}
+					});
+					layer.close(index);
+				} else {
+					layer.msg('请输入拒绝理由!', {icon: 5, anim: 6});
+				}
+			}
+        });
+    }
+
+    function closePass() {
+        layer.close(layer_pass);
+    }
+</script>
+
+<!-- 在线转账html -->
+<script type="text/html" id="actiontransfer_html">
+    <div class="layui-form" lay-filter="form">
+        <div class="layui-form-item">
+            <label class="layui-form-label">结算类型：</label>
+            <div class="layui-input-block">
+                <p class="input-text ">{{d.transfer_type_name}}</p>
+            </div>
+        </div>
+        {{# if(d.transfer_type == "bank"){ }}
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">账户名称：</label>
+                <div class="layui-input-block">
+                    <p class="input-text ">{{d.bank_name}}</p>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">银行账号：</label>
+                <div class="layui-input-block">
+                    <p class="input-text ">{{d.account_number}}</p>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">真实姓名：</label>
+                <div class="layui-input-block">
+                    <p class="input-text ">{{ d.realname }}</p>
+                </div>
+            </div>
+        {{# }else if(d.transfer_type == "alipay"){ }}
+            <div class="layui-form-item">
+                <label class="layui-form-label">支付宝账号：</label>
+                <div class="layui-input-block">
+                    <p class="input-text ">{{d.account_number}}</p>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">真实姓名：</label>
+                <div class="layui-input-block">
+                    <p class="input-text ">{{ d.realname }}</p>
+                </div>
+            </div>
+        {{# }else if(d.transfer_type == "wechatpay"){ }}
+        <div class="layui-form-item">
+            <label class="layui-form-label">微信号：</label>
+            <div class="layui-input-block">
+                <p class="input-text ">{{d.account_number}}</p>
+            </div>
+        </div>
+        {{# } }}
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">结算金额：</label>
+            <div class="layui-input-block">
+                <p class="input-text">{{d.money}}</p>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">转账凭证：</label>
+            <div class="layui-input-block img-upload">
+                <div class="upload-img-block">
+                    <div class="upload-img-box">
+                        <div class="upload-default" id="voucher_img">
+							<div class="upload">
+								<i class="iconfont iconshangchuan"></i>
+								<p>点击上传</p>
+							</div>
+                        </div>
+						<div class="operation">
+							<div>
+								<i title="图片预览" class="iconfont iconreview js-preview" style="margin-right: 20px;"></i>
+								<i title="删除图片" class="layui-icon layui-icon-delete js-delete"></i>
+							</div>
+							<div class="replace_img js-replace">点击替换</div>
+						</div>
+						<input type="hidden" name="voucher_img" >
+                    </div>
+                   <!-- <p id="certificate" class="no-replace">替换</p>
+                    <input type="hidden" name="certificate" >
+                    <i class="del">x</i> -->
+                </div>
+            </div>
+        </div>
+
+        <div class="layui-form-item">
+            <label class="layui-form-label">转账凭证说明：</label>
+            <div class="layui-input-block len-long">
+                <textarea name="voucher_desc" class="layui-textarea" maxlength="150"></textarea>
+            </div>
+        </div>
+
+        <input type="hidden" name="withdraw_id" value="{{ d.withdraw_id }}">
+        <div class="form-row">
+            <button class="layui-btn" lay-submit lay-filter="actiontransfer">确定</button>
+            <button class="layui-btn layui-btn-primary" onclick="closePass()">返回</button>
+        </div>
+    </div>
+</script>

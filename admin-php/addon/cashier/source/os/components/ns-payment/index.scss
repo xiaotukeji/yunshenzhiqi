@@ -1,0 +1,786 @@
+.container {
+  width: 100%;
+  height: 100%;
+
+  & > view {
+    width: 100%;
+    height: 100%;
+  }
+}
+
+.payment-wrap {
+  .header {
+    height: 0.66rem;
+    display: flex;
+    align-items: center;
+    border-bottom: 0.01rem solid #e6e6e6;
+  }
+
+  .body {
+    flex: 1;
+    height: 0;
+    padding: 0.15rem 0;
+    box-sizing: border-box;
+    display: flex;
+  }
+
+  .info-wrap {
+    flex: 1;
+    width: 0;
+    margin-right: 0.15rem;
+    display: flex;
+    flex-direction: column;
+
+    .info {
+      flex: 1;
+      height: 0;
+      background-color: #f7f8fa;
+      padding-bottom: 0.15rem;
+      box-sizing: border-box;
+
+      /deep/ .uni-scroll-view-content {
+        margin: 0 0.15rem;
+        width: calc(100% - 0.3rem);
+        box-sizing: border-box;
+      }
+
+      .payment-money {
+        text-align: right;
+        font-size: 0.2rem;
+        border-bottom: 0.01rem solid #e6e6e6;
+        line-height: 0.6rem;
+      }
+
+      .title {
+        line-height: 0.6rem;
+        font-size: 0.16rem;
+      }
+
+      .uni-flex {
+        flex-wrap: wrap;
+      }
+
+      .type-item {
+        padding: 0.2rem 0.1rem;
+        background: #fff;
+        border: 0.01rem solid #e6e6e6;
+        display: flex;
+        align-items: center;
+        font-size: 0.16rem;
+        margin: 0 0.1rem 0.1rem 0;
+        width: calc((100% - 0.86rem) / 3);
+        line-height: 1;
+        cursor: pointer;
+        position: relative;
+        border-radius: 0.02rem;
+
+        &.account {
+          width: calc((100% - 0.86rem) / 2);
+        }
+
+        .name {
+          flex: 1;
+          width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        &:nth-child(3n + 3) {
+          margin-right: 0;
+        }
+
+        .iconfont {
+          color: $primary-color;
+          font-size: 0.3rem;
+          margin-right: 0.1rem;
+        }
+
+        .text {
+          color: #fe2278;
+          margin-left: 0.05rem;
+        }
+
+        .iconxuanzhong {
+          position: absolute;
+          display: none;
+        }
+
+        &.active {
+          border-color: $primary-color;
+
+          .iconxuanzhong {
+            display: block;
+            right: -0.11rem;
+            bottom: -0.01rem;
+          }
+        }
+
+        &.disabled {
+          background: #f5f5f5;
+          cursor: not-allowed;
+        }
+      }
+
+      .pay-type {
+        .type-item {
+          padding: 0.15rem 0.1rem;
+        }
+
+        .pay-icon {
+          color: #fff;
+          background: #f0f0f0;
+          width: 0.3rem;
+          height: 0.3rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: 0.16rem;
+          border-radius: 0.05rem;
+        }
+      }
+    }
+
+    .button-wrap {
+      padding-top: 0.15rem;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+
+      .scancode {
+        color: $primary-color;
+      }
+
+      button {
+        margin: 0 0 0 0.1rem;
+        min-width: 1rem;
+      }
+
+      .print-ticket {
+        flex: 1;
+        width: 0;
+        display: flex;
+        align-items: center;
+      }
+    }
+  }
+
+  .bill-wrap {
+    width: 3rem;
+    border: 0.01rem solid #e6e6e6;
+
+    .title {
+      text-align: center;
+      font-size: 0.2rem;
+      border-bottom: 0.01rem solid #e6e6e6;
+      line-height: 0.6rem;
+    }
+
+    .body {
+      padding: 0;
+      margin: 0 0.15rem;
+      display: block;
+      height: auto;
+
+      .block-title {
+        position: relative;
+        text-align: center;
+        width: 100%;
+        height: 0.35rem;
+        margin-top: 0.2rem;
+
+        text {
+          padding: 0 0.2rem;
+          background: #fff;
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          z-index: 1;
+          transform: translate(-50%, -50%);
+          font-size: 0.16rem;
+        }
+
+        &::before {
+          content: '';
+          position: absolute;
+          width: 100%;
+          top: 50%;
+          left: 0;
+          border-top: 0.01rem dashed #e6e6e6;
+        }
+      }
+
+      .bill-info {
+        display: flex;
+        justify-content: space-between;
+        line-height: 1;
+        align-items: center;
+        margin-top: 0.2rem;
+
+        .text {
+          color: #fe2278;
+        }
+      }
+    }
+  }
+
+  .remark-info {
+    padding: 0.1rem;
+    background-color: var(--primary-color-light-9);
+    color: $primary-color;
+    margin-top: 0.1rem;
+    font-size: 0.12rem;
+  }
+}
+
+.pay-result {
+  .body {
+    flex: 1;
+    height: 0;
+    text-align: center;
+
+    &.status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+
+      .iconfont {
+        font-size: 1rem;
+        color: $primary-color;
+      }
+
+      .msg {
+        margin-top: 0.1rem;
+        font-size: 0.16rem;
+        color: $primary-color;
+      }
+    }
+  }
+
+  .footer {
+    height: 0.66rem;
+    display: flex;
+    align-items: center;
+    border-top: 0.01rem solid #e6e6e6;
+    justify-content: center;
+
+    button {
+      margin: 0 0 0 0.15rem;
+      width: auto;
+      min-width: 1.6rem;
+      height: 0.45rem;
+      line-height: 0.45rem;
+    }
+  }
+}
+
+.money-wrap {
+  background: #fff;
+  border-radius: 0.05rem;
+
+  .head {
+    height: 0.6rem;
+    line-height: 0.6rem;
+    text-align: center;
+    font-weight: bold;
+    position: relative;
+
+    text {
+      font-size: 0.16rem;
+    }
+
+    .iconguanbi1 {
+      position: absolute;
+      right: 0.15rem;
+      font-size: 0.22rem;
+      cursor: pointer;
+    }
+  }
+
+  .content-wrap {
+    display: flex;
+    border: 0.01rem solid #e6e6e6;
+    height: 0.6rem;
+    align-items: center;
+    margin: 0 0.2rem;
+    padding: 0 0.15rem;
+
+    .unit {
+      font-size: 0.25rem;
+    }
+
+    .money {
+      margin-left: 0.05rem;
+      font-size: 0.2rem;
+    }
+  }
+
+  .keyboard-wrap {
+    width: 4rem;
+    padding: 0 0.2rem 0.3rem 0.2rem;
+    margin-top: 0.1rem;
+  }
+}
+
+.coupon-wrap {
+  background: #fff;
+  width: 6rem;
+  border-radius: 0.05rem;
+
+  .head {
+    height: 0.6rem;
+    line-height: 0.6rem;
+    text-align: center;
+    font-weight: bold;
+    position: relative;
+
+    text {
+      font-size: 0.16rem;
+    }
+
+    .iconguanbi1 {
+      position: absolute;
+      right: 0.15rem;
+      font-size: 0.22rem;
+      cursor: pointer;
+    }
+  }
+
+  .body {
+    height: 3rem;
+  }
+
+  .list {
+    display: flex;
+    padding: 0.1rem 0.15rem;
+    flex-wrap: wrap;
+
+    .item {
+      margin: 0 0.1rem 0.1rem 0;
+      padding: 0.1rem 0;
+      border: 0.01rem solid #e6e6e6;
+      width: calc((100% - 0.14rem) / 2);
+      cursor: pointer;
+      display: flex;
+      position: relative;
+
+      .iconxuanzhong {
+        position: absolute;
+        display: none;
+        right: -0.01rem;
+        bottom: -0.01rem;
+        font-size: 0.3rem;
+      }
+
+      &.active {
+        border-color: $primary-color;
+
+        .iconxuanzhong {
+          display: block;
+          color: $primary-color;
+        }
+      }
+
+      &:nth-child(2n + 2) {
+        margin-right: 0;
+      }
+
+      .money {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 0.6rem;
+        min-width: 1rem;
+        font-size: 0.2rem;
+        line-height: 1;
+
+        .unit {
+          font-size: 0.16rem;
+          margin-top: 0.05rem;
+          font-weight: bold;
+        }
+      }
+
+      .info {
+        padding: 0 0.1rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        .title {
+          font-weight: bold;
+        }
+
+        .time,
+        .limit {
+          font-size: 0.12rem;
+          color: #999;
+          line-height: 1;
+          margin-top: 0.05rem;
+        }
+      }
+    }
+  }
+}
+
+.safe-verify-popup {
+  width: 4.4rem;
+  height: 3.1rem;
+  background-color: #fff;
+  border-radius: 0.1rem;
+
+  .header {
+    height: 0.6rem;
+    line-height: 0.6rem;
+    text-align: center;
+    position: relative;
+
+    .type-wrap {
+      display: flex;
+
+      .item {
+        margin-left: 0.15rem;
+        font-size: 0.16rem;
+        cursor: pointer;
+
+        &.active {
+          font-size: 0.18rem;
+          color: $primary-color;
+          font-weight: bold;
+        }
+      }
+    }
+
+    .iconguanbi1 {
+      position: absolute;
+      right: 0.15rem;
+      top: 0;
+      font-size: 0.22rem;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  }
+
+  .content {
+    padding: 0 0.3rem;
+    margin-top: 0.2rem;
+  }
+  
+  .member-code-hint{
+	margin-top: .3rem;
+	font-size: .16rem;
+  }
+
+  .tips {
+    color: #999;
+  }
+
+  .mobile {
+    font-size: 0.25rem;
+    font-weight: bold;
+    margin-top: 0.05rem;
+  }
+
+  .sms-code {
+    display: flex;
+    align-items: center;
+    margin-top: 0.15rem;
+    border-bottom: 0.01rem solid #eee;
+    padding: 0.15rem 0;
+
+    view {
+      position: relative;
+      display: flex;
+      align-items: center;
+      flex: 1;
+
+      input {
+        flex: 1;
+        margin: 0 0.1rem 0 0;
+        padding: 0;
+        border-bottom: none;
+        font-size: 0.14rem;
+      }
+
+      text {
+        position: absolute;
+        right: 0.1rem;
+        font-size: 0.2rem;
+        color: #999;
+        cursor: pointer;
+      }
+
+    }
+
+    .send-tip {
+      color: $primary-color;
+      font-size: 0.13rem;
+      cursor: pointer;
+
+      &.disabled {
+        color: #999;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .placeholder {
+    font-size: 0.14rem;
+  }
+
+  .primary-btn {
+    margin-top: 0.3rem;
+    line-height: 0.4rem;
+  }
+
+  .scancode-wrap {
+    text-align: center;
+
+    .input-wrap {
+      display: flex;
+
+      view {
+        position: relative;
+        display: flex;
+        align-items: center;
+        flex: 1;
+
+        input {
+          width: 0;
+          flex: 1;
+          height: 0.5rem;
+          border: 0.01rem solid #cccccc;
+          text-align: center;
+          padding: 0 0.1rem;
+          box-sizing: border-box;
+          transition: all 0.3s;
+
+          &.focus {
+            border-color: $primary-color;
+            box-shadow: 0 0 0.02rem 0.02rem var(--primary-color-light-7);
+          }
+        }
+
+        text {
+          position: absolute;
+          right: 0.1rem;
+          font-size: 0.2rem;
+          color: #999;
+          cursor: pointer;
+        }
+      }
+
+      .primary-btn {
+        margin: 0 0 0 0.1rem;
+        line-height: 0.5rem;
+        width: 1rem;
+        padding: 0;
+      }
+    }
+
+    image {
+      width: 3rem;
+      padding: 0.2rem 0.4rem;
+      box-sizing: border-box;
+    }
+  }
+}
+
+.third-popup {
+  width: 4rem;
+  height: 5rem;
+  background-color: #fff;
+  border-radius: 0.1rem;
+  display: flex;
+  flex-direction: column;
+
+  .head {
+    height: 0.8rem;
+    line-height: 0.8rem;
+    text-align: center;
+    position: relative;
+
+    text {
+      font-size: 0.25rem;
+    }
+
+    .iconguanbi1 {
+      position: absolute;
+      right: 0.15rem;
+      font-size: 0.22rem;
+      cursor: pointer;
+      font-weight: bold;
+    }
+  }
+
+  .money {
+    text-align: center;
+    font-size: 0.18rem;
+    color: $primary-color;
+  }
+
+  .scan-code-type {
+    display: flex;
+    width: 100%;
+    margin-top: 0.2rem;
+    background-color: #f5f5f5;
+
+    .type-item {
+      flex: 1;
+      text-align: center;
+      line-height: 0.5rem;
+      font-size: 0.16rem;
+      cursor: pointer;
+      border-bottom: 0.03rem solid #f5f5f5;
+      position: relative;
+
+      &.active {
+        border-bottom: 0.03rem solid $primary-color;
+      }
+
+      &:last-child::after {
+        content: ' ';
+        position: absolute;
+        left: 0;
+        top: 20%;
+        width: 0.01rem;
+        height: 60%;
+        background: #ddd;
+      }
+    }
+  }
+
+  .content-wrap {
+    flex: 1;
+    height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .qrcode-wrap {
+      display: flex;
+      justify-content: center;
+
+      .empty {
+        padding: 1rem 0;
+        text-align: center;
+      }
+
+      .qrcode-item {
+        height: 1.3rem;
+        width: 1.3rem;
+        padding: 0.1rem;
+        box-shadow: 0 0.02rem 0.1rem 0 rgba(0, 0, 0, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+
+        .qrcode {
+          width: 100%;
+        }
+
+        .logo {
+          width: 0.25rem;
+          position: absolute !important;
+          z-index: 5;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+        }
+
+        &:nth-child(2) {
+          margin-left: 0.2rem;
+        }
+      }
+    }
+
+    .scancode-wrap {
+      view {
+        position: relative;
+        display: flex;
+        align-items: center;
+
+        input {
+          width: 3.3rem;
+          height: 0.5rem;
+          border: 0.01rem solid #cccccc;
+          text-align: center;
+          padding: 0 0.1rem;
+          box-sizing: border-box;
+          transition: all 0.3s;
+
+          &.focus {
+            border-color: $primary-color;
+            box-shadow: 0 0 0.02rem 0.02rem var(--primary-color-light-7);
+          }
+        }
+
+        text {
+          position: absolute;
+          right: 0.1rem;
+          font-size: 0.2rem;
+          color: #999;
+          cursor: pointer;
+        }
+      }
+
+      image {
+        width: 3.3rem;
+        padding: 0.2rem 0.4rem;
+        box-sizing: border-box;
+      }
+    }
+  }
+}
+
+.remark-wrap {
+  width: 6rem;
+  background-color: #fff;
+  border-radius: 0.04rem;
+  box-shadow: 0 0.01rem 0.12rem 0 rgba(0, 0, 0, 0.1);
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 0.15rem;
+    height: 0.45rem;
+    line-height: 0.45rem;
+    border-bottom: 0.01rem solid #e8eaec;
+
+    .iconfont {
+      font-size: $uni-font-size-lg;
+    }
+  }
+
+  .body {
+    padding: 0.15rem 0.15rem 0.1rem;
+
+    textarea {
+      border: 0.01rem solid #e6e6e6;
+      width: 100%;
+      padding: 0.1rem;
+      box-sizing: border-box;
+      font-size: 0.14rem;
+    }
+
+    .placeholder-class {
+      font-size: 0.14rem;
+    }
+  }
+
+  .footer {
+    height: 0.5rem;
+    padding-bottom: 0.05rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    button {
+      width: 95%;
+    }
+  }
+}

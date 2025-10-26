@@ -1,0 +1,286 @@
+<link rel="stylesheet" type="text/css" href="STATIC_EXT/searchable_select/searchable_select.css" />
+<link rel="stylesheet" type="text/css" href="__STATIC__/ext/layui/extend/cascader/cascader.css"/>
+<link rel="stylesheet" href="__ADDON__/stock/site/css/goods_lists.css">
+
+<div class="main-wrap">
+	<div class="content_full">
+		<div class="screen layui-collapse margin-bot" lay-filter="selection_panel">
+			<div class="layui-colla-item">
+				<div class="layui-colla-content layui-form layui-show" lay-filter="order_list">
+					<div class="layui-form-item">
+						<div class="classification">
+							<div class="layui-inline">
+								<label class="layui-form-label">商品名称/编码：</label>
+								<div class="layui-input-inline">
+									<input type="text" name="search_text" autocomplete="off" placeholder="请输入商品名称/编码" class="layui-input" />
+								</div>
+							</div>
+							<div class="layui-inline">
+								<label class="layui-form-label">商品分类</label>
+								<div class="layui-input-inline category-wrap">
+									<input type="text" autocomplete="off" show="false" class="layui-input select-category" placeholder="请选择" readonly="">
+									<input type="hidden" name="category_id">
+								</div>
+							</div>
+						</div>
+						<div class="classification">
+							<div class="layui-inline">
+							     <label class="layui-form-label">库存：</label>
+								 <div class="layui-input-inline">
+								 	<input type="number" name="min_stock" id="start_sale" lay-verify="int" min="0" placeholder="最低库存" class="layui-input" autocomplete="off">
+								 </div>
+								 <div class="layui-form-mid">-</div>
+								 <div class="layui-input-inline">
+								 	<input type="number" name="max_stock" id="end_sale" lay-verify="int" min="0" placeholder="最高库存" class="layui-input" autocomplete="off">
+								 </div>
+							</div>
+							<div class="layui-inline">
+								<label class="layui-form-label">门店：</label>
+								<div class="layui-input-inline">
+									<select name="store_id"  lay-filter="store_list" class="len-mid">
+										<option value="">全部</option>
+										{foreach $store_list as $store_k => $store_v}
+										<option value="{$store_v.store_id}">{$store_v.store_name}</option>
+										{/foreach}
+									</select>
+									<input type="hidden" name="store_name"/>
+								</div>
+							</div>
+						</div>
+					</div>
+					<input type="hidden" name="goods_state" value="{$goods_state}"/>
+					<div class="form-row">
+						<button class="layui-btn" lay-submit lay-filter="search">筛选</button>
+						<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+						<button class="layui-btn layui-btn-primary" lay-submit lay-filter="batch_export_stock">导出商品</button>
+						<a class="layui-btn layui-btn-primary" href="{:href_url('stock://shop/stock/export')}" target="_blank">查看导出记录</a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- 批量操作时判断是否为当前选项,防止重复点击 -->
+		<input type="hidden" name="openSwitch" lay-type="grouping" value="">
+	</div>
+
+	<div class="layui-tab table-tab" lay-filter="goods_list_tab">
+		<ul class="layui-tab-title">
+			<li {if $goods_state=='' }class="layui-this" {/if} lay-id="">全部</li>
+			<li {if $goods_state=='1' }class="layui-this" {/if} lay-id="1">销售中</li>
+			<li {if $goods_state=='0' }class="layui-this" {/if} lay-id="0">仓库中</li>
+		</ul>
+		<div class="layui-tab-content" style="margin-top: 15px;">
+			<table id="goods_list" lay-filter="goods_list"></table>
+		</div>
+	</div>
+</div>
+<script type="text/html" id="goods_detail">
+	<div class='table-title'>
+		<div class='title-pic'>
+			<img layer-src src="{{ns.img(d.sku_image, 'small')}}">
+		</div>
+		<div class='title-content'>
+			<p class="layui-elip" style="color: #333;" title="{{d.goods_name}}">{{d.goods_name}}</p>
+			<p class="layui-elip">{{d.spec_name}}</p>
+		</div>
+	</div>
+</script>
+
+<script type="text/html" id="operation">
+	<div class="table-btn">
+		<a class="layui-btn" lay-event="records">查看记录</a>
+	</div>
+</script>
+
+<script src="STATIC_EXT/searchable_select/searchable_select.js"></script>
+<script>
+	var table,form,layCascader;
+	layui.use(['form', 'element','layCascader'], function() {
+		form = layui.form;
+		layCascader = layui.layCascader;
+		element = layui.element;
+		form.render();
+
+		var store_name = $('select[name="store_id"] option:selected').text()
+		$('input[name="store_name"]').val(store_name);
+
+		table = new Table({
+			elem: '#goods_list',
+			url: ns.url("stock://shop/stock/manage"),
+			cols: [
+				[{
+					type: 'checkbox',
+					unresize: 'false',
+					width: '3%'
+				},{
+					field: 'sku_name',
+					title: '商品信息',
+					width: '30%',
+					templet: '#goods_detail'
+				}, {
+					field: 'sku_no',
+					title: '编码',
+					width: '10%',
+				}, {
+					field: 'stock',
+					title: '销售库存',
+					width: '9%',
+					templet: function (data){
+						if(!data.stock){
+							return 0;
+						}
+						return data.stock;
+					}
+				}, {
+					field: 'stock',
+					title: '实物库存',
+					width: '9%',
+					templet: function (data){
+						if(!data.real_stock){
+							return 0;
+						}
+						return data.real_stock;
+					}
+				}, {
+					field: 'cost_price',
+					title: '成本价',
+					width: '9%',
+				}, {
+					title: '状态',
+					unresize: 'false',
+					width: '8%',
+					templet: function (data) {
+						var str = '';
+						if (data.goods_state == 1) {
+							str = '销售中';
+						} else if (data.goods_state == 0) {
+							str = '仓库中';
+						}
+						return str;
+					}
+				}, {
+					field: 'create_time',
+					title: '添加时间',
+					width: '15%',
+					templet: function (data) {
+						return ns.time_to_date(data.create_time);
+					}
+				},
+				{
+					title: '操作',
+					width: '7%',
+					toolbar: '#operation',
+					align: 'right',
+				}
+				]
+			],
+
+		});
+
+		/**
+		 * 监听工具栏操作
+		 */
+		table.tool(function (obj) {
+			var data = obj.data;
+			switch (obj.event) {
+				case 'records': //查看
+					window.open(ns.href("stock://shop/stock/records?sku_id=" + data.sku_id));
+					break;
+			}
+		});
+
+		element.on('tab(goods_list_tab)', function () {
+			var id = this.getAttribute('lay-id');
+			$('input[name="goods_state"]').val(id)
+			table.reload({
+				page: {
+					curr: 1
+				},
+				where: {
+					search_text: $('input[name="search_text"]').val(),
+					category_id: $('input[name="category_id"]').val(),
+					min_stock: $('input[name="min_stock"]').val(),
+					max_stock: $('input[name="max_stock"]').val(),
+					store_id: $('select[name="store_id"]').val(),
+					goods_state: $('input[name="goods_state"]').val()
+				}
+			});
+		});
+
+		form.on('select(store_list)', function (data) {
+			var store_name = $('select[name="store_id"] option:selected').text()
+			$('input[name="store_name"]').val(store_name);
+		})
+
+		//监听筛选事件
+		form.on('submit(search)', function (data) {
+			table.reload({
+				page: {
+					curr: 1
+				},
+				where: data.field
+			});
+		});
+
+		// 商品导出
+		form.on('submit(batch_export_stock)', function(data){
+			var id_array = [];
+			var checkedData = table.checkStatus('goods_list').data;
+			for (var i in checkedData) id_array.push(checkedData[i].goods_id);
+
+			data.field.goods_ids = id_array.toString(); // 选择要导出的商品
+
+			$.ajax({
+				type: 'post',
+				dataType: 'json',
+				url: ns.url("stock://shop/stock/exportGoods"),
+				data: data.field,
+				success: function (res) {
+				}
+			})
+			window.open(ns.href("stock://shop/stock/export",{}));
+		});
+		
+		var goodsCategory = [];
+		fetchCategory('.select-category', function (value, node) {
+			$('[name="category_id"]').val(value)
+		});
+
+		/**
+		 * 渲染分类选择
+		 * @param elem
+		 * @param callback
+		 */
+		function fetchCategory(elem, callback){
+			if (!goodsCategory.length) {
+				$.ajax({
+					url : ns.url("shop/goodscategory/lists"),
+					dataType: 'JSON',
+					type: 'POST',
+					async: false,
+					success: function(res) {
+						goodsCategory = res.data;
+					}
+				})
+			}
+			if($(elem).length) {
+				var _cascader = layCascader({
+					elem: elem,
+					options: goodsCategory,
+					props: {
+						value: 'category_id',
+						label: 'category_name',
+						children: 'child_list'
+					}
+				});
+				_cascader.changeEvent(function (value, node) {
+					typeof callback == 'function' && callback(value, node)
+				});
+
+				$("form").unbind().bind("reset", function (event) {
+					_cascader.clearCheckedNodes()
+				});
+			}
+		}
+	});
+</script>

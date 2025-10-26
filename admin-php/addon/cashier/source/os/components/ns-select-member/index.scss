@@ -1,0 +1,333 @@
+.member-inquire-wrap {
+  overflow: hidden;
+  background-color: #fff;
+  border-radius: 0.05rem;
+
+  .member-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 0.15rem;
+    height: 0.45rem;
+    line-height: 0.45rem;
+    border-bottom: 0.01rem solid #e8eaec;
+
+    .iconfont {
+      font-size: $uni-font-size-lg;
+	}
+  }
+
+  &.exact{
+    width: 4rem;
+
+    .member-content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.3rem 0.3rem;
+
+      .member-img{
+        width: 0.75rem;
+        height: 0.75rem;
+      }
+      .member-input{
+        margin-top: .25rem;
+        width: 100%;
+        height: .4rem;
+        line-height: .4rem;
+        // border-radius: 0.02rem;
+        padding: 0 0.1rem;
+        border: 0.01rem solid $primary-color;
+        box-sizing: border-box;
+        text-align: center;
+      }
+      button{
+        // border-radius: 0.05rem;
+        height: .4rem;
+        line-height: .4rem;
+        margin-top: 0.15rem;
+        width: 100%;
+      }
+      .function-list{
+        margin-top: .25rem;
+        padding-top: .15rem;
+        border-top: 0.01rem dashed #ccc;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        .item-wrap{
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          cursor: pointer;
+          .item-icon{
+            font-size: .25rem;
+            color: #333;
+            margin-bottom: 0.05rem;
+          }
+        }
+      }
+    }
+
+  }
+
+  &.list{
+    width: 9.55rem;
+    height: 5.37rem;
+
+    .member-content {
+      padding: 0.1rem;
+
+      .search-warp {
+        margin-left: 0.1rem;
+
+        .search-input {
+          display: flex;
+          align-items: center;
+          margin-bottom: 0.05rem;
+
+          input {
+            flex: 1;
+            padding-left: 0.1rem;
+            width: 2.5rem;
+            height: 0.4rem;
+            line-height: 0.4rem;
+            border: 0.01rem solid #dcdee2;
+            border-right: none;
+          }
+
+          button {
+            width: 2rem;
+            height: 0.42rem;
+            line-height: 0.42rem;
+            color: #fff;
+            font-size: $uni-font-size-base;
+            margin: 0;
+
+            &:last-of-type {
+              margin-left: 0.15rem;
+              margin-right: 0.1rem;
+            }
+          }
+        }
+      }
+
+      /deep/ .uni-scroll-view-content {
+        display: flex;
+        flex-wrap: wrap;
+        align-content: baseline;
+        height: 430px;
+      }
+
+      .member-list {
+        .member-item {
+          display: flex;
+          padding: 0.13rem 0.15rem;
+          margin: 0.1rem;
+          width: 2.9rem;
+          height: 1rem;
+          background-color: #f5f5f5;
+          box-sizing: border-box;
+          border-radius: 0.05rem;
+          &.active {
+            background-color: $primary-color;
+            .name,
+            .phone,
+            .other>view {
+              color: #fff;
+            }
+          }
+
+          &:nth-child(3n + 3) {
+            margin-right: 0;
+          }
+
+          image {
+            width: 0.45rem;
+            height: 0.45rem;
+            border-radius: 50%;
+            margin-right: 0.1rem;
+            flex-shrink: 0;
+          }
+
+          .item-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            flex: 1;
+			width: calc( 100% - 0.55rem );
+			.name{
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+          }
+
+          .name {
+            text:nth-child(1) {
+              font-size: $uni-font-size-lg;
+              font-weight: bold;
+            }
+          }
+
+          .phone {
+            font-size: $uni-font-size-sm;
+            color: #666;
+          }
+
+          .other {
+            display: flex;
+            justify-content: space-between;
+            font-size: $uni-font-size-sm;
+
+            view {
+              font-size: $uni-font-size-sm;
+              color: #666;
+            }
+          }
+        }
+      }
+    }
+  }
+
+}
+
+// 录入会员
+.member-entering-wrap {
+  width: 3.8rem;
+  background-color: #fff;
+  border-radius: 0.05rem;
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 0.15rem;
+    height: 0.45rem;
+    line-height: 0.45rem;
+    border-bottom: 0.01rem solid #e8eaec;
+
+    .iconfont {
+      font-size: $uni-font-size-lg;
+    }
+  }
+
+  .form-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.2rem;
+
+    .form-item {
+      margin-bottom: 0.1rem;
+      display: flex;
+
+      .form-label {
+        width: 0.9rem;
+        text-align: right;
+        padding-right: 0.1rem;
+        box-sizing: border-box;
+        height: 0.32rem;
+        line-height: 0.32rem;
+
+        .required {
+          color: red;
+          margin-right: 0.03rem;
+        }
+      }
+
+      .form-inline {
+        width: 2.5rem;
+        line-height: 0.32rem;
+        box-sizing: border-box;
+
+        .form-input {
+          border-width: 0.01rem;
+          border-style: solid;
+          background-color: #fff;
+          color: rgba(0, 0, 0, 0.85);
+          border-radius: 0.02rem;
+          padding-left: 0.1rem;
+          height: 0.32rem;
+          line-height: 0.32rem;
+          font-size: 0.14rem;
+          border-color: #e6e6e6;
+        }
+
+        button {
+          width: calc(50% - 0.05rem);
+          display: inline-block;
+          margin-right: 0.1rem;
+
+          &:nth-child(2) {
+            margin-right: 0;
+          }
+        }
+
+      }
+
+    }
+
+    .btn-wrap {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0.1rem 0;
+      .primary-btn {
+        height: 0.4rem;
+        line-height: 0.4rem;
+      }
+    }
+  }
+}
+
+.empty {
+  text-align: center;
+  padding-top: 0.8rem;
+  width: 100%;
+
+  image {
+    width: 2rem;
+  }
+
+  .tips {
+    color: #999;
+    margin-top: 0.15rem;
+  }
+}
+
+.member-empty{
+	overflow: hidden;
+	background-color: #fff;
+	border-radius: 0.02rem;
+	width: 3rem;
+	.head{
+		display: flex;
+		align-items: center;
+		padding-left: .2rem;
+		height: .42rem;
+		background-color: #f8f8f8;
+		border-bottom: .01rem solid #eee;
+	}
+	.content{
+		padding: .06rem .2rem 0;
+		height: .6rem;
+		line-height: .6rem;
+	}
+	.btn-wrap{
+		display: flex;
+		justify-content: flex-end;
+		padding-right: .2rem;
+		padding-bottom: .2rem;
+		button{
+			margin: 0;
+			margin-left: .1rem;
+			border-radius: .02rem;
+		}
+		.close-btn{
+			font-size: 0.14rem;
+		}
+	}
+}

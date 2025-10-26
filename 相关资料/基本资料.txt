@@ -1,0 +1,14 @@
+小程序参数：
+
+
+
+
+
+微信支付参数：
+
+商户号：1730773390
+商户名称：杭州易伴电子商务有限公司
+密码：654321
+
+apiv2:fasdjf3742398IYIHKHJKHKwerwerwe8
+apiv3:jdljflgLJLKJIOU23423423LJKLJLKJw

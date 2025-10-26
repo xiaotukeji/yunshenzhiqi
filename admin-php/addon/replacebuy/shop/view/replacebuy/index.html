@@ -1,0 +1,694 @@
+<link rel="stylesheet" type="text/css" href="REPLACEBUY_CSS/index.css"/>
+<style type="text/css">
+	.sku-name{overflow: hidden; text-overflow: ellipsis;width: 300px;}
+	.layui-layout-admin .lineation{background-color: #EFF0F4 !important;}
+    .card-brief .layui-card-header{padding-left: 0}
+    .money-right .card-common .layui-card-header{height: 42px;line-height: 42px;}
+    .money-left .table-tab{margin-top: 0;}
+    .money-right .layui-card-body{max-height: 875px;}
+    .new-footer{text-align: center;}
+    .new-footer .layui-btn{margin: auto;}
+</style>
+
+<div style="margin-bottom: 20px;" class="card-brief card-common card-brief">
+	<div class="layui-card-header">
+		<span class="card-title">选择会员和商品</span>
+	</div>
+	<div class="layui-card card-common card-brief member">
+		<button class="layui-btn" onclick="addLabel()">选择下单会员</button>
+	</div>
+</div>
+
+<div class="lineation" style="background-color: #f8f8f8; height: 20px; width: 100%; position: absolute; left: 0;"></div>
+
+<div class="cash">
+	<div class="form-wrap money">
+		<div class="money-block money-left">
+			<div class="money-box">
+				<div class="layui-card-header" style="border: none; padding: 0;">
+					<span class="card-title text-color">全部商品</span>
+				</div>
+				<div class="layui-tab table-tab cash-member" lay-filter="goods_list_tab">
+					<div class="layui-tab-content">
+						<div class="layui-tab-item layui-show">
+							<div class="goods-block">
+								<div class="good-left layui-form">
+									<div class="border-border">
+										<div class="layui-inline">
+											<div class="layui-input-inline search-input">
+												{include file="replacebuy/category_select" /}
+											</div>
+										</div>
+										<div class="layui-inline">
+											<div class="layui-input-inline search-input">
+												<select name="label_id" lay-filter="goods_grouping" id="goods_grouping">
+													<option value="">选择商品分组</option>
+													{foreach name="$label_list" item="vo"}
+													<option value="{$vo['id']}">{$vo['label_name']}</option>
+													{/foreach}
+												</select>
+											</div>
+										</div>
+										<div class="single-filter-box">
+											<div class="layui-form">
+												<div class="layui-input-block search-input">
+													<input type="text" name="search_text" placeholder="搜索商品名称" autocomplete="off" class="layui-input ">
+													<button type="button" class="layui-btn layui-btn-primary" lay-filter="goods_search" lay-submit>
+														<i class="layui-icon">&#xe615;</i>
+													</button>
+												</div>
+											</div>
+										</div>
+									</div>
+
+									<!-- 商品列表 -->
+									<div class="layui-form goods-list"></div>
+									<div id="page"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="money-block money-middle"></div>
+
+		<div class="money-block money-right">
+			<div class="money-box">
+				<div class="layui-card card-common">
+					<div class="layui-card-header" style="border: none; padding: 0;">
+						<span class="card-title text-color">已选择（<span class="goods-total">0</span>）</span>
+					</div>
+					<div class="layui-card-body">
+						<div class="order-list"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+<div class="layui-form form-wrap new-footer" >
+	<button class="layui-btn" lay-submit lay-filter="settle">去结算</button>
+</div>
+
+<script type="text/html" id="addLabel">
+	<div class="layui-form">
+		<div class="layui-input-inline" style="width:300px;">
+			<input type="text" name="member_search" placeholder="请输入会员名称、用户名、手机号" autocomplete="off" class="layui-input">
+			<button type="button" class="layui-btn layui-btn-primary member-search" style="height: 32px; line-height: 32px; position: absolute; right: 1px; top: 1px; border-width: 0; border-left-width: 1px;" lay-filter="search" lay-submit>
+				<i class="layui-icon"></i>
+			</button>
+		</div>
+		<div style="overflow: auto;height: 500px;">
+			<table id="selected_goods_list" lay-filter="selected_goods_list"></table>
+		</div>
+	</div>
+</script>
+
+<!-- 会员详情 -->
+<script type="text/html" id="member_detail">
+	<div class="member-detail">
+		<div class="table-title checked-peo border-color">
+			<div class="title-pic">
+				<img src="{{ns.img(d.headimg)}}" onerror=src="{:img('public/static/img/default_img/head.png')}" />
+			</div>
+			<div class="title-content">
+				<div class="member-con-first">
+					<h3 class="nickname" title="{{d.nickname}}">{{d.nickname}}</h3>
+				</div>
+				<div class="member-con-second">
+					<p class="text-color-gray"><span class="member-mobile">{{d.mobile == "" ? '--' : d.mobile}}</span></p>
+				</div>
+			</div>
+		</div>
+		<button class="layui-btn check-btn" lay-submit lay-filter="logout_member">重新选择</button>
+	</div>
+</script>
+
+<!-- 会员查询 -->
+<script type="text/html" id="search_member">
+<div class="layui-card card-common card-brief member">
+	<button class="layui-btn" onclick="addLabel()">选择下单会员</button>
+</div>
+</script>
+
+<input id="member_id" type="hidden" value="" />
+
+<!-- 商品渲染 -->
+<script type="text/html" id="goods_list">
+	{{#  if (d.list.length == 0) {  }}
+	<div class="empty-goods">
+		<img class="empty-img" src="REPLACEBUY_IMG/no_goods.png">
+		<p class="empty-text">暂无商品</p>
+	</div>
+	{{#  } else {  }}
+	{{#  layui.each(d.list, function(index, item) {  }}
+	{{#  if(item.stock == 0){  }}
+	<div class="good-box disabled all-goods" data-sku-id="{{item.sku_id}}" data-sku-name="{{item.sku_name}}" data--stock="{{item.stock}}" data-sku-price="{{item.discount_price}}">
+		{{#  } else {  }}
+		<div class="good-box all-goods" data-sku-id="{{item.sku_id}}" data-sku-name="{{item.sku_name}}" data-stock="{{item.stock}}" data-sku-price="{{item.discount_price}}">
+			{{#  }  }}
+			<div class="table-title">
+				<div class="title-pic">
+					<img layer-src="{{ns.img(item.sku_image,'big')}}" src="{{ns.img(item.sku_image,'small')}}" />
+				</div>
+				<div class="title-content">
+					<p class="multi-line-hiding good-name" title="{{item.sku_name}}">{{item.sku_name}}</p>
+					<div class="good-price">
+						<p class="basic-color store-price text-color">￥<span>{{item.discount_price}}</span></p>
+						<p class="line-hideing store-stoce" title="{{item.stock}}">库存：<span class="store-stock text-color">{{item.stock}}</span></p>
+					</div>
+				</div>
+				<button class="layui-btn y-stock text-color border-color" data-sku-id="{{item.sku_id}}" data-sku-name="{{item.sku_name}}" data-stock="{{item.stock}}" data-sku-price="{{item.discount_price}}" data-sku-image="{{item.sku_image}}" data-spec-name="{{item.spec_name}}" onclick="addGoods(this)">选择</button>
+				<button class="layui-btn layui-btn-grey n-stock" readonly="readonly">选择</button>
+			</div>
+		</div>
+		{{#  })  }}
+		<div id="paged" class="page"></div>
+		{{#  }  }}
+</script>
+
+<!-- 渲染购物车 -->
+<script type="text/html" id="render_cart">
+	{{#  if(d.length == 0){  }}
+	<div class="empty-goods">
+		<img class="empty-img" src="REPLACEBUY_IMG/no_goods.png">
+		<p class="empty-text">未添加任何商品</p>
+	</div>
+	{{#  }else{  }}
+	{{#  layui.each(d, function(index, item){  }}
+	<div class="good-seleted" data-id="{{item.sku_id}}">
+	<div class="table-title">
+		<div class="title-pic checked-pic">
+			<img layer-src="{{ns.img(item.sku_image,'big')}}" src="{{ns.img(item.sku_image,'small')}}" />
+		</div>
+		<div class="title-content">
+			<p class="multi-line-hiding good-name sku-name" title="{{item.sku_name}}">{{item.sku_name}}</p>
+			<div class="good-price new-price">
+				<p class="basic-color store-price text-color">￥<span>{{item.sku_price}}</span></p>
+				<!-- <div class="align-right selected-num">
+					<p class="num-btn" onclick="decrease({{item.sku_id}})">-</p>
+					<input type="number" value="{{item.num}}" onchange="changeCart({{item.sku_id}}, this)" class="layui-input num-input" />
+					<p class="num-btn" onclick="increase({{item.sku_id}})">+</p>
+				</div> -->
+			</div>
+			<div class="align-right selected-num">
+				<p class="num-btn" onclick="decrease({{item.sku_id}})">-</p>
+				<input type="number" value="{{item.num}}" onchange="changeCart({{item.sku_id}}, this)" class="layui-input num-input" />
+				<p class="num-btn" onclick="increase({{item.sku_id}})">+</p>
+			</div>
+		</div>
+		<button class="layui-btn" onclick="delRow({{index}})">移除</button>
+	</div>
+
+	</div>
+	{{#  })  }}
+	{{#  }  }}
+</script>
+
+<script>
+	var buyer_info = {:json_encode($buyer_info, JSON_UNESCAPED_UNICODE)};
+	var cart = JSON.parse('{:json_encode($cart, JSON_UNESCAPED_UNICODE)}');
+	var laytpl,form,add_attr_index = -1,category_id,limit = 10,page = 1,laypage;
+
+	//扫码相关判断
+	var is_scan = false;
+	var is_scan_on_ready = false;
+	var input_start_time = 0;
+
+	function categorySelectCallBack(){
+		goodsList(page,limit);
+	}
+	var table;
+
+	layui.use(['form', 'laytpl','table','laypage'], function() {
+		laytpl = layui.laytpl;
+		form = layui.form;
+		laypage = layui.laypage;
+		table = layui.table;
+		form.render();
+
+		goodsList(page,limit); // 初始化商品列表
+		cartList(cart); // 初始化购物车
+		syncData();//初始化用户地址
+
+		{if condition="$buyer_info"}
+			memberDetail(buyer_info);
+		{else/}
+			searchMember();
+		{/if}
+
+		/**
+		 * 商品搜索
+		 */
+		form.on('submit(goods_search)', function(data) {
+			goodsList(page,limit);
+		});
+
+		/**
+		 * 更换会员
+		 */
+		form.on('submit(logout_member)', function(data) {
+			// $.ajax({
+			// 	url: ns.url("replacebuy://shop/replacebuy/logoutBuyer"),
+			// 	type: "POST",
+			// 	dataType: "JSON",
+			// 	data: data.field,
+			// 	success: function(res) {
+			// 		console.log(res)
+			// 		if (res.code == 0) {
+			// 			searchMember();
+			// 			$("#member_id").val("");
+			// 		} else {
+			// 			layer.msg(res.message);
+			// 		}
+			// 	}
+			// })
+			addLabel()
+		});
+
+		//选择分组
+		form.on('select(goods_grouping)', function(data){
+			goodsList(page,limit);
+		});
+
+		//去结算
+		form.on('submit(settle)', function(data) {
+			if (!$("#member_id").val()) {
+				layer.msg('请选择会员');
+			} else if (cart.length == 0) {
+				layer.msg('请选择商品');
+			} else {
+				// window.open(ns.href("replacebuy://shop/replacebuy/order", {"cart": cart}))
+				location.hash = ns.hash("replacebuy://shop/replacebuy/order");
+			}
+		});
+
+	});
+
+	function closeAttrLayer() {
+		layer.close(add_attr_index);
+	}
+
+	// 商品列表渲染
+	function goodsList(page,limit) {
+		$.ajax({
+			url: ns.url("replacebuy://shop/replacebuy/getGoodsSkuList"),
+			async: false,
+			data: {
+				"page"		  : page,
+				"page_size"   : limit,
+				"search_text" : $("input[name='search_text']").val(),
+				"category_id" : $("input[name='category_id']").val(),
+				"label_id"    : $("#goods_grouping option:selected").val()
+			},
+			type: "POST",
+			dataType: "JSON",
+			success: function(res) {
+				if (res.code == 0) {
+					var data = res.data;
+					laytpl($("#goods_list").html()).render(data, function(html) {
+						$(".goods-list").html(html);
+						//如果是扫码则自动添加商品并恢复初始化 便于用户继续扫码
+						if(data.list.length === 1 && is_scan){
+							$(".goods-list .layui-btn[data-sku-id='"+ data.list[0].sku_id +"']").click();
+							$("input[name='search_text']").val('').blur().focus();
+						}
+					});
+
+					isNull();
+
+					//分页
+					$("#paged").empty();
+					if (res.data.count > 0) {
+						//调用分页
+						laypage.render({
+							elem: "paged",
+							count: res.data.count,
+							curr: page, //当前页
+							limit: limit,
+							jump: function(obj, first) {
+								if (!first) {
+									goodsList(obj.curr, obj.limit);
+								}
+								form.render('checkbox');
+							}
+						})
+					}
+					
+				} else {
+					layer.msg(res.message);
+				}
+			}
+		});
+	}
+
+	// 商品是否售空
+	function isNull() {
+		$(".good-box").each(function() {
+			var _this = this;
+			var stock = $(this).attr("data-stock");
+			var id = $(this).attr("data-sku-id");
+
+			if (stock != 0) {
+				$.each(cart, function(index, item) {
+					if (item.sku_id == id) {
+						if (item.num == stock) {
+							$(_this).addClass("disabled");
+						} else {
+							$(_this).removeClass("disabled");
+						}
+					}
+				});
+			}
+		});
+	}
+
+	function addLabel() {
+		var add_attr = $("#addLabel").html();
+		var new_member_id;
+		form.on('radio(laymemberid)', function(obj){
+			new_member_id = obj.value
+		});
+		
+		laytpl(add_attr).render({}, function(html) {
+			
+			add_attr_index = layer.open({
+				title: '选择会员',
+				skin: 'layer-tips-class',
+				type: 1,
+				area: ['900px', '660px'],
+				content: html,
+				btn:["保存","返回"],
+				yes: function(){
+						$.ajax({
+						  	url: ns.url("replacebuy://shop/replacebuy/loginBuyer"),
+						  	data:{member_id: new_member_id},
+						  	dataType: 'JSON',
+						  	type: 'POST',
+						  	success: function(res) {
+						  		if (res.code == 0) {
+						  			memberDetail(res.data);
+									layer.close(add_attr_index);
+						  		} else {
+						  			layer.msg(res.message);
+						  		}
+						  	}
+						});
+				}
+			});
+		});
+		
+		//展示已知数据
+		table = new Table({
+		    elem: '#selected_goods_list',
+			url: ns.url("replacebuy://shop/replacebuy/getMemberList"),
+		    cols: [
+		        [{
+					width: "8%",
+					title: '选择',
+					unresize: 'false',
+					templet: function(data) {
+						var html = '';
+						html += `
+							<div>
+							<input type="radio" name="layTableRadioc"  value="${data.member_id}" lay-type="layTableRadio" lay-filter="laymemberid">
+							</div>
+						`;
+						return html;
+					}
+				},{
+	                title: '会员名称',
+					width: '28%',
+	                unresize: 'false',
+					templet: function(data) {
+	                	var html = '';
+						html += `
+							<div>
+							<img style="width:40px; height:40px; margin-right:20px;" layer-src src="${ns.img(data.headimg)}" onerror="this.src = '{:img('public/static/img/default_img/head.png')}' "><span>${data.nickname}</span>
+							</div>
+						`;
+						return html;
+					}
+	            }, {
+	                field: 'username',
+	                title: '用户名',
+	                unresize: 'false',
+	                align: 'center',
+					width: '16%',
+	            }, {
+	                field: 'mobile',
+	                title: '手机号',
+	                unresize: 'false',
+	                align: 'center',
+					width: '16%',
+	            }, {
+	                // field: 'balance',
+	                title: '余额',
+	                unresize: 'false',
+	                align: 'center',
+					width: '12%',
+					templet: function (data) {
+						return parseFloat(data.balance)+parseFloat(data.balance_money);
+					}
+	            }, {
+				    field: 'point',
+				    title: '积分',
+				    unresize: 'false',
+				    align: 'center',
+					width: '17%',
+					templet: function (data) {
+					    return parseInt(data.point);
+					}
+				   
+				},
+				]
+		    ],
+		});
+		
+		/**
+		 * 会员搜索
+		 */
+		form.on('submit(search)', function (data) {
+			table.reload({
+				page: {
+					curr: 1
+				},
+				where: data.field
+			});
+		});
+
+		$(document).keydown(function (event) {
+			if (event.keyCode == 13) {
+				$(".member-search").trigger("click");
+			}
+		});
+		
+	}
+
+	// 会员详情页面渲染
+	function memberDetail(data) {
+		laytpl($("#member_detail").html()).render(data, function(html) {
+			$(".member").html(html);
+			$("#member_id").val(data.member_id);
+		})
+	}
+
+	// 会员查询页面渲染
+	function searchMember() {
+		laytpl($("#search_member").html()).render([], function(html) {
+			$(".member").html(html);
+		});
+	}
+
+	// 添加商品
+	function addGoods(e) {
+		var sku_id = $(e).attr("data-sku-id"),
+				sku_name = $(e).attr("data-sku-name"),
+				stock = $(e).attr("data-stock"),
+				sku_price = $(e).attr("data-sku-price"),
+				sku_image = $(e).attr("data-sku-image"),
+				spec_name = $(e).attr("data-spec-name");
+
+		var sku_json = {sku_id: sku_id, sku_name: sku_name, stock: stock, sku_price: sku_price, sku_image: sku_image, spec_name: spec_name, num: 1};
+		if (stock != 0) {
+			addCart(sku_json);
+		}
+	}
+
+	// 购物车
+	function addCart(json) {
+		var is_exit = false;
+		var null_stock = false;
+
+		$.each(cart, function(index, item) {
+			if (item.sku_id == json.sku_id) {  // 购物车中已存在该商品
+				var item_num = parseInt(item.num) + 1;
+
+				if (item_num > parseInt(item.stock)) {
+					null_stock = true;
+					item_num = parseInt(item.stock)
+				}
+				item.num = item_num;
+				is_exit = true;
+			}
+		});
+
+		if (!is_exit) {
+			cart.push(json);
+		}
+
+		isNull();
+		syncCart();
+		cartList(cart);
+	}
+
+	// 渲染购物车
+	function cartList(cart) {
+		var data = cart;
+		laytpl($("#render_cart").html()).render(data, function(html) {
+			$(".order-list").html(html);
+		});
+
+		var total_num = 0, total_price = 0;
+		$.each(cart, function(index, item) {
+			total_num += Number(item.num);
+
+			var id = item.sku_id;
+		});
+
+		$(".goods-total").text(total_num);
+	}
+
+	// 同步购物车数据
+	function syncCart() {
+		$.ajax({
+			url: ns.url("replacebuy://shop/replacebuy/cart"),
+			type: "POST",
+			dataType: "JSON",
+			async: false,
+			data: {"cart_json": JSON.stringify(cart)}
+		})
+	}
+
+	// 加
+	function increase(sku_id) {
+		$.each(cart, function(index, item) {
+			if (item.sku_id == sku_id) {
+				var item_num = parseInt(item.num) + 1;
+
+				if(item_num > parseInt(item.stock)){
+					item_num = parseInt(item.stock)
+				}
+				item.num = item_num;
+			}
+		});
+
+		isNull();
+		syncCart();
+		cartList(cart);
+	}
+
+	// 减
+	function decrease(sku_id) {
+		$.each(cart, function(index, item) {
+			if (item.sku_id == sku_id) {
+				var item_num = parseInt(item.num) - 1;
+
+				if(item_num < 1){
+					layer.msg('已经是最小值了，不能再减少了', {icon: 5, anim: 6});
+					item_num = 1
+				}
+
+				item.num = item_num;
+			}
+		});
+
+		isNull();
+		syncCart();
+		cartList(cart);
+	}
+
+	// 改变购物车数量
+	function changeCart(sku_id, obj){
+		var num = $(obj).val();
+		$.each(cart, function(index, item) {
+			if(item.sku_id == sku_id){
+				if(num < 1){
+					layer.msg('已经是最小值了，不能再减少了', {icon: 5, anim: 6});
+					num = 1;
+				}
+				if(num > parseInt(item.stock)){
+					num = parseInt(item.stock);
+				}
+
+				item.num = num;
+			}
+		});
+
+		isNull();
+		syncCart();
+		cartList(cart);
+	}
+
+	// 删除整行
+	function delRow(key) {
+		$.each(cart, function(index, item) {
+			if (index == key) {
+				$(".good-box").each(function() {
+					if ($(this).attr("data-sku-id") == item.sku_id) {
+						$(this).removeClass("disabled");
+					}
+				});
+			}
+		});
+		cart.splice(key, 1);
+		syncCart();
+		cartList(cart);
+	}
+
+	// 同步数据
+	function syncData() {
+		$.ajax({
+			url: ns.url("replacebuy://shop/replacebuy/choiceAddress"),
+			type: "POST",
+			dataType: "JSON",
+			async: false,
+			data: {"address_id": 0}
+		})
+	}
+
+	$(function(){
+		//输入框聚焦 判断是否准备扫码
+		$("input[name='search_text']").on('focus', function(){
+			if($(this).val() === ''){
+				is_scan_on_ready = true;
+			}
+		});
+
+		//输入框失焦 清空所有判断参数
+		$("input[name='search_text']").on('blur', function(){
+			is_scan = false;
+			is_scan_on_ready = false;
+			input_start_time = 0;
+		});
+
+		$(document).keydown(function (event) {
+			var goods_search = $("input[name='search_text']").val();
+			if(is_scan_on_ready && input_start_time === 0){
+				input_start_time = (new Date()).getTime();
+			}
+			if (event.keyCode == 13 && goods_search) {
+				//根据输入时间怕判断是否是扫码操作
+				if((new Date()).getTime() - input_start_time <= 200){
+					is_scan = true;
+				}
+				goodsList(1, 10);
+			}
+		});
+	})
+
+</script>

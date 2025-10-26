@@ -1,0 +1,179 @@
+<style>
+    .single-filter-box{
+        padding: 0;
+    }
+</style>
+<!-- 搜索框 -->
+<div class="single-filter-box">
+    <button class="layui-btn" onclick="add()">添加供应商</button>
+
+    <div class="layui-form">
+        <div class="layui-input-inline">
+            <input type="text" name="search_text" placeholder="请输入关键词" autocomplete="off" class="layui-input">
+            <button type="button" class="layui-btn layui-btn-primary" lay-filter="search" lay-submit>
+                <i class="layui-icon">&#xe615;</i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<table id="supplier_list" lay-filter="supplier_list"></table>
+
+<script type="text/html" id="info">
+    <div class='table-title'>
+        <div class='title-pic'>
+            {{# if(d.logo){ }}
+            <img layer-src src="{{ns.img(d.logo)}}" onerror="this.src = 'STATIC_IMG/default_img/head.png' ">
+            {{# }else{ }}
+            <img layer-src src="STATIC_IMG/default_img/head.png">
+            {{# } }}
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="toolbarOperation">
+    <button class="layui-btn layui-btn-primary" lay-event="delete">批量删除</button>
+</script>
+
+<script type="text/html" id="batchOperation">
+    <button class="layui-btn layui-btn-primary" lay-event="delete">批量删除</button>
+</script>
+
+<!-- 操作 -->
+<script type="text/html" id="operation">
+    <div class="table-btn">
+        <a class="layui-btn" lay-event="edit">编辑</a>
+        <a class="layui-btn" lay-event="delete">删除</a>
+    </div>
+</script>
+
+<script>
+    var form, table;
+    layui.use(['table', 'form'], function() {
+        form = layui.form;
+        form.render();
+        table = new Table({
+            elem: '#supplier_list',
+            url: ns.url("supply://shop/supplier/lists"),
+            cols: [
+                [{
+                    width: "3%",
+                    type: 'checkbox',
+                    unresize: 'false'
+                }, {
+                    title: '供应商LOGO',
+                    width: '20%',
+                    unresize: 'false',
+                    templet: '#info',
+                }, {
+                    title: '供应商名称',
+                    field: 'title',
+                    width: '20%',
+                    unresize: 'false',
+                }, {
+                    title: '联系电话',
+                    field: 'supplier_phone',
+                    width: '20%',
+                    unresize: 'false',
+                }, {
+                    title: '供应商地址',
+                    field: 'supplier_address',
+                    width: '20%',
+                    unresize: 'false',
+                }, {
+                    title: '操作',
+                    width: '17%',
+                    toolbar: '#operation',
+                    unresize: 'false',
+                    align : 'right'
+                }]
+            ],
+            toolbar: '#toolbarOperation',
+            bottomToolbar: "#batchOperation"
+        });
+
+        /**
+         * 监听工具栏操作
+         */
+        table.tool(function(obj) {
+            var data = obj.data;
+            switch (obj.event) {
+                case 'edit':
+                    location.hash = ns.hash("supply://shop/supplier/edit", {supplier_id: data.supplier_id});
+                    break;
+                case 'delete':
+                    deleteSupplier(data.supplier_id);
+                    break;
+            }
+        });
+
+        // 批量操作
+        table.toolbar(function(obj) {
+
+            if (obj.data.length < 1) {
+                layer.msg('请选择要操作的数据');
+                return;
+            }
+
+            switch (obj.event) {
+                case "delete":
+                    var id_array = new Array();
+                    for (i in obj.data) id_array.push(obj.data[i].supplier_id);
+                    deleteSupplier(id_array.toString());
+                    break;
+            }
+        });
+
+        // 批量操作
+        table.bottomToolbar(function(obj) {
+            if (obj.data.length < 1) {
+                layer.msg('请选择要操作的数据');
+                return;
+            }
+
+            switch (obj.event) {
+                case "delete":
+                    var id_array = new Array();
+                    for (i in obj.data) id_array.push(obj.data[i].supplier_id);
+                    deleteSupplier(id_array.toString());
+                    break;
+            }
+        });
+
+        /**
+         * 删除
+         */
+        function deleteSupplier(supplier_id) {
+            layer.confirm('确定要删除该供应商吗？', function(index) {
+				layer.close(index);
+                $.ajax({
+                    url: ns.url("supply://shop/supplier/delete"),
+                    data: {supplier_id: supplier_id},
+                    dataType: 'JSON',
+                    type: 'POST',
+                    success: function (res) {
+                        layer.msg(res.message);
+                        if (res.code == 0) {
+                            table.reload();
+                        }
+                    }
+                });
+            });
+        }
+        /**
+         * 搜索功能
+         */
+        form.on('submit(search)', function(data){
+            table.reload({
+                page: {
+                    curr: 1
+                },
+                where: data.field
+            });
+        });
+    });
+
+    function add() {
+        location.hash = ns.hash("supply://shop/supplier/add");
+    }
+</script>

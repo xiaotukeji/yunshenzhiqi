@@ -1,0 +1,180 @@
+<style>
+    .layui-form-radio{margin-top: 0;}
+    .layui-form-label{width: 160px;}
+    .layui-form-label + .layui-input-block{margin-left: 160px;}
+    .word-aux{margin-left: 160px;}
+    .card-common{margin-top: 0;}
+
+    /* 分类数据 */
+    .category-table{width: 665px;}
+    .category-table .category-head, .category-table .category-tr{display: flex;width: 100%;height: 50px;padding: 8px 0;box-sizing: border-box;background-color: #f9f9fc;}
+    .category-table .category-body{overflow: auto;max-height: 470px;}
+    .category-table .category-head span:first-of-type, .category-table .category-tr .tr-input{flex: 1;}
+    .category-table .category-head span:last-of-type{width: 150px;text-align: center;}
+    .category-table .category-head span{padding: 0 15px;box-sizing: border-box;}
+    .category-table .category-tr{background-color: transparent;border-bottom: 1px solid #e4e4e4;padding: 15px 0;height: auto;}
+    .category-table .category-tr .tr-input{background-color: transparent;padding-left: 15px;}
+    .category-table .category-tr .tr-input input{border: 1px solid #e4e4e4;height: 36px;line-height: 36px;border-radius: 3px;width: 350px;padding: 0 15px;box-sizing: border-box;}
+    .category-table .category-tr .tr-active{display: flex;}
+    .category-table .category-tr .tr-delete, .category-table .category-tr .tr-save{cursor: pointer; padding: 0 15px;}
+    .add-category{cursor: pointer;}
+    .category-empty{padding: 15px 0;text-align: center;border-bottom: 1px solid #e4e4e4;}
+</style>
+
+<div class="layui-form">
+    <div class="layui-card card-common card-brief">
+        <div class="layui-card-header">
+            <span class="card-title">分类设置</span>
+        </div>
+        <div class="layui-card-body">
+            <div class="layui-form-item is-withdraw">
+                <label class="layui-form-label">门店分类：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="checkbox" name="status" value="1" lay-filter="status_filter" lay-skin="switch" {if $status == 1} checked{/if}>
+                    </div>
+                </div>
+                <div class="word-aux">启用门店分类后，用户选择门店时，将显示门店分类并可以切换筛选。</div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label">分类数据：</label>
+                <div class="layui-input-block">
+                    <div class="category-table">
+                        <div class="category-head">
+                            <span>分类名称</span>
+                            <span>操作</span>
+                        </div>
+                        <div class="category-body"></div>
+                    </div>
+                    <div class="add-category text-color" onclick="addCategory()">+添加分类名称</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var form;
+    layui.use(['form'], function() {
+        form = layui.form;
+        form.render();
+        getCategory();
+
+        form.on('switch(status_filter)', function(data){
+            let val = data.elem.checked ? 1 : 0;
+            categoryConfig(val);
+        });  
+    });
+
+    function getCategory(){
+        $.ajax({
+            url: ns.url("store://shop/store/category"),
+            dataType: 'JSON',
+            type: 'POST',
+            success: function(res) {
+                if (res.code == 0) {
+                    let list = res.data.list;
+                    let html = "";
+                    if(list.length) {
+                        list.forEach((item, index) => {
+                            html += `
+                            <div class="category-tr">
+                                <div class="tr-input">
+                                    <input type="text" attr_category_id="${item.category_id}" value="${item.category_name}" />
+                                </div>
+                                <div class="tr-active">
+                                    <span class="tr-save text-color" onclick="editCategory(this)">保存</span>
+                                    <span class="tr-delete text-color" onclick="deleteCategory(this)">删除</span>
+                                </div> 
+                            </div>
+                        `;
+                        });
+                    }else{
+                        html = '<div class="category-empty">暂无分类,请添加分类</div>';
+                    }
+                    $(".category-table .category-body").html(html);
+                }
+            }
+        });
+    }
+
+    function addCategory(){
+        var html = `
+            <div class="category-tr">
+                <div class="tr-input">
+                    <input type="text" />
+                </div>
+               <div class="tr-active">
+                    <span class="tr-save text-color" onclick="editCategory(this)">保存</span>
+                    <span class="tr-delete text-color" onclick="deleteCategory(this)">删除</span>
+               </div> 
+            </div>
+        `;
+        $(".category-table .category-body").append(html);
+
+        let len = $(".category-table .category-body .category-tr").length;
+        if(len) $(".category-table .category-empty").remove();
+
+        $.ajax({
+            url: ns.url("store://shop/store/addCategory"),
+            data:{category_name: ''},
+            dataType: 'JSON',
+            type: 'POST',
+            success: function(res) {
+                if (res.code == 0) {
+                    let data = res.data;
+                    $(".category-table .category-body .tr-input input").last().attr("attr_category_id",data);
+                }
+            }
+        });
+    }
+
+    function editCategory(event){
+        let categoryId = $(event).parents(".category-tr").find("input").attr("attr_category_id");
+        let categoryName = $(event).parents(".category-tr").find("input").val();
+        $.ajax({
+            url: ns.url("store://shop/store/editCategory"),
+            data:{category_id: categoryId, category_name: categoryName},
+            dataType: 'JSON',
+            type: 'POST',
+            success: function(res) {
+                if (res.code == 0) {
+                    layer.msg(res.message);
+                }
+            }
+        });
+    }
+
+    function deleteCategory(event){
+        let categoryId = $(event).parents(".category-tr").find("input").attr("attr_category_id");
+        $.ajax({
+            url: ns.url("store://shop/store/deleteCategory"),
+            data:{category_id: categoryId},
+            dataType: 'JSON',
+            type: 'POST',
+            success: function(res) {
+                layer.msg(res.message);
+                if (res.code == 0) {
+                    $(event).parents('.category-tr').remove();
+                    let len = $(".category-table .category-body .category-tr").length;
+                    if(!len){
+                        let html = `<div class="category-empty">暂无分类,请添加分类</div>`;
+                        $(".category-table .category-body").append(html);
+                    }
+                }
+            }
+        });
+    }
+
+    function categoryConfig(data){
+        $.ajax({
+            url: ns.url("store://shop/store/categoryConfig"),
+            data:{status: data},
+            dataType: 'JSON',
+            type: 'POST',
+            success: function(res) {
+                layer.msg(res.message);
+            }
+        });
+    }
+</script>

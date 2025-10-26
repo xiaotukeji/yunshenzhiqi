@@ -1,0 +1,537 @@
+<link rel="stylesheet" href="ADDON_STORE_CSS/add_reserve.css">
+<div class="main-wrap">
+    <div class="layui-form" lay-filter="form">
+        <br>
+        {empty name="info"}
+        <div class="layui-form-item">
+            <label class="layui-form-label"><span class="required">*</span>手机号：</label>
+            <div class="layui-input-inline search-wrap">
+                <input type="text" class="layui-input len-mid" name="mobile" placeholder="请输入客户手机号" autocomplete="off" lay-verify="required">
+                <i class="iconfont iconsousuo"></i>
+            </div>
+        </div>
+        {else/}
+        <input type="hidden" name="reserve_id" value="{$info.reserve_id}">
+        {/empty}
+        <div class="error">请输入正确的手机号</div>
+        <div class="layui-form-item" lay-verify="member">
+            <label class="layui-form-label"><span class="required">*</span>客户：</label>
+            <div class="layui-input-block member">
+                {notempty name="info"}
+                <div class="member-info">
+                    <input type="hidden" name="member_id" value="{$info.member_id}">
+                    {notempty name="$info.headimg"}
+                    <img src="{:img($info.headimg)}" onerror="this.src = 'STATIC_IMG/default_img/head.png' " alt="">
+                    {else/}
+                    <img src="STATIC_IMG/default_img/head.png" alt="">
+                    {/notempty}
+                    <div class="info">
+                        <div class="name">{$info.nickname}</div>
+                        <div>
+                            <span>手机号：{$info.mobile}</span>
+                        </div>
+                    </div>
+                </div>
+                {/notempty}
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"><span class="required">*</span>预约门店：</label>
+            <div class="layui-input-inline len-mid">
+                <select name="store_id" lay-filter="store"  {notempty name="info"}disabled{/notempty}>
+                    {foreach $store_list as $k=> $v}
+                    <option value="{$v.store_id}" {if !empty($info) && $info['store_id'] == $v['store_id']} selected {/if}>{$v.store_name}</option>
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+        <div class="layui-form-item" lay-verify="service">
+            <label class="layui-form-label"><span class="required">*</span>项目：</label>
+            <div class="layui-input-block service-table">
+                <table class="layui-table" lay-skin="line">
+                    <colgroup>
+                        <col width="50%">
+                        <col width="30%">
+                        <col width="20%">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>预约项目</th>
+                            <th>员工</th>
+                            <th class="align-center">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {notempty name="info"}
+                            {foreach name="info.item" item="vo"}
+                            <tr>
+                                <td>
+                                    <div class="service-item service-item-btn">
+                                        <div class="info" >
+                                            <input type="hidden" name="sku" value="{$vo.sku_id}">
+                                            <input type="hidden" name="goods" value="{$vo.goods_id}">
+                                            <div class="title" title="{$vo.goods_name}">{$vo.goods_name}</div>
+                                            <div class="desc">项目时长：{$vo.service_length}分钟  ￥{$vo.price}</div>
+                                        </div>
+                                        <i class="iconfont iconlower-triangle"></i>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="servicer-item servicer-item-btn">
+                                        {if $vo.reserve_user_id}
+                                        <div class="info">
+                                            <input type="hidden" name="servicer_id" value="{$vo.reserve_user_id}">
+                                            <div class="title" title="{$vo.username}">{$vo.username}</div>
+                                        </div>
+                                        {else/}
+                                        <div class="info">请选择员工</div>
+                                        {/if}
+                                        <i class="iconfont iconlower-triangle"></i>
+                                    </div>
+                                </td>
+                                <td class="align-center"><a href="javascript:;" class="text-color delete">删除</a></td>
+                            </tr>
+                            {/foreach}
+                        {else/}
+
+                        <tr>
+                            <td>
+                                <div class="service-item service-item-btn"  id="">
+                                    <div class="info">请选择项目</div>
+                                    <i class="iconfont iconlower-triangle"></i>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="servicer-item servicer-item-btn">
+                                    <div class="info">请选择员工</div>
+                                    <i class="iconfont iconlower-triangle"></i>
+                                </div>
+                            </td>
+                            <td class="align-center"><a href="javascript:;" class="text-color delete">删除</a></td>
+                        </tr>
+                        {/notempty}
+                    </tbody>
+                </table>
+                <button class="layui-btn layui-btn-primary add">添加</button>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label"><span class="required">*</span>到店时间：</label>
+            <div class="layui-input-block">
+                <div class="layui-input-inline">
+                    {notempty name="info"}
+                    <input type="text" id="reserveDate" name="date" autocomplete="off" class="layui-input" placeholder="请选择到店日期" value="{:date('Y-m-d', $info.reserve_time)}" lay-verify="required">
+                    {else/}
+                    <input type="text" id="reserveDate" name="date" autocomplete="off" class="layui-input" placeholder="请选择到店日期" value="{:date('Y-m-d')}" lay-verify="required">
+                    {/notempty}
+                    <i class="iconfont iconriqi"></i>
+                </div>
+                <div class="layui-input-inline">
+                    {notempty name="info"}
+                    <input type="text" id="reserveTime" name="time" autocomplete="off" class="layui-input" value="{:date('H:i', $info.reserve_time)}" placeholder="请选择到店时间" readonly lay-verify="required">
+                    {else/}
+                    <input type="text" id="reserveTime" name="time" autocomplete="off" class="layui-input" placeholder="请选择到店时间" readonly lay-verify="required">
+                    {/notempty}
+                </div>
+            </div>
+            <div class="word-aux">预约需提前{$config.advance}小时预约</div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">备注：</label>
+            <div class="layui-input-block">
+                <textarea name="remark" cols="30" rows="6" class="layui-textarea len-long">{$info.remark ?? ''}</textarea>
+            </div>
+        </div>
+        <div class="save-wrap">
+            <button class="layui-btn" lay-submit lay-filter="save">保存</button>
+        </div>
+    </div>
+</div>
+
+{php}$today = strtotime(date('Y-m-d')) {/php}
+<script type="text/html" id="selectTime">
+    <div class="select-time">
+        <div class="time-wrap today">
+            {for start="$config.start" end="$config.end + 1800" name="i" step="1800"}
+            {if $today + $i > time()}
+            <div class="time-item" data-value="{:date('H:i', ($today + $i) )}">{:date('H:i', ($today + $i) )}</div>
+            {/if}
+            {/for}
+        </div>
+        <div class="time-wrap no-today">
+            {for start="$config.start" end="$config.end + 1800" name="i" step="1800"}
+                <div class="time-item" data-value="{:date('H:i', ($today + $i) )}">{:date('H:i', ($today + $i) )}</div>
+            {/for}
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="selectService">
+    <div class="select-service">
+        <div class="service-wrap">
+            {notempty name="$service"}
+                <div class="flex-wrap">
+                    {foreach name="$service" item="vo"}
+                    <div class="item">
+                        <input type="hidden" name="sku" value="{$vo.sku_id}">
+                        <input type="hidden" name="goods" value="{$vo.goods_id}">
+                        <div class="title" title="{$vo.goods_name}">{$vo.goods_name}</div>
+                        <div class="desc">项目时长：{$vo.service_length}分钟  ￥{$vo.price}</div>
+                    </div>
+                    {/foreach}
+                </div>
+            {else/}
+                <div class="flex-wrap">
+                    <div class="empty">暂无可预约的项目</div>
+                <div>
+            {/notempty}
+        </div>
+    </div>
+</script>
+
+<script type="text/html" id="selectServicer">
+
+</script>
+
+<script>
+    var today = "{$today}";
+    var laydate, dropdown, form, target, repeat = false;
+    layui.use(['laytpl', 'laydate', 'dropdown', 'form'], function(){
+        laytpl = layui.laytpl;
+        laydate = layui.laydate;
+        dropdown = layui.dropdown;
+        form = layui.form;
+
+        $('.search-wrap .iconfont').click(function () {
+            var mobile = $('[name="mobile"]').val();
+            if (mobile.length == 0) {
+                $('.error').text('请输入客户手机号').show();
+                return;
+            }
+            if (!ns.parse_mobile(mobile)) {
+                $('.error').text('请输入正确的手机号').show();
+                return;
+            }
+            $('.error').hide();
+
+            $.ajax({
+                url: ns.url("shop/member/searchMember"),
+                data: {
+                    search_text: mobile
+                },
+                dataType: 'JSON',
+                type: 'POST',
+                success: function (res) {
+                    if (res.code == 0 && res.data) {
+                        $('.error').hide();
+                        var info = res.data;
+                        $('.member').html(` <div class="member-info">
+                            <input type="hidden" name="member_id" value="` + info.member_id + `">
+                            `+ (info.headimg ? `<img src="${ns.img(info.headimg)}" onerror="this.src = \'STATIC_IMG/default_img/head.png\' " alt="">` : '<img src="STATIC_IMG/default_head_square.png" alt="">') + `
+                            <div class="info">
+                                <div class="name">` + info.nickname + `</div>
+                                <div>
+                                    <span>手机号：` + info.mobile + `</span>
+                                </div>
+                            </div>
+                        </div>`);
+                    } else {
+                        $('.member').html('');
+                        $('.error').text('未查找到该客户').show();
+                    }
+                }
+            });
+        });
+
+        // 切换门店
+        form.on('select(store)', function (data) {
+            $.ajax({
+                url: ns.url("store://shop/reserve/getconfig"),
+                data: {'store_id' : data.value},
+                dataType: 'JSON',
+                type: 'POST',
+                success: function (res) {
+                    if (res.code == 0) {
+                        let data = res.data.value;
+                        let time = "{:time()}";
+                        let html = `
+                        <div class="select-time">
+                            <div class="time-wrap today">
+                        `;
+
+                        for (let i = data.start; i <= (data.end + 1800); i+=1800){
+                            if(parseInt(today)  + parseInt(i) > time){
+                                let data_value = ns.time_to_date(parseInt(today)+parseInt(i), 'H:i');
+                                data_value = $.trim(data_value);
+                                html += `<div class="time-item" data-value="${data_value}">${data_value}</div>`;
+                            }
+                        }
+                        html += '</div>';
+                        html += '<div class="time-wrap no-today">';
+                        for (let i = data.start; i <= (data.end + 1800); i+=1800){
+
+                            let data_value = ns.time_to_date(parseInt(today)+parseInt(i), 'H:i');
+                            data_value = $.trim(data_value);
+                            html += `
+                                <div class="time-item" data-value="${data_value}">${data_value}</div>
+                            `;
+                        }
+
+                        html += `
+                            </div>
+                        </div>
+                        `;
+
+                        $('#selectTime').html(html);
+                        $('#reserveTime').val('');
+                        initTime(data.week);
+                        $('.servicer-item-btn .info').html('请选择员工');
+                        getServicer();
+                    }
+                }
+            })
+        });
+
+        laydate.render({
+            elem: '#reserveDate',
+            type: 'date',
+            min: 0,
+            done: function(value, date, endDate){
+                $('[name="time"]').val('');
+            }
+        });
+
+       initTime("{:implode($config.week)}");
+
+        $('body').off('click', '.time-wrap .time-item').on('click', '.time-wrap .time-item', function () {
+            if ($(this).hasClass('no-select')) {
+                layer.msg('不在可预约时间内');
+                return;
+            }
+            dropdown.hide('#reserveTime');
+            $('[name="time"]').val($(this).text());
+        });
+
+        getServicer();
+
+        initDropdown();
+
+        $('.service-table .add').click(function () {
+            var service_id = ns.gen_non_duplicate(5);
+            var servicer_id = ns.gen_non_duplicate(5);
+            $('.service-table tbody').append(`<tr>
+                <td>
+                    <div class="service-item service-item-btn" id="${service_id}">
+                        <div class="info">请选择项目</div>
+                        <i class="iconfont iconlower-triangle"></i>
+                    </div>
+                </td>
+                <td>
+                    <div class="servicer-item servicer-item-btn" id="${servicer_id}">
+                        <div class="info">请选择员工</div>
+                        <i class="iconfont iconlower-triangle"></i>
+                    </div>
+                </td>
+                <td class="align-center"><a href="javascript:;" class="text-color delete">删除</a></td>
+            </tr>`);
+
+            dropdown.suite("#"+service_id, {
+                template: "selectService",
+                maxWidth:'660',
+                success: function ($dom) {
+                    $dom.addClass('border-color').css({
+                        'outline':'none',
+                        'border':'2px solid'
+                    });
+                }
+            });
+
+            dropdown.suite("#"+servicer_id, {
+                template: "selectServicer",
+                maxWidth:'660',
+                success: function ($dom) {
+                    $dom.addClass('border-color').css({
+                        'outline':'none',
+                        'border':'2px solid'
+                    });
+                }
+            });
+        });
+
+        // 选择项目
+        $('body').off('click', '.service-wrap .item').on('click', '.service-wrap .item', function () {
+            var id = $(this).parents('.layu-dropdown-root').prev().attr('id');
+            dropdown.hide('#'+id);
+            var target = $('#'+id).find('.info');
+            if ($(this).find('[name="sku"]').val() != $(target).find('[name="sku"]').val()) {
+                $(target).html($(this).html());
+                $(target).parents('tr').find('.servicer-item .info').html('请选择员工');
+            }
+        });
+
+        // 选择员工
+        $('body').off('click', '.select-servicer .select-item').on('click', '.select-servicer .select-item', function () {
+            var id = $(this).parents('.layu-dropdown-root').prev().attr('id');
+            dropdown.hide('#'+id);
+            var target = $('#'+id).find('.info');
+            $(target).html($(this).html());
+        });
+
+        $('body').off('click', '.service-table .delete').on('click', '.service-table .delete', function () {
+            if ($('.service-table tbody tr').length == 1) {
+                layer.msg('至少需要有一项项目');
+                return;
+            }
+            $(this).parents('tr').remove();
+        });
+
+        form.verify({
+            member: function () {
+                if (!$('[name="member_id"]').val()) {
+                    return '请选择客户';
+                }
+            },
+            service: function () {
+                if (!$('[name="sku"]').val()) {
+                    return '请选择项目';
+                }
+            }
+        });
+
+        form.on('submit(save)', function (data) {
+            if (repeat) return;
+            repeat = false;
+
+            data.field.goods = [];
+            $('.service-table tbody tr').each(function () {
+                data.field.goods.push({
+                    sku_id: $(this).find('[name="sku"]').val(),
+                    uid: $(this).find('[name="servicer"]').val() ? $(this).find('[name="servicer"]').val() : 0
+                })
+            });
+            data.field.goods = JSON.stringify(data.field.goods);
+
+            $.ajax({
+                url: data.field.reserve_id ? ns.url("store://shop/reserve/updatereserve") : ns.url("store://shop/reserve/addreserve"),
+                data: data.field,
+                dataType: 'JSON',
+                type: 'POST',
+                success: function (res) {
+                    if (res.code == 0) {
+                        layer.msg("保存成功");
+                        setTimeout(function(){
+                            parent.listenerHash(); // 刷新页面
+                            parent.layer.closeAll();
+                        },500)
+                    } else {
+                        layer.msg(res.message);
+                        repeat = false;
+                    }
+                }
+            })
+        })
+    });
+
+    function initDropdown(){
+        $('.service-item-btn').each(function (i, e) {
+            var id = ns.gen_non_duplicate(5);
+            if($(e).attr('id') == '' || $(e).attr('id') == undefined) $(e).attr('id', id);
+            id = $(e).attr('id');
+
+            dropdown.suite("#"+id, {
+                template: "selectService",
+                maxWidth:'660',
+                success: function ($dom) {
+                    $dom.addClass('border-color').css({
+                        'outline':'none',
+                        'border':'2px solid'
+                    });
+                }
+            });
+        })
+
+    }
+
+    function initTime(config){
+        // 选择预约时间
+        dropdown.suite("#reserveTime", {
+            template: "selectTime",
+            maxWidth:'660',
+            success: function ($dom) {
+                var date = $('[name="date"]').val();
+                $('.time-wrap').css('display', 'none');
+
+                if (date == "{:date('Y-m-d')}") {
+                    $('.today').css('display', 'flex')
+                } else {
+                    $('.no-today').css('display', 'flex')
+                }
+
+                var dateArr = date.split('-'),
+                    dateEl = new Date(dateArr[0], parseInt(dateArr[1] - 1), dateArr[2]);
+
+                if (config.indexOf(dateEl.getDay()) == -1) {
+                    $('.time-wrap .time-item').addClass('no-select');
+                }
+
+                var time = $('[name="time"]').val();
+                $('.time-wrap .time-item[data-value="'+ time +'"]').addClass('active');
+            }
+        });
+    }
+
+    function getServicer(){
+        let store_id = $('[name="store_id"]').val();
+        $.ajax({
+            url: ns.url("store://shop/reserve/servicerlist"),
+            data: {'store_id':store_id},
+            dataType: 'JSON',
+            type: 'POST',
+            success: function (res) {
+                if (res.code == 0) {
+                    let html = '';
+
+                    let store_html = '';
+
+                    for(let i in res.data){
+                        let item = res.data[i];
+                        store_html += `
+                         <div class="select-item">
+                            <div class="title">${item.username}</div>
+                            <input type="hidden" name="servicer" value="${item.uid}">
+                        </div>
+                        `;
+                    }
+
+                    html += `
+                        <div class="select-servicer">
+                            <div class="select-item">
+                                <div class="title">不选择员工</div>
+                                <input type="hidden" name="servicer" value="0">
+                            </div>
+                           ${store_html}
+                        </div>
+                    `;
+
+                    $('#selectServicer').html(html);
+
+                    $('.servicer-item-btn').each(function (i, e) {
+                        var id = ns.gen_non_duplicate(5);
+                        if($(e).attr('id') == '' || $(e).attr('id') == undefined) $(e).attr('id', id);
+                        id = $(e).attr('id');
+                        dropdown.suite("#"+id, {
+                            template: "selectServicer",
+                            maxWidth:'660',
+                            success: function ($dom) {
+                                $dom.addClass('border-color').css({
+                                    'outline':'none',
+                                    'border':'2px solid'
+                                });
+                            }
+                        });
+                    })
+                }
+            }
+        })
+    }
+</script>

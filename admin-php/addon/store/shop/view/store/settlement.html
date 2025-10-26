@@ -1,0 +1,394 @@
+<style>
+    .layui-form-radio{margin-top: 0;}
+    .layui-form-label{width: 160px;}
+    .layui-form-label + .layui-input-block{margin-left: 160px;}
+    .word-aux{margin-left: 160px;}
+    .form-row{margin-left: 160px;}
+    .bank-type-wrap{display: flex;}
+    .bank-type-wrap .bank-type-item{display: flex;align-items: center;margin-right: 15px;}
+    .bank-type-wrap .bank-type-item .layui-form-radio{padding: 0;margin: 0;}
+    .bank-type-wrap .bank-type-item .layui-form-radio .layui-icon{margin-right: 5px;}
+    .bank-type-wrap .bank-type-item > .iconfont{margin-right: 3px;}
+    .bank-type-wrap .bank-type-item:nth-child(2) > .iconfont{color: #24af41;}
+    .bank-type-wrap .bank-type-item:nth-child(3) > .iconfont{color: #00a0e9;}
+
+    .img-box{position: relative;}
+    .img-box .img-load{position: absolute;width: 100%;height: 100%;background: rgba(0,0,0,0.8);left:0;top:0;color:#fff;display: flex;justify-content: center;align-items: center;align-content: center;line-height: 20px;padding: 4px;box-sizing: border-box;cursor: pointer;}
+</style>
+<div class="layui-form">
+    <div class="layui-card card-common card-brief head">
+        <div class="layui-card-header">
+            <span class="card-title">结算设置</span>
+        </div>
+        <div class="layui-card-body">
+			<div class="layui-form-item is-withdraw">
+                <label class="layui-form-label">是否结算：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="checkbox" name="is_settlement" lay-filter="is_settlement" value="1" lay-filter="third_party" lay-skin="switch" {if $info.is_settlement == 1} checked{/if}>
+                    </div>
+                </div>
+            </div>
+            <div class="layui-form-item settlement_rate {if $info.is_settlement == 0} layui-hide{/if}" >
+                <label class="layui-form-label">门店抽成：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="radio" name="settlement_rate" lay-filter="settlement_rate" value="0" title="跟随系统" {if $info.settlement_rate == 0} checked{/if} />
+                        <input type="radio" name="settlement_rate" lay-filter="settlement_rate" value="1" title="自定义"{if $info.settlement_rate > 0} checked{/if}/>
+                    </div>
+                </div>
+                <div class="word-aux along-system {if $info.settlement_rate != 0}layui-hide{/if}">跟随系统时门店抽成比率是{$withdraw_config.settlement_rate}%</div>
+            </div>
+            <div class="layui-form-item settlement-rate-wrap {if $info.is_settlement == 0 || $info.settlement_rate == 0} layui-hide{/if}">
+                <label class="layui-form-label">门店抽成比率：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="number" name="settlement_rate" lay-verify="settlement_rate" placeholder="0" class="layui-input len-short" autocomplete="off" value="{$info.settlement_rate}"/>
+                    </div>
+                    <div class="layui-form-mid layui-word-aux">%</div>
+                </div>
+                <div class="word-aux">门店抽成比率需是0-100且保存两位小数</div>
+			</div>
+			<div class="layui-form-item bank-type {if $info.is_settlement == 0} layui-hide{/if}">
+                <label class="layui-form-label">账户类型：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="radio" name="bank_type" lay-filter="bank_type" value="3" title="银行卡" {if $info.bank_type == 3 || $info.bank_type == 0} checked{/if}/>
+                        <input type="radio" name="bank_type" lay-filter="bank_type" value="1" title="微信" {if $info.bank_type == 1} checked{/if}/>
+                        <input type="radio" name="bank_type" lay-filter="bank_type" value="2" title="支付宝" {if $info.bank_type == 2} checked{/if}/>
+                    </div>
+                </div>
+			</div> 
+
+            <!-- 银行卡 -->
+			<div class="layui-form-item bank_card {if $info.is_settlement == 0 || $info.bank_type != 3} layui-hide{/if}">
+                <label class="layui-form-label"><span class="required">*</span>开户行：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="text" name="bank_type_name" {if $info.bank_type == 3}lay-verify="bank_type_name"{/if} placeholder="请输入开户行" class="layui-input len-mid" autocomplete="off" value="{$info.bank_type_name}">
+                    </div>
+                </div>
+			</div>
+			<div class="layui-form-item bank_card {if $info.is_settlement == 0 || $info.bank_type != 3} layui-hide{/if}">
+                <label class="layui-form-label"><span class="required">*</span>户头：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="text" name="bank_user_name" {if $info.bank_type == 3}lay-verify="bank_user_name"{/if} placeholder="请输入户头" class="layui-input len-mid" autocomplete="off" value="{$info.bank_user_name}">
+                    </div>
+                </div>
+			</div>
+			<div class="layui-form-item bank_card {if $info.is_settlement == 0 || $info.bank_type != 3} layui-hide{/if}">
+                <label class="layui-form-label"><span class="required">*</span>账户：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="text" name="bank_type_account" {if $info.bank_type == 3}lay-verify="bank_type_account"{/if} placeholder="请输入账户" class="layui-input len-mid" autocomplete="off" value="{$info.bank_type_account}">
+                    </div>
+                </div>
+			</div>
+			
+			<!-- 微信 -->
+            <div class="layui-form-item  wixin-wrap {if $info.is_settlement == 0 || $info.bank_type != 1} layui-hide{/if}">
+                <label class="layui-form-label">微信绑定：</label>
+                <div class="layui-input-block">
+                    <div class="img-box" style="height: 100px!important;width: auto;" id="wechat_auth_qrcode">
+                        <image src="" />
+                        <div class="img-load layui-hide"></div>
+                    </div>
+                </div>
+                <div class="word-aux">请扫描二维码与微信绑定</div>
+            </div>
+            <div class="layui-form-item  wixin-wrap {if $info.is_settlement == 0 || $info.bank_type != 1} layui-hide{/if}">
+                <label class="layui-form-label"><span class="required">*</span>微信openid：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="text" name="bank_type_account_weixin" {if $info.bank_type == 1}lay-verify="bank_type_account_weixin"{/if} class="layui-input len-mid" autocomplete="off" value="{$info.bank_type_account}" readonly>
+                    </div>
+                </div>
+            </div>
+			<div class="layui-form-item  wixin-wrap {if $info.is_settlement == 0 || $info.bank_type != 1} layui-hide{/if}">
+                <label class="layui-form-label"><span class="required">*</span>真实姓名：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="text" name="bank_user_name_weixin" {if $info.bank_type == 1}lay-verify="bank_user_name_weixin"{/if} placeholder="请输入微信名" class="layui-input len-mid" autocomplete="off" value="{$info.bank_user_name}">
+                    </div>
+                </div>
+                <div class="word-aux">请输入真实姓名，否则转账会校验失败</div>
+            </div>
+
+            <!-- 支付宝 -->
+            <div class="layui-form-item alipay-wrap {if $info.is_settlement == 0 || $info.bank_type != 2} layui-hide{/if}">
+                <label class="layui-form-label"><span class="required">*</span>真实名字：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">  
+                        <input type="text" name="bank_user_name_alipay" {if $info.bank_type == 2}lay-verify="bank_user_name_alipay"{/if} placeholder="请输入真实名字" class="layui-input len-mid" autocomplete="off" value="{$info.bank_user_name}">
+                    </div>
+                </div>
+            </div>
+			<div class="layui-form-item alipay-wrap {if $info.is_settlement == 0 || $info.bank_type != 2} layui-hide{/if}">
+                <label class="layui-form-label"><span class="required">*</span>支付宝账号：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">
+                        <input type="text" name="bank_type_account_alipay" {if $info.bank_type == 2}lay-verify="required"{/if} placeholder="请输入支付宝账户" class="layui-input len-mid" autocomplete="off" value="{$info.bank_type_account}">
+                    </div>
+                </div>
+            </div>
+
+            <input type="hidden" name="store_id" value="{$store_id}">
+        </div>
+    </div>
+    <div class="form-row">
+        <button class="layui-btn" lay-submit lay-filter="save">保存</button>
+    </div>
+</div>
+
+<script>
+	var form,
+        repeat_flag=false,
+        isSettlementRate=false, //抽成比率是否跟随系统
+        bankType='{$info.bank_type}' == 0 ? 3 : '{$info.bank_type}'; //账户类型
+
+    //微信授权
+    var wechatAuth;
+    getWechatAuthInstance();
+    wechatAuth.bankTypeChange(bankType);
+        
+	layui.use(['form'], function() {
+        form = layui.form;
+        form.render();
+
+        // 是否结算
+        form.on('switch(is_settlement)', function (data) {
+            $(".bank_card").addClass("layui-hide");
+            $(".wixin-wrap").addClass("layui-hide");
+            $(".alipay-wrap").addClass("layui-hide");
+
+            if (data.elem.checked) {
+                $(".settlement_rate").removeClass("layui-hide");
+                $(".bank-type").removeClass("layui-hide");
+
+                //账户类型
+                if (bankType == 1) {
+                    $(".wixin-wrap").removeClass("layui-hide");
+                } else if (bankType == 2) {
+                    $(".alipay-wrap").removeClass("layui-hide");
+                } else if (bankType == 3) {
+                    $(".bank_card").removeClass("layui-hide");
+                }
+            } else {
+                $(".settlement-rate-wrap").addClass("layui-hide");
+                $(".settlement_rate").addClass("layui-hide");
+                $(".bank-type").addClass("layui-hide");
+            }
+
+            if (isSettlementRate) {
+                $(".along-system").addClass("layui-hide");
+                $(".settlement-rate-wrap").removeClass("layui-hide");
+            } else {
+                $(".along-system").removeClass("layui-hide");
+                $(".settlement-rate-wrap").addClass("layui-hide");
+            }
+        });
+
+        // 提现抽成
+        form.on('radio(settlement_rate)', function (data) {
+            isSettlementRate = Boolean(parseFloat(data.value));
+            if (parseFloat(data.value)) {
+                $(".along-system").addClass("layui-hide");
+                $(".settlement-rate-wrap").removeClass("layui-hide");
+            } else {
+                $(".along-system").removeClass("layui-hide");
+                $(".settlement-rate-wrap").addClass("layui-hide");
+            }
+        });
+
+        // 账户类型选择
+        form.on('radio(bank_type)', function (data) {
+            bankType = parseFloat(data.value);
+
+            $("input[name='bank_type_name']").removeAttr('lay-verify');
+            $("input[name='bank_user_name']").removeAttr('lay-verify');
+            $("input[name='bank_type_account']").removeAttr('lay-verify');
+            $("input[name='bank_user_name_alipay']").removeAttr('lay-verify');
+            $("input[name='bank_type_account_alipay']").removeAttr('lay-verify');
+            $("input[name='bank_user_name_weixin']").removeAttr('lay-verify');
+            if (parseFloat(data.value) == 1) {
+                $(".bank_card").addClass("layui-hide");
+                $(".wixin-wrap").removeClass("layui-hide");
+                $(".alipay-wrap").addClass("layui-hide");
+
+                $("input[name='bank_user_name_weixin']").attr('lay-verify', 'required');
+                $("input[name='bank_type_account_weixin']").attr('lay-verify', 'required');
+            } else if (parseFloat(data.value) == 2) {
+                $(".bank_card").addClass("layui-hide");
+                $(".wixin-wrap").addClass("layui-hide");
+                $(".alipay-wrap").removeClass("layui-hide");
+
+                $("input[name='bank_user_name_alipay']").attr('lay-verify', 'required');
+                $("input[name='bank_type_account_alipay']").attr('lay-verify', 'required');
+            } else if (parseFloat(data.value) == 3) {
+                $(".bank_card").removeClass("layui-hide");
+                $(".wixin-wrap").addClass("layui-hide");
+                $(".alipay-wrap").addClass("layui-hide");
+
+                $("input[name='bank_type_name']").attr('lay-verify', 'required');
+                $("input[name='bank_user_name']").attr('lay-verify', 'required');
+                $("input[name='bank_type_account']").attr('lay-verify', 'required');
+            }
+
+            wechatAuth.bankTypeChange(data.value);
+        });
+
+        form.on('submit(save)', function (data) {
+            if (repeat_flag) return;
+            repeat_flag = true;
+
+            let field = data.field;
+            if (bankType == 1){
+                field.bank_user_name = field.bank_user_name_weixin;
+                field.bank_type_account = field.bank_type_account_weixin;
+            } else if (bankType == 2) {
+                field.bank_user_name = field.bank_user_name_alipay;
+                field.bank_type_account = field.bank_type_account_alipay;
+            }
+
+            if (!isSettlementRate) {
+                field.settlement_rate = 0;
+            }
+
+            $.ajax({
+                type: 'POST',
+                dataType: 'JSON',
+                url: ns.url("store://shop/store/settlement"),
+                data: field,
+                success: function (res) {
+                    layer.msg(res.message);
+                    repeat_flag = false;
+                }
+            });
+        });
+
+        // 验证正整数
+        form.verify({
+            bank_type_name:function(value){
+                if($("input[name='is_settlement']:checked").val() && parseInt($("input[name='bank_type']:checked").val()) == 3){
+                    if(value.length == 0){
+                        return '请输入开户行';
+                    }
+                }
+            },
+            bank_user_name:function(value){
+                if($("input[name='is_settlement']:checked").val() && parseInt($("input[name='bank_type']:checked").val()) == 3){
+                    if(value.length == 0){
+                        return '请输入户头';
+                    }
+                }
+            },
+            bank_type_account:function(value){
+                if($("input[name='is_settlement']:checked").val() && parseInt($("input[name='bank_type']:checked").val()) == 3){
+                    if(value.length == 0){
+                        return '请输入账户';
+                    }
+                }
+            },
+            bank_user_name_weixin:function(value){
+                if($("input[name='is_settlement']:checked").val() && parseInt($("input[name='bank_type']:checked").val()) == 1){
+                    if(value.length == 0){
+                        return '请输入微信名';
+                    }
+                }
+            },
+            bank_user_name_alipay:function(value){
+                if($("input[name='is_settlement']:checked").val() && parseInt($("input[name='bank_type']:checked").val()) == 2){
+                    if(value.length == 0){
+                        return '请输入真实名字';
+                    }
+                }
+            },
+            bank_type_account_alipay:function(value){
+                if($("input[name='is_settlement']:checked").val() && parseInt($("input[name='bank_type']:checked").val()) == 2){
+                    if(value.length == 0){
+                        return '请输入支付宝账号';
+                    }
+                }
+            },
+            settlement_rate: function (value) {
+                if (parseFloat(value) < 0 || parseFloat(value) > 100) {
+                    return '请输入0-100之间的数';
+                }
+                let len = value.split(".")[1] ? value.split(".")[1].length : 0;
+                if (len > 2) {
+                    return '门店抽成比率最多两位小数';
+                }
+            }
+        });
+
+    });
+
+	//微信授权操作
+    function getWechatAuthInstance(){
+        wechatAuth = {
+            cache_key : '',
+            interval: null,
+            create: function (){
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'JSON',
+                    url: ns.url("store://shop/store/createWechatAuthQrcode"),
+                    data: {},
+                    success: (res) => {
+                        if(res.code >= 0){
+                            this.cache_key = res.data.cache_key;
+                            $("#wechat_auth_qrcode img").attr('src', res.data.qrcode);
+                            this.startCheck();
+                        }
+                    }
+                });
+            },
+            check: function (){
+                //如果切换了页面就不要继续执行了
+                if(location.hash.indexOf('store://shop/store/settlement') === -1){
+                    this.stopCheck();
+                }
+                $.ajax({
+                    type: 'POST',
+                    dataType: 'JSON',
+                    url: ns.url("store://shop/store/getWechatAuthData"),
+                    data: {
+                        cache_key : this.cache_key,
+                    },
+                    success: (res) => {
+                        if (res.code >= 0 && res.data){
+                            $("#wechat_auth_qrcode .img-load").removeClass("layui-hide").html('已绑定成功<br/>点击重新绑定');
+                            $("input[name='bank_type_account_weixin']").val(res.data.openid)
+                            this.stopCheck();
+                        }
+                    }
+                });
+            },
+            startCheck: function (){
+                clearInterval(this.interval);
+                this.interval = setInterval(()=>{
+                    this.check();
+                }, 1000)
+            },
+            stopCheck: function(){
+                clearInterval(this.interval);
+            },
+            init: function(){
+                let img_load_dom = $("#wechat_auth_qrcode .img-load");
+                img_load_dom.click(()=>{
+                    img_load_dom.addClass('layui-hide');
+                    this.create();
+                })
+            },
+            bankTypeChange: function (bank_type){
+                if(parseInt(bank_type) === 1){
+                    this.create();
+                }else{
+                    this.stopCheck();
+                }
+            }
+        }
+        wechatAuth.init();
+    }
+</script>

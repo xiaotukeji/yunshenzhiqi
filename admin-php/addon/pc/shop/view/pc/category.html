@@ -1,0 +1,128 @@
+<style>
+.new-footer {
+	position: fixed;
+	bottom: 0px;
+	left: 180px;
+	width: 89%;
+	height: 50px;
+}
+.new-footer .layui-btn1 {
+	position: absolute;
+	bottom: 20px;
+	left: 790px;
+}
+.new-footer .layui-btn2 {
+	position: absolute;
+	bottom: 20px;
+	left: 870px;
+}
+</style>
+
+<div class="screen layui-collapse" lay-filter="selection_panel">
+	<div class="layui-colla-item">
+		<form class="layui-colla-content layui-form layui-show"  lay-filter="addForm">
+			<div class="layui-form-item">
+				<label class="layui-form-label">模板选择</label>
+				<div class="layui-input-block">
+					<input type="radio" name="category" value="1" lay-filter="category_filter" title="一级分类" {$config_info.category==1?'checked':''}>
+					<input type="radio" name="category" value="2" lay-filter="category_filter" title="二级分类" {$config_info.category==2?'checked':''}>
+					<input type="radio" name="category" value="3" lay-filter="category_filter" title="三级分类" {$config_info.category==3?'checked':''}>
+				</div>
+			</div>
+			<div class="layui-form-item">
+				<input type="hidden" name="img" id="img" value="{$config_info.img}" />
+				<label class="layui-form-label">分类图</label>
+				<div class="layui-input-block">
+					<button type="button" class="layui-btn layui-btn-primary propertychange noimg">无图模式</button>
+					<button type="button" class="layui-btn layui-btn-primary propertychange youimg">有图模式</button>
+				</div>
+			</div>
+			<div class="layui-form form-wrap new-footer">
+				<div class="form-row">
+					<button class="layui-btn layui-btn1" lay-submit lay-filter="save">保存</button>
+					<button class="layui-btn layui-btn2 layui-btn-primary" lay-submit lay-filter="back">返回</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>
+<div class="layui-form form-wrap">
+	<div class="layui-form-item">
+		<label class="layui-form-label"></label>
+		<div class="layui-input-block">
+			<img class="index-classify" src="" alt="" width="800" >
+		</div>
+	</div>
+
+</div>
+
+<div class="footer"></div>
+
+<script>
+	var template = {$config_info.category};
+	var img = {$config_info.img};
+	var classifyData = {
+		template: template,
+		img: img
+	};
+	renderImg();
+
+	layui.use(['form'], function() {
+		var form = layui.form;
+		form.on('radio(category_filter)', function (data) {
+			classifyData.template = data.value;
+			// classifyData.img = 0;
+			renderImg();
+			// $(".noimg").addClass('border-color text-color').siblings().removeClass('border-color text-color');
+		});
+		form.on('submit(save)', function (data) {
+			$.ajax({
+				type: 'post',
+				dataType: 'json',
+				url: ns.url("pc://shop/pc/category"),
+				data: data.field,
+				success: function (res) {
+					layer.msg(res.message);
+					if (res.code == 0) {
+						listenerHash(); // 刷新页面
+					}
+				}
+			});
+			return false;
+		});
+		form.on('submit(back)', function (data) {
+			history.go(-1);
+			return false;
+		});
+
+		if(classifyData.img==1){
+			$(".youimg").addClass('border-color text-color');
+			$('.noimg').removeClass('border-color text-color');
+		}else{
+			$('.noimg').addClass('border-color text-color');
+			$('.youimg').removeClass('border-color text-color');
+		}
+	});
+
+	$('.youimg').click(function () {
+		classifyData.img = 1;
+		$("#img").attr("value","1");
+		$(".youimg").addClass('border-color text-color');
+		$('.noimg').removeClass('border-color text-color');
+		renderImg();
+	});
+
+	$('.noimg').click(function () {
+		classifyData.img = 0;
+		$("#img").attr("value","0");
+		$('.noimg').addClass('border-color text-color');
+		$('.youimg').removeClass('border-color text-color');
+		renderImg();
+	});
+	
+	function renderImg() {
+		var imgSrc = "public/static/img/shop/category_" + classifyData.template + '_' + classifyData.img + '.png';
+		imgSrc = ns.img(imgSrc);
+		$(".index-classify").attr("src",imgSrc);
+	}
+</script>

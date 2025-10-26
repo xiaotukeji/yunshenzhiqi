@@ -1,0 +1,1107 @@
+<style type="text/css">
+.limit .layui-input{
+	display: inline-block;
+}
+.limit .layui-form-mid{
+	float: none;margin-right: 0
+}
+.limit .layui-form-radio{
+	padding: 0;margin: 0;
+}
+.limit .layui-input[disabled]{
+	background: #eee;cursor:not-allowed
+}
+.layui-form-item .layui-input-inline {
+	width: 140px !important;
+}
+.len-mid {
+	width: 440px !important;
+}
+.input-required {
+	margin-bottom: 8px;
+}
+.member-detail {
+	display: flex;
+}
+.checked-peo {
+	width: 200px;
+	border: 1px solid var(--base-color);
+	border-radius: 3px;
+	padding: 12px 10px;
+	margin: 10px 0;
+}
+.nickname {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.address-list {
+	display: flex;
+	flex-wrap: wrap;
+	margin-top: 15px;
+}
+.good-box {
+	width: 280px;
+	padding: 10px;
+	border: 1px solid #e8e8e8;
+	margin:0 15px 15px 0;
+	cursor: pointer;
+}
+.empty-goods .empty-text {
+	line-height: 90px;
+	margin-right: 20px;
+}
+.add-address {
+	width: 105px;
+	height: 102px;
+	border: 1px solid #e8e8e8;
+	display: flex;
+	flex-direction: column;
+	text-align: center;
+	cursor: pointer;
+	margin-bottom: 10px;
+}
+.add-address .span1 {
+	margin-top: 20px;
+    font-size: 35px;
+    color: #949596;
+}
+.bargain-title {
+	display: flex;
+}
+.title-icon {
+	width: 60px;
+	height: 60px;
+	margin-right: 20px;
+}
+.title-icon img {
+	width: 60px;
+}
+.title-right {
+	width: 200px;
+}
+.title-name {
+	width: 200px;
+}
+.layui-card-bottom .layui-form-label {
+	width: 100px;
+}
+.good-name {
+	margin-bottom: 5px;
+}
+.store-stock {
+	margin-bottom: 5px;
+}
+.good-price {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	width: 260px;
+}
+.addclass {
+	border: 1px solid var(--base-color);
+}
+
+.new-footer {
+	position: fixed;
+	bottom: 0px;
+	left: 180px;
+	width: 89%;
+	height: 50px;
+}
+
+.new-footer .layui-btn1 {
+	position: absolute;
+	bottom: 20px;
+	left: 790px;
+}
+.new-footer .layui-btn2 {
+	position: absolute;
+	bottom: 20px;
+	left: 870px;
+}
+.title-content {
+	margin-right: 10px !important;
+}
+.select_store{
+	padding: 20px;
+	margin-left:20px;
+}
+
+.select_store .store-item {
+	box-sizing: border-box;
+	margin: 0 15px 15px 0;
+	border: 1px solid var(--base-color);
+	width: 220px;
+	padding: 10px;
+	cursor: pointer;
+	height: fit-content;
+	border-radius: 4px;
+}
+
+.select_store .store-item .name {
+	font-weight: bold;
+}
+.open
+{
+	color: #00A717;
+	font-size: 12px
+}
+.select_store .store-item .address {
+	color: #999;
+	font-size: 12px;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	overflow: hidden;
+	width: 100%;
+}
+.support-delivery{
+	color:red;
+	margin-left: 10px;
+}
+.order-map{width:876px;height:380px;}
+</style>
+
+
+<div class="member layui-card card-common card-brief">
+	<div class="layui-card-header">
+		<span class="card-title">正在为该会员下单</span>
+	</div>
+</div>
+<div class="layui-card card-common card-brief member-address-message">
+	<div class="layui-card-header">
+		<span class="card-title">地址信息</span>
+	</div>
+
+	<div class="layui-card-body">
+		<div class="layui-form address-list"></div>
+	</div>
+</div>
+
+<div class="layui-card card-common card-brief">
+	<div class="layui-card-header">
+		<span class="card-title">商品价格明细</span>
+	</div>
+
+	<div class="layui-card-body">
+		<table id="attr_class_list" lay-filter="attr_class_list"></table>
+	</div>
+	<div class="layui-card card-common card-brief store-select">
+		<div class="layui-card-header">
+			<span class="card-title">门店信息</span>
+		</div>
+		<div class="select_store">
+			<button class="layui-btn select-store">选择门店</button>
+		</div>
+	</div>
+	<div class="layui-card-body" style="padding-top: 0px">
+		<div class="price_detailed"></div>
+	</div>
+
+</div>
+
+
+
+<!-- 结算页面 -->
+<script type="text/html" id="settle_page">
+	<div class="form-wrap money">
+		<div class="cash-settle layui-form">
+			<div class="card-bottom">
+				<div class="layui-card-bottom">
+					<label class="layui-form-label">物流方式：</label>
+					<div class="layui-input-inline" style="display: inline-block">
+						{{#  layui.each(d.delivery.express_type, function(index, item) {  }}
+							<input type="radio" name="delivery_type"  value="{{item.name}}" data-index={{index}} title="{{item.title}}" lay-filter="delivery_type" 	{{# if(item.name == express.delivery_type) { }} checked {{# } }}>
+						{{#  })  }}
+					</div>
+					{{# if( express.delivery_type == 'store') { }}
+					<div class="layui-form-item">
+						<label class="layui-form-label">姓名：</label>
+						<div class="layui-input-inline">
+							<input type="text" name="nickname" value="{{d.member_account.nickname}}" class="layui-input" readonly>
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">预留手机：</label>
+						<div class="layui-input-inline">
+							<input type="number" name="mobile" value="" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-form-item">
+						<label class="layui-form-label">提货时间：</label>
+						<div class="layui-input-inline" style="width:180px !important">
+							<select name="date_time" lay-filter="timeSelect" id="dateSelect">
+								{{#  layui.each(d.delivery_time, function(index, item) {  }}
+								<option value="{{item.date}}" data-index="{{index}}" >{{item.date}}({{item.day}})</option>
+								{{#  })  }}
+							</select>
+						</div>
+						<div class="layui-input-inline" id="date_time_range">
+							<select name="date_time_range" id="sel_date_time_range">
+								{{# if( d.delivery_time && d.delivery_time.length > 0) { }}
+									{{#  layui.each(d.delivery_time[0].time_slots, function(index, item) {  }}
+									<option value="{{item.start}}-{{item.end}}">{{item.start}}-{{item.end}}</option>
+									{{#  })  }}
+								{{# } }}
+							</select>
+						</div>
+					</div>
+					{{# } }}
+					{{# if( express.delivery_type == 'local') { }}
+					<div class="layui-form-item">
+						<label class="layui-form-label">送达时间：</label>
+						<div class="layui-input-inline" style="width:180px !important">
+							<select name="date_time" lay-filter="timeSelect" id="dateSelect">
+								{{#  layui.each(d.delivery_time, function(index, item) {  }}
+								<option value="{{item.date}}" data-index="{{index}}" >{{item.date}}({{item.day}})</option>
+								{{#  })  }}
+							</select>
+						</div>
+						<div class="layui-input-inline" id="date_time_range">
+							<select name="date_time_range" id="sel_date_time_range">
+								{{# if( d.delivery_time && d.delivery_time.length > 0) { }}
+									{{#  layui.each(d.delivery_time[0].time_slots, function(index, item) {  }}
+									<option value="{{item.start}}-{{item.end}}">{{item.start}}-{{item.end}}</option>
+									{{#  })  }}
+								{{# } }}
+							</select>
+						</div>
+					</div>
+					{{# } }}
+					<div class="layui-form-item">
+						<label class="layui-form-label">使用余额：</label>
+						<div class="layui-input-inline">
+							<input type="radio" name="is_balance" value="1" title="是">
+							<input type="radio" name="is_balance" value="0" title="否" checked>
+						</div>
+					</div>
+					<input type="hidden" value="{$is_use}" id="is_use">
+					{{# if( express.delivery_type == 'express' && d.delivery_money > 0) { }}
+					<div class="layui-form-item">
+						<label class="layui-form-label">运费：</label>
+						<div class="layui-input-inline">
+							<span>￥{{d.delivery_money}}</span>
+						</div>
+					</div>
+					{{# } }}
+					{{# if( express.delivery_type == 'local' && d.delivery_money > 0 ) { }}
+					<div class="layui-form-item">
+						<label class="layui-form-label">配送费用：</label>
+						<div class="layui-input-inline">
+							<span>￥{{d.delivery_money}}</span>
+						</div>
+					</div>
+					{{# } }}
+					<div class="layui-form-item">
+						<label class="layui-form-label">商品金额：</label>
+						<div class="layui-input-inline">
+							<span>￥{{d.goods_money}}</span>
+						</div>
+					</div>
+					{{# if(d.promotion_money > 0){ }}
+					<div class="layui-form-item">
+						<label class="layui-form-label">优惠：</label>
+						<div class="layui-input-inline">
+							<span>￥{{d.promotion_money}}</span>
+						</div>
+					</div>
+					{{# } }}
+					<div class="layui-form-item">
+						<label class="layui-form-label">合计：</label>
+						<div class="layui-input-inline">
+							<span>￥{{d.order_money}}</span>
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+</script>
+
+<input id="member_id" type="hidden" value="" />
+
+<div class="layui-form form-wrap new-footer">
+	<div class="form-row">
+		<button class="layui-btn layui-btn1 layui-btn-primary" onclick="backReplaceBuyIndex()">返回</button>
+		<button class="layui-btn layui-btn2 bg-color" lay-filter="save_order" lay-submit>提交订单</button>
+	</div>
+</div>
+
+<script type="text/html" id="member_detail">
+	<div class="layui-card-body">
+		<div class="member-detail">
+			<div class="table-title checked-peo border-color">
+				<div class="title-pic">
+					<img src="{{ns.img(d.headimg)}}" onerror=src="{:img('public/static/img/default_img/head.png')}" />
+				</div>
+				<div class="title-content">
+					<div class="member-con-first">
+						<h3 class="nickname">{{d.nickname}}</h3>
+					</div>
+					<div class="member-con-second">
+						<p class="text-color-gray"><span class="member-mobile">{{d.mobile == "" ? '--' : d.mobile}}</span></p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</script>
+
+<!-- 地址列表 -->
+<script type="text/html" id="address_list">
+	{{#  if (d.length == 0) {  }}
+	<div class="empty-goods">
+		<p class="empty-text">暂无地址</p>
+	</div>
+	{{#  } else {  }}
+	{{#  layui.each(d, function(index, item) {  }}
+	<div class="good-box  {{item.is_default == 1 ? 'addclass border-color' : ''}}" data-address-id="{{item.id}}" onclick="choiceAddress({{item.id}})">
+		<div class="table-title">
+			<div class="title-content">
+				<p class="multi-line-hiding good-name" title="{{item.name}}">收货人：{{item.name}}</p>
+				<div class="good-price">
+					<p class="line-hideing store-stock" title="{{item.mobile}}">联系电话：{{item.mobile}}</p>
+					<p class="basic-color good-price">联系地址：{{item.full_address}}{{item.address}}</p>
+				</div>
+			</div>
+		</div>
+	</div>
+	{{#  })  }}
+	{{#  }  }}
+	<div class="add-address" onclick="addAddress()"><span class="span1">+</span><span>添加地址</span></div>
+</script>
+
+
+<script type="text/html" id="date_time_range_template">
+	<select name="date_time_range" id="sel_date_time_range">
+		{{#  layui.each(d, function(index, item) {  }}
+		<option value="{{item.start}}-{{item.end}}">{{item.start}}-{{item.end}}</option>
+		{{#  })  }}
+	</select>
+</script>
+
+<script type="text/html" id="addAddress">
+
+	<div class="layui-form form-wrap" lay-filter="update_address">
+		<div class="layui-form-item">
+			<label class="layui-form-label mid">收货人：</label>
+			<div class="layui-input-block input-required">
+				<input name="name" type="text" placeholder="请输入姓名" lay-verify="required" class="layui-input len-mid">
+			</div>
+			<label class="layui-form-label mid">联系电话：</label>
+			<div class="layui-input-block input-required">
+				<input name="mobile" type="text" placeholder="请输入联系电话" lay-verify="mobile" class="layui-input len-mid">
+			</div>
+			<div style="display: flex;">
+				<label class="layui-form-label mid">地区：</label>
+
+				<div class="layui-form-item" style="display: flex; margin-right: -20px;">
+					<div class="layui-input-inline area-select">
+						<select name="province_id" lay-filter="province_id" lay-verify="province_id">
+							<option value="">请选择省份</option>
+							{foreach $province_list as $k => $v}
+							<option value="{$v.id}">{$v.name}</option>
+							{/foreach}
+						</select>
+					</div>
+
+					<div class="layui-input-inline area-select">
+						<select name="city_id"  lay-filter="city_id" lay-verify="city_id">
+							<option value="">请选择城市</option>
+						</select>
+					</div>
+
+					<div class="layui-input-inline area-select">
+						<select name="district_id"  lay-filter="district_id" lay-verify="district_id">
+							<option value="">请选择区/县</option>
+						</select>
+					</div>
+				</div>
+			</div>
+
+			<label class="layui-form-label mid">详细地址：</label>
+			<div class="layui-input-block">
+				<input name="address" type="text" placeholder="请输入收货人地址" lay-verify="required" class="layui-input len-mid">
+				{{# if(d.type == 2){ }}
+				<input type = "hidden" name="longitude" class="layui-input" value=""/>
+				<input type = "hidden" name="latitude"  class="layui-input" value=""/>
+				<button class='layui-btn-primary layui-btn' onclick="refreshFrom();">查找地址</button>
+				{{# } }}
+			</div>
+
+			{{# if(d.type == 2){ }}
+			<label class="layui-form-label mid">地图定位：</label>
+			<!--地图定位-->
+			<div class="layui-input-block special-length">
+					<div id="container" class="order-map"></div>
+			</div>
+			{{# } }}
+
+			<div>
+				<label class="layui-form-label mid">智能识别地址：</label>
+				<div class="layui-input-block analysis" style="margin-top: 10px">
+						<div  style="float:left;width:570px">
+							<textarea class="layui-textarea" id="address_text" style="width: 570px; height: 100px;" ></textarea>
+							<div class="eg-text" style="font-size: 12px">*示例:小红152********山西省太原市小店区**路**号</div>
+						</div>
+					<div class="layui-input-inline" style="margin-left: 10px;">
+						<button class="layui-btn" onclick="analysis()">解析</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="form-row mid">
+			<button class="layui-btn member-search" lay-submit lay-filter="save" lay-submit>确定</button>
+			<button class="layui-btn layui-btn-primary" onclick="closeAttrLayer()">返回</button>
+		</div>
+	</div>
+
+</script>
+
+<script type="text/javascript" src="SHOP_JS/address.js"></script>
+<script>
+	var buyer_info = {:json_encode($buyer_info, JSON_UNESCAPED_UNICODE)};
+	var cart = JSON.parse('{:json_encode($cart, JSON_UNESCAPED_UNICODE)}');
+	var address_id = JSON.parse('{:json_encode($address_id, JSON_UNESCAPED_UNICODE)}');
+	var laytpl,add_attr_index = -1,repeat_flag,form,table;
+	var order_key;
+	var store_id = "{$store_id}";
+	var express = {}
+	var store_business = "{$store_business ?? 'shop'}"
+	var store = JSON.parse('{:json_encode($store, JSON_UNESCAPED_UNICODE)}');
+	var express_type_arr;
+	var delivery_time_arr;
+	var member_address = {};
+	var map_class;
+	var latlng = {lat: '', lng: ''};
+	layui.use(['form', 'laytpl','laypage'], function() {
+		laytpl = layui.laytpl;
+		form = layui.form;
+		repeat_flag = false;//防重复标识
+		memberDetail(buyer_info);
+		settleList();
+		refreshStore(store)
+		// syncData();
+
+		form.render();
+		table = new Table({
+				data: cart,
+				elem: '#attr_class_list',
+				cols: [
+					[{
+						field: 'sku_name',
+						title: '商品信息',
+						unresize: 'false',
+						width: '20%',
+						templet: function (data) {
+							var html = "";
+							html += `<div class="bargain-title">
+										<div class="title-icon">
+											<img src="${ns.img(data.sku_image)}" alt="">
+										</div>
+										<div class="title-right">
+										<p class="title-name multi-line-hiding">${data.sku_name}</p>
+										<span>￥${data.sku_price}</span>`;
+							if(express.delivery_type == 'local' && !data.support_trade_type.includes('local')){
+								html += `<span class="support-delivery">不支持同城配送</span>`;
+							}
+							if(express.delivery_type == 'express' && !data.support_trade_type.includes('express')){
+								html += `<span class="support-delivery">不支持快递发货</span>`;
+							}
+							if(express.delivery_type == 'store' && !data.support_trade_type.includes('store')){
+								html += `<span class="support-delivery">不支持门店自提</span>`;
+							}
+							html +=`</div>
+									</div>`;
+							return html;
+						},
+					}, {
+						templet: function (data) {
+							if (data.spec_name != '') {
+								return data.spec_name
+							} else {
+								return '无'
+							}
+						},
+						title: '商品规格',
+						width: '10%'
+					}, {
+						unresize: 'false',
+						title: '库存',
+						field: 'stock',
+						width: '10%'
+					}, {
+						unresize: 'false',
+						title: '数量',
+						width: '10%',
+						field: 'num'
+					}, {
+						title: '成交价',
+						width: '10%',
+						unresize: 'false',
+						templet: function (data) {
+							return '￥' + (data.sku_price * data.num).toFixed(2);
+						}
+					}]
+				]
+			});
+
+		/**
+		 * 验证
+		 */
+		form.verify({
+			required : function(value, item){
+				var msg = $(item).attr("placeholder") != undefined ? $(item).attr("placeholder") : '';
+				if(value == '') return msg;
+			},
+			mobile : function(value, item) {
+				if(value == '') return '请输入手机号码';
+				if (value != '') {
+					if (!ns.parse_telephone(value) && !ns.parse_mobile(value)) {
+						return '请输入正确的电话号码或手机号！';
+					}
+				}
+			},
+			province_id : function(value, item){
+				if(value == ''){
+					return '请选择省份';
+				}
+			},
+			city_id : function(value, item){
+				if(value == ''){
+					return '请选择城市';
+				}
+			},
+			district_id : function(value, item){
+				if(value == ''){
+					return '请选择区/县';
+				}
+			}
+		});
+
+		/**
+		 * 监听新增地址提交
+		 */
+		form.on('submit(save)', function(data){
+
+			if(repeat_flag) return;
+			repeat_flag = true;
+
+			var full_address  = [];
+			full_address.push($("select[name=province_id] option:selected").text());
+			full_address.push($("select[name=city_id] option:selected").text());
+			full_address.push($("select[name=district_id] option:selected").text());
+
+			data.field.full_address = full_address.join('-');
+
+			$.ajax({
+				type : "POST",
+				dataType: 'JSON',
+				url : ns.url("replacebuy://shop/replacebuy/addAddress"),
+				async : true,
+				data : data.field,
+				success : function(res) {
+					if (res.code == 0) {
+
+						address_id = res.data;
+						syncData();
+						addressList(express.delivery_type == 'local' ? 2 : 1);
+						settleList();
+						layer.msg('添加成功');
+
+						layer.close(add_attr_index);
+
+						setTimeout(function(){
+							repeat_flag = false;
+						},200)
+
+					} else {
+						layer.msg(res.message);
+						repeat_flag = false;
+					}
+				}
+			})
+		});
+
+		/**
+		 * 监听订单提交
+		 */
+		form.on('submit(save_order)', function(data){
+			let order_data = getOrderData()
+			if(express.delivery_type != 'store' && (address_id == '' || address_id == 0)){
+				layer.msg('请选择地址!');
+				return;
+			}
+			if(express.delivery_type == 'local' && !express.buyer_ask_delivery_time){
+				layer.msg('请选择送达时间!');
+				return;
+			}
+			if(express.delivery_type == 'store'){
+				if(!express.buyer_ask_delivery_time){
+					layer.msg('请选择提货时间!');
+					return;
+				}
+				express.mobile = $("input[name='mobile']").val()
+				if(!express.mobile){
+					layer.msg('请填写预留手机号码!');
+					return;
+				}
+			}
+			// var is_use = $("#is_use").val();
+			// if (is_use == 0){
+			// 	layer.msg('物流配送方式未开启!');
+			// 	return;
+			// }
+
+			if(repeat_flag) return;
+			repeat_flag = true;
+
+			var is_balance = $("input[name='is_balance']:checked").val();
+
+			$.ajax({
+				type : "POST",
+				dataType: 'JSON',
+				url : ns.url("replacebuy://shop/ordercreate/create"),
+				async : true,
+				data : order_data,
+				success : function(res) {
+					repeat_flag = false;
+					if (res.code == 0) {
+						cart = [];
+						address_id = 0;
+						syncData();
+						syncCart();
+						syncUser();
+						layer.msg('提交成功！');
+						window.open(ns.url("shop/order/detail",{order_id:res.data}), '_blank');
+						location.hash = ns.hash("replacebuy://shop/replacebuy/index");
+					} else {
+						layer.msg(res.message);
+					}
+				}
+			})
+		});
+
+
+		//监听物方式变动
+		form.on('radio(delivery_type)', function(data){
+
+			table.reload('attr_class_list', {
+				page: {
+					curr: 1 // 从第一页开始刷新
+				}
+			});
+
+			if(express.delivery_type != data.value){
+				express.delivery_type =  data.value;
+				express.delivery_type_name = $(this).attr("title")
+				$(".member-address-message").show()
+				if(data.value == 'local'){
+					addressList(2)
+				}else if(data.value == 'express'){
+					addressList(1)
+				}else if(data.value == 'store'){
+					$(".member-address-message").hide()
+				}
+				settleList()
+			}
+		})
+
+		form.on('select(timeSelect)', function(data){
+			let time_slots = {}
+		    delivery_time_arr.forEach(function(item, index) {
+				if(item.date == data.value){
+					time_slots =  item.time_slots
+				}
+			});
+			console.log(time_slots)
+			laytpl($("#date_time_range_template").html()).render(time_slots, function(html) {
+				$("#date_time_range").empty().append(html);
+				form.render('select')
+			})
+			form.render();
+		});
+	});
+
+	// 选中地址
+	function choiceAddress(id) {
+		$(`.good-box[data-address-id=${id}]`).addClass('addclass border-color').siblings().removeClass('addclass border-color');
+		address_id = id;
+		syncData();
+		settleList();
+	}
+
+	// 会员详情页面渲染
+	function memberDetail(data) {
+		member_address.name = data.nickname
+		laytpl($("#member_detail").html()).render(data, function(html) {
+			$(".member").append(html);
+			$("#member_id").val(data.member_id);
+		})
+	}
+
+	// 同步购物车数据
+	function syncCart() {
+		$.ajax({
+			url: ns.url("replacebuy://shop/replacebuy/cart"),
+			type: "POST",
+			dataType: "JSON",
+			async: false,
+			data: {"cart_json": JSON.stringify(cart)}
+		})
+	}
+
+	//注销会员
+	function syncUser() {
+		$.ajax({
+			url: ns.url("replacebuy://shop/replacebuy/logoutBuyer"),
+			type: "POST",
+			dataType: "JSON",
+			async: false
+		})
+	}
+
+	// 结算
+	function settleList() {
+		let index = layer.load();
+		$.ajax({
+			url: ns.url("replacebuy://shop/ordercreate/payment"),
+			type: "POST",
+			dataType: "JSON",
+			async: false,
+			data: getOrderData(),
+			success: function(res) {
+				layer.close(index);
+				if (res.code == 0) {
+
+					var data = res.data;
+					order_key = data.order_key;
+					laytpl($("#settle_page").html()).render(data, function(html) {
+						$(".price_detailed").html(html);
+					});
+					if(Object.keys(express).length === 0){
+						//初始化配送方式
+						express.delivery_type = data.delivery.express_type[0].name;
+						$("input[name='delivery_type'][value='"+express.delivery_type+"']").prop("checked", true);
+						addressList(express.delivery_type == 'local' ? 2 : 1);
+					}
+					express_type_arr = data.delivery.express_type
+					delivery_time_arr = data.delivery_time
+					form.render();
+					setExpressType();
+				} else {
+					layer.msg(res.message);
+				}
+			}
+		})
+	}
+
+
+	/**
+	 * 设置物流方式
+	 */
+	function setExpressType(param) {
+		let express_type = $("input[name='delivery_type']:checked").val()
+		let index =  $("input[name='delivery_type']:checked").data('index')
+		console.log(express_type)
+		if(typeof express_type == 'undefined'){
+			layer.msg("请配置物流方式");
+			return;
+		}
+		if(express_type == 'express' &&  store_business == 'shop'){
+			$(".store-select").hide()
+		}else{
+			$(".store-select").show()
+		}
+
+		let delivery_type_name = $("input[name='delivery_type']:checked").attr('title')
+		express.delivery_type =  express_type
+		express.delivery_type_name =  delivery_type_name
+		express.store_id = store_id
+
+		//刷新门店
+		let info = express_type_arr[index]
+		if(info.hasOwnProperty("store_list")){
+			console.log(info.store_list)
+			let change_store = true;
+			let store_list = info.store_list;
+			for (let i = 0; i < store_list.length; i++){
+                 if(store_list[i].store_id == store_id){
+					 change_store = false;
+				 }
+			}
+			if(change_store){
+				console.log(info.store_list.shift())
+				refreshStore(info.store_list.shift())
+			}
+		}
+	}
+
+	// 地址列表渲染
+	function addressList(type=1) {
+		$.ajax({
+			url: ns.url("replacebuy://shop/replacebuy/addressPage"),
+			async: false,
+			type: "POST",
+			dataType: "JSON",
+			data:{type: type},
+			success: function(res) {
+				if (res.code == 0) {
+					var data = res.data;
+					laytpl($("#address_list").html()).render(data, function(html) {
+						$(".address-list").html(html);
+					});
+				} else {
+					layer.msg(res.message);
+				}
+			}
+		});
+	}
+
+
+	//新增地址
+	function addAddress(){
+		var add_attr = $("#addAddress").html();
+		let data = {'type':1}
+		if(express.delivery_type == 'local'){
+			data.type = 2
+		}
+		laytpl(add_attr).render(data, function(html) {
+			add_attr_index = layer.open({
+				title: '添加收货地址',
+				skin: 'layer-tips-class',
+				type: 1,
+				area: ["1200px"],
+				content: html,
+				success: function (){
+
+					if($("#container").length) {
+						setTimeout(function () {
+							map_class = new mapClass("container", latlng);
+						},200);
+					}
+					form.render();
+				}
+			});
+
+		});
+
+		$(document).keydown(function (event) {
+			if (event.keyCode == 13) {
+				$(".member-search").trigger("click");
+			}
+		});
+	}
+
+	// 同步数据
+	function syncData() {
+		$.ajax({
+			url: ns.url("replacebuy://shop/replacebuy/choiceAddress"),
+			type: "POST",
+			dataType: "JSON",
+			async: false,
+			data: {"address_id": address_id}
+		})
+	}
+
+	function backReplaceBuyIndex() {
+		location.hash = ns.hash("replacebuy://shop/replacebuy/index");
+	}
+
+	function closeAttrLayer() {
+		layer.close(add_attr_index);
+	}
+
+	$(".select_store").off("click").on("click", ".select-store",function () {
+		let condition = {}
+		switch (express.delivery_type){
+			case 'express':
+				condition = {'multiple_type':1,'status':1,'is_express':1};
+				break;
+				case 'store':
+				condition= {'multiple_type':1,'status':1,'is_pickup':1}
+				break;
+			case 'local':
+				condition = {'multiple_type':1,'status':1,'is_o2o':1}
+				break;
+		}
+		storeSelect(function (store) {
+			refreshStore(store.shift())
+		}, condition)
+	});
+
+	function refreshStore(store){
+		console.log(store)
+		if(typeof store ==  'undefined'){
+			layer.msg('请选择门店')
+			return
+		}
+		store_id = store.store_id
+		express.store_id = store.store_id
+		try{
+			let batchOperateTemplate = $("#store_info").html()
+			laytpl(batchOperateTemplate).render(store, function (html) {
+				$(".select_store").empty().append(html)
+			})
+			form.render();
+			settleList()
+		}catch (error){
+			console.error("捕获到错误:", error.message);
+		}
+	}
+
+	function getOrderData(){
+		console.log(store_id)
+		var is_balance = $("input[name='is_balance']:checked").val();
+		if(express.delivery_type == 'store' ||  express.delivery_type == 'local'){
+			const date = $('#dateSelect').val();
+			const timeRange = $("#sel_date_time_range").val();
+			if(typeof date != 'undefined' && typeof timeRange != 'undefined'){
+				const [startTime, endTime] = timeRange.split('-');
+				express.buyer_ask_delivery_time  = {'start_date':date+' '+startTime,'end_date':date+' '+endTime}
+			}
+			member_address.mobile = $("input[name='mobile']").val()
+		}
+		return {
+			"cart": JSON.stringify(cart),
+			"is_balance" : is_balance,
+			'order_key' : order_key,
+			'store_id': store_id,
+			'delivery': JSON.stringify(express),
+			'member_address':JSON.stringify(member_address)
+		};
+	}
+
+	function analysis(){
+		let address = $("#address_text").val();//详细地址
+		if(!address){
+			layer.msg('请输入详细地址', {icon: 5, anim: 6});
+			return;
+		}
+		$.ajax({
+			url: ns.url("shop/address/analysesAddress"),
+			type: "POST",
+			dataType: "JSON",
+			async: false,
+			data: {'address':address},
+			success: function (res) {
+				if(res.code == 0){
+					if(res.data.province_id !== ''){
+						form.val("update_address", {
+							"province_id": res.data.province_id // "name": "value"
+						});
+						$("select[name=province_id]").change();
+					}
+					if(res.data.city_id !== ''){
+						form.val("update_address", {
+							"city_id": res.data.city_id // "name": "value"
+						});
+						$("select[name=city_id]").change();
+					}
+					if(res.data.district_id !== ''){
+						form.val("update_address", {
+							"district_id": res.data.district_id // "name": "value"
+						});
+						$("select[name=district_id]").change();
+					}
+					if(res.data.detail !== ''){
+						form.val("update_address", {
+							"address": res.data.detail // "name": "value"
+						});
+					}
+					if(res.data.name !== ''){
+						$("input[name='name']").val(res.data.name)
+					}
+					if(res.data.mobile !== ''){
+						$("input[name='mobile']").val(res.data.mobile)
+					}
+				}else{
+					layer.msg(res.message);
+				}
+			}
+		});
+	}
+
+	function refreshFrom(){
+		form.render();
+		orderAddressChange();//改变地址
+		map_class.mapChange();
+	}
+
+	//动态改变订单地址赋值
+	function orderAddressChange(){
+		map_class.address.province = $("select[name=province_id]").val();
+		map_class.address.province_name = $("select[name=province_id] option:selected").text();
+		map_class.address.city = $("select[name=city_id]").val();
+		map_class.address.city_name = $("select[name=city_id] option:selected").text();
+		map_class.address.district = $("select[name=district_id]").val();
+		map_class.address.district_name = $("select[name=district_id] option:selected").text();
+		map_class.address.detail_address = $("input[name=address]").val()
+	}
+
+	function mapChangeCallBack(){
+		$("input[name=address]").val(map_class.address.address);//详细地址
+		$("input[name=longitude]").val(map_class.address.longitude);//坐标
+		$("input[name=latitude]").val(map_class.address.latitude);//坐标
+		$.ajax({
+			type : "post",
+			url : ns.url("shop/address/getGeographicId"),
+			dataType: 'json',
+			async : true,
+			data : {
+				"address" : map_class.address.area
+			},
+			success : function(data) {
+				map_class.address.province = data.province_id;
+				map_class.address.city = data.city_id;
+				map_class.address.district = data.district_id;
+				// map_class.address.township = data.community_id;
+				map_class.map_change = false;
+				form.val("update_address", {
+					"province_id": data.province_id // "name": "value"
+				});
+				$("select[name=province_id]").change();
+				form.val("update_address", {
+					"city_id": data.city_id // "name": "value"
+				});
+				$("select[name=city_id]").change();
+				form.val("update_address", {
+					"district_id": data.district_id // "name": "value"
+				});
+				$("select[name=district_id]").change();
+				// form.val("update_address", {
+				//     "community_id": data.community_id // "name": "value"
+				// });
+				refreshFrom();//重新渲染form
+				map_class.map_change = true;
+			}
+		})
+	}
+</script>
+<script type="text/html" id="store_info">
+	<div class="store-item" data-store="29">
+		<div class="name">{{d.store_name}}</div>
+		<div class="status">
+			<span class="open">
+				{{# if(d.is_frozen == 1) {  }}
+                       <span class="close">已停业</span>
+					{{#  } else {  }}
+				       {{#  if (d.status == 0) {  }}
+                         <span class="open">休息中</span>
+				            {{#  } else {  }}
+                         <span class="open">营业中</span>
+				       {{# } }}
+				    {{# } }}
+			</span>
+		</div>
+		<div class="address">{{d.full_address}}{{d.address}}</div>
+	</div>
+	<button class="layui-btn select-store">更换门店</button>
+</script>
+<script type="text/javascript" src="SHOP_JS/address.js"></script>
+<script src="https://map.qq.com/api/gljs?v=1.exp&libraries=service&key={$tencent_map_key}"></script>
+<script src="https://map.qq.com/api/js?v=2.exp&key={$tencent_map_key}"></script>
+<script src="https://mapapi.qq.com/jsapi_v2/2/4/148/main.js"></script>
+<script type="text/javascript" src="STATIC_JS/qq_map.js?time=20240601"></script>

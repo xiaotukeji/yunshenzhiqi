@@ -1,0 +1,94 @@
+<nc-component :data="data[index]" class="component-store-show-info">
+	
+	<!-- 预览 -->
+	<template slot="preview">
+		
+		<div class="preview-box">
+			<div class="info-list">
+				<div class="info-item style-one" v-if="nc.style == 1">
+					<div class="info-item">
+						<span class="store-name" :style="{ color: nc.textColor }">门店名称</span>
+						<span class="change" :style="{ color: nc.textColor }">切换 ></span>
+						<p :style="{ color: nc.textColor }">这里展示门店地址</p>
+					</div>
+					<div class="img-wrap">
+						<img src="{$resource_path}/img/default_store.png" />
+					</div>
+				</div>
+
+				<div class="info-item style-three" v-if="nc.style == 2">
+					<div class="info-item">
+						<div class="img-wrap">
+							<img src="{$resource_path}/img/default_store.png" />
+						</div>
+						<span class="store-name" :style="{ color: nc.textColor }">门店名称</span>
+						<span class="change" :style="{ color: nc.textColor }">切换 ></span>
+					</div>
+					<div class="icon-wrap">
+						<img src="{$resource_path}/img/sousuo.png" />
+					</div>
+				</div>
+				
+				<div class="info-item style-four" v-if="nc.style == 3">
+					<div class="store-left-wrap">
+						<i class="iconfont iconweizhi" :style="{ color: nc.textColor }"></i>
+						<span class="store-name" :style="{ color: nc.textColor }">门店名称</span>
+						<i class="layui-icon layui-icon-down" :style="{ color: nc.textColor }"></i>
+					</div>
+					<div class="store-right-search">
+						<div>商品搜索<i class="iconfont iconsousuo2"></i></div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</template>
+	
+	<!-- 内容编辑 -->
+	<template slot="edit-content">
+		<template v-if="nc.lazyLoad">
+			<div class="template-edit-title">
+				<h3>门店风格</h3>
+				<store-show-style></store-show-style>
+			</div>
+		</template>
+
+		<!-- 风格弹框 -->
+		<article class="store-style" style="display: none;">
+			<div class="style-list-con-store">
+				<div class="item" :class="{'selected border-color': nc.style == 1}">
+					<img src="{$resource_path}/img/style1.png" />
+					<span class="layui-hide">风格一</span>
+				</div>
+				<div class="item" :class="{'selected border-color': nc.style == 2}">
+					<img src="{$resource_path}/img/style3.png" />
+					<span class="layui-hide">风格二</span>
+				</div>
+				<div class="item" :class="{'selected border-color': nc.style == 3}">
+					<img src="{$resource_path}/img/style4.png" />
+					<span class="layui-hide">风格三</span>
+				</div>
+			</div>
+
+			<input type="hidden" name="style">
+			<input type="hidden" name="style_name" />
+		</article>
+	</template>
+
+	<!-- 样式编辑 -->
+	<template slot="edit-style">
+		<template v-if="nc.lazyLoad">
+			<div class="template-edit-title">
+				<h3>门店样式</h3>
+				<color  :data="{ field : 'textColor', 'label' : '文本颜色','defaultColor': '#303133' }"></color>
+			</div>
+		</template>
+	</template>
+
+	<!-- 资源 -->
+	<template slot="resource">
+		<css src="{$resource_path}/css/design.css"></css>
+		<js src="{$resource_path}/js/design.js"></js>
+	</template>
+
+</nc-component>

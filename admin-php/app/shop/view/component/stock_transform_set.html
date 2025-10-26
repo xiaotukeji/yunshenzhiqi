@@ -1,0 +1,50 @@
+<script type="text/html" id="stockTransformSetTemplate">
+    <div class="layui-form form-wrap">
+        <div class="layui-form-item">
+            <label class="layui-form-label sm">换算关系：</label>
+            <div class="layui-input-block">
+                <div class="layui-input-inline">每个=</div>
+                <div class="layui-input-inline">
+                    <input name="stock_transform_unit" type="number" lay-verify="required|stock_transform_unit" class="layui-input len-short" value="{{d.goodsSkuData[d.sku_index].stock_transform_unit}}">
+                </div>
+                <div class="layui-input-inline">个基本单位</div>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label sm">自动转换：</label>
+            <div class="layui-input-inline">
+                <input type="checkbox" value="1" lay-skin="switch" name="stock_transform_auto" lay-filter="stock_transform_auto" {{# if(d.goodsSkuData[d.sku_index].stock_transform_auto == 1){ }}checked{{# } }}>
+            </div>
+        </div>
+        <div class="{{# if(d.goodsSkuData[d.sku_index].stock_transform_auto == 0){ }}layui-hide{{# } }}">
+            <div class="layui-form-item">
+                <label class="layui-form-label sm">触发条件：</label>
+                <div class="layui-input-block">
+                    <div class="layui-input-inline">库存<=</div>
+                    <div class="layui-input-inline">
+                        <input name="stock_transform_auto_num" type="number" lay-verify="required|stock_transform_auto_num" class="layui-input len-short" value="{{d.goodsSkuData[d.sku_index].stock_transform_auto_num}}">
+                    </div>
+                    <div class="layui-input-inline">时触发转换</div>
+                </div>
+            </div>
+            <div class="layui-form-item">
+                <label class="layui-form-label sm">使用规格：</label>
+                <div class="layui-input-inline">
+                    <select name="stock_transform_auto_sku" lay-search="">
+                        <option value="">请选择</option>
+                        {{# d.goodsSkuData.forEach((item,index)=>{ }}
+                        {{# if(index != d.sku_index){ }}
+                        {{# var spec_name = getSpecNameBySkuSpecFormat(item.sku_spec_format); }}
+                        <option value="{{spec_name}}" {{# if(d.goodsSkuData[d.sku_index].stock_transform_auto_sku == spec_name){ }}selected{{# } }}>{{spec_name}}</option>
+                        {{# } }}
+                        {{# }) }}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row layui-hide">
+            <button class="layui-btn" lay-submit lay-filter="stockTransformSetSave">保存</button>
+        </div>
+    </div>
+</script>

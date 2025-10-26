@@ -1,0 +1,121 @@
+.coupons-detail {
+	position: relative;
+    height: calc(100vh - 0.4rem);
+    background-color: #fff;
+	.common-wrap.fixd {
+		padding: 30rpx;
+		height: 100%;
+		overflow-y: auto;
+		padding-bottom: 0.85rem !important;
+		box-sizing: border-box;
+
+		.form-label {
+			width: 1.7rem !important;
+            height: 0.3rem !important;
+            line-height: 0.3rem !important;
+            padding: 0 0.15rem;
+		}
+        .common-form-item{
+            width: 33.333%;
+            height: 0.3rem;
+            margin-bottom: 0;
+            .form-input-inline{
+                border-width: 0 !important;
+                width: calc(100% - 1.8rem);
+            }
+            &.coupons-img{
+                -webkit-box-align: start;
+                -ms-flex-align: start;
+                -webkit-align-items: flex-start;
+                align-items: flex-start;
+                width: 100% !important;
+                height: auto;
+                .upload-box {
+                    border: 0.01rem dashed #e6e6e6 !important;
+                    width: 2.5rem !important;
+                    height: 1.2rem !important;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+            
+                    .upload {
+                        text-align: center;
+                        color: #5a5a5a;
+            
+                        .iconfont {
+                            font-size: 0.3rem;
+                        }
+            
+                        image {
+                            max-width: 100%;
+                            height: 1.2rem !important;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .common-title {
+        font-size: 0.18rem;
+        margin-bottom: 0.2rem;
+        &.mt-20{
+            margin-top: 0.2rem;
+        } 
+    }
+    .data{
+        margin-top: 0.1rem;
+       .data-item{
+            width: 33.333%;
+            text-align: center;
+            .title{
+                color: #909399;
+                margin-bottom: 0.2rem;
+            }
+            .content{
+                font-size: 0.26rem;
+                color: #303133;
+            }
+        } 
+    }
+    /deep/ .member-img{
+        width: 0.6rem;
+        height: 0.6rem;
+        margin-right: 0.1rem;
+        -ms-flex-negative: 0;
+        -webkit-flex-shrink: 0;
+        flex-shrink: 0;
+    }
+    /deep/ .member-nickname{
+        width: 2.3rem;
+    }
+    /deep/ .member-mobile{
+        width: 2.3rem;
+    }
+    .record{
+        margin-bottom: 0.2rem;
+        view {
+            width: 1rem;
+            height: 0.35rem;
+            line-height: 0.35rem;
+            text-align: center;
+            font-size: 0.14rem;
+            border: 0.01rem solid #e6e6e6;
+            border-left-width: 0;
+            transition: all 0.3s;
+            cursor: pointer;
+      
+            &:hover,
+            &.active {
+              border-color: $primary-color;
+              color: $primary-color;
+              background-color: var(--primary-color-light-9);
+              box-shadow: -0.01rem 0 0 0 $primary-color;
+            }
+      
+            &:first-child {
+              border-left-width: 0.01rem;
+              box-shadow: none;
+            }
+          }
+    }
+}

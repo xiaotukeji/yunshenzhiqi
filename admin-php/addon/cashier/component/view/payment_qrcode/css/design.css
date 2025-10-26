@@ -1,0 +1,131 @@
+@CHARSET "UTF-8";
+/* 付款码组件 */
+
+.payment-qrocde-box {
+	overflow: hidden;
+	display: flex;
+	background-color: #fff;
+	border-radius: 8px;
+}
+
+.payment-qrocde-box .qrocde-left {
+	flex: 1;
+}
+
+.payment-qrocde-box .qrocde-left .qrocde-desc {
+	margin-top: 10px;
+	margin-bottom: 15px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: #999999;
+	font-size: 12px;
+}
+
+.payment-qrocde-box .qrocde-left .qrocde-desc .iconfont {
+	margin-left: 5px;
+	font-size: 12px;
+}
+
+.payment-qrocde-box .qrocde-left .qrocde-action {
+	padding-bottom: 15px;
+	display: flex;
+	justify-content: center;
+}
+
+.payment-qrocde-box .qrocde-left .qrocde-action div {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	margin: 0;
+	width: 115px;
+	height: 43px;
+	border-radius: 25px;
+	color: #fff;
+}
+
+.payment-qrocde-box .qrocde-left .qrocde-action div:first-of-type {
+	margin-right: 23px;
+	background-color: #58be6a;
+}
+
+.payment-qrocde-box .qrocde-left .qrocde-action div:last-of-type {
+	background-color: #999999;
+}
+
+.payment-qrocde-box .qrocde-left .qrocde-action div .iconfont {
+	margin-right: 5px;
+}
+
+.payment-qrocde-box .qrocde-left .qrocde-action div .action-name {
+	font-size: 15px;
+}
+
+.payment-qrocde-box .qrocde-right {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding-left: 8px;
+	width: 45px;
+	z-index: 2;
+	box-sizing: border-box;
+}
+
+.payment-qrocde-box .qrocde-right .name {
+	font-size: 13px;
+	writing-mode: tb-rl;
+	color: #fff;
+	letter-spacing: 3px;
+	margin-top: 6px;
+}
+
+.payment-qrocde-box .qrocde-right .iconfont {
+	color: #fff;
+}
+
+.payment-qrocde-box .qrocde-right::after {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 0;
+	width: 250px;
+	height: 250px;
+	border-radius: 50%;
+	background-color: #58be6a;
+	transform: translateY(-50%);
+	z-index: -1;
+}
+
+.payment-popup {
+	padding: 0 15px 20px;
+	background-color: #fff;
+}
+
+.payment-popup .head-wrap {
+	font-size: 16px;
+	line-height: 50px;
+	height: 50px;
+	display: block;
+	text-align: center;
+	position: relative;
+	border-bottom: 1px solid #eeeeee;
+	margin-bottom: 10px;
+}
+
+.payment-popup .head-wrap .iconfont {
+	position: absolute;
+	float: right;
+	right: 0;
+	font-size: 16px;
+}
+
+.payment-popup .content-wrap {
+	max-height: 300px;
+	overflow-y: auto;
+}
+
+.payment-popup button {
+	margin-top: 20px;
+}

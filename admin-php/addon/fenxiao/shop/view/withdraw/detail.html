@@ -1,0 +1,98 @@
+<link rel="stylesheet" href="STATIC_CSS/promotion_detail.css">
+
+<div class="layui-card card-common card-brief">
+	<div class="layui-card-header">
+        <span class="card-title">基本信息</span>
+	</div>
+	<div class="layui-card-body">
+		<div class="promotion-view">
+
+			<div class="promotion-view-item">
+				<label>提现状态：</label>
+				<span>{$info.status_name}</span>
+			</div>
+			{if $info.status == -1}
+			<div class="promotion-view-item">
+				<label>拒绝原因：</label>
+				<span>{$info.refuse_reason}</span>
+			</div>
+			{/if}
+			{if $info.status == -2}
+			<div class="promotion-view-item">
+				<label>失败原因：</label>
+				<span>{$info.fail_reason}</span>
+			</div>
+			{/if}
+			<div class="promotion-view-item">
+				<label>申请提现金额：</label>
+				<span>￥{$info.money}</span>
+			</div>
+			<div class="promotion-view-item">
+				<label>提现手续费：</label>
+				<span>￥{$info.withdraw_rate_money}</span>
+			</div>
+			<div class="promotion-view-item">
+				<label>提现到账金额：</label>
+				<span>￥{$info.real_money}</span>
+			</div>
+			<div class="promotion-view-item">
+				<label>提现申请时间：</label>
+				<span>{:time_to_date($info.create_time)}</span>
+			</div>
+			<div class="promotion-view-item">
+				<label>提现方式：</label>
+				<span>{$info.transfer_name}</span>
+			</div>
+
+			{if $info.transfer_type == "bank"}
+			<div class="promotion-view-item">
+				<label>提现方式：</label>
+				<span>{$info['bank_name']}</span>
+			</div>
+			{/if}
+
+			<div class="promotion-view-item">
+				<label>提现收款账号：</label>
+				<span>{$info.account_number}</span>
+			</div>
+			<div class="promotion-view-item">
+				<label>真实姓名：</label>
+				<span>{$info.realname}</span>
+			</div>
+			<div class="promotion-view-item">
+				<label>手机号：</label>
+				<span>{$info.mobile}</span>
+			</div>
+
+		</div>
+
+		{if $info['status'] == 3}
+		<div class="promotion-view">
+			{if !empty($info['document'])}
+			<div class="promotion-view-item-line">
+				<label class="promotion-view-item-custom-label">转账凭证：</label>
+				<div class="promotion-view-item-custom-box img-upload">
+					<div class="upload-img-block icon">
+						<div class="upload-img-box">
+							<img layer-src src="{:img($info['document'])}" alt="转账凭证"   />
+						</div>
+					</div>
+				</div>
+			</div>
+			{/if}
+			{if !empty($info.transfer_remark)}
+			<div class="promotion-view-item-line">
+				<label class="promotion-view-item-custom-label">凭证说明：</label>
+				<div class="promotion-view-item-custom-box">{$info.transfer_remark}</div>
+			</div>
+			{/if}
+		</div>
+		{/if}
+	</div>
+</div>
+
+<script>
+	function backFenxiaoWithdrawList() {
+		location.hash = ns.hash("fenxiao://shopwithdraw/lists");
+	}
+</script>

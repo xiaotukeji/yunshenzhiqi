@@ -1,0 +1,264 @@
+<div class="main-wrap">
+	<div class="single-filter-box">
+		<button type="button" class="layui-btn bg-color" onclick="add()">添加调拨单</button>
+	</div>
+
+	<!-- 搜索框 -->
+	<div class="screen layui-collapse search-nav" lay-filter="selection_panel">
+		<div class="layui-colla-item">
+			<form class="layui-colla-content layui-form layui-show">
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">调拨单号：</label>
+						<div class="layui-input-inline">
+							<input type="text" name="allot_no" placeholder="请输入调拨单号" autocomplete="off" class="layui-input">
+						</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">出库门店：</label>
+						<div class="layui-input-inline">
+							<select name="output_store_id" class="len-mid">
+								<option value="">全部</option>
+								{foreach $store_list as $store_k => $store_v}
+								<option value="{$store_v.store_id}">{$store_v.store_name}</option>
+								{/foreach}
+							</select>
+						</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">入库门店：</label>
+						<div class="layui-input-inline">
+							<select name="input_store_id" class="len-mid">
+								<option value="">全部</option>
+								{foreach $store_list as $store_k => $store_v}
+								<option value="{$store_v.store_id}">{$store_v.store_name}</option>
+								{/foreach}
+							</select>
+						</div>
+					</div>
+				</div>
+
+				<div class="form-row">
+					<button class="layui-btn bg-color" lay-submit lay-filter="search">筛选</button>
+					<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<div class="layui-tab table-tab" lay-filter="doc_tab">
+		<div class="layui-tab-content">
+			<!-- 列表 -->
+			<table id="doc_list" lay-filter="doc_list"></table>
+		</div>
+	</div>
+</div>
+
+<!-- 操作 -->
+<script type="text/html" id="operation">
+	<div class="table-btn">
+		<a class="layui-btn" lay-event="detail">查看</a>
+		<!-- 待审核状态下进行审核操作 -->
+		{{# if(d.status == 1 && {$is_audit} == 0){ }}
+		<!-- 只有管理员和拥有调拨单审核权限的才能审核 -->
+		<a class="layui-btn" lay-event="audit_agree">审核通过</a>
+		<a class="layui-btn" lay-event="audit_refuse">审核拒绝</a>
+		{{# } }}
+
+		{{# if(d.status == -1){ }}
+		<a class="layui-btn" lay-event="detail_refuse">拒绝理由</a>
+		{{# } }}
+
+		<!-- 只有经办人才能操作入库单 -->
+		{{# if((d.status == 1 || d.status == -1) && d.operater == {$user_info['uid']} ){ }}
+		<a class="layui-btn" lay-event="edit">编辑</a>
+		<a class="layui-btn" lay-event="delete">删除</a>
+		{{# } }}
+	</div>
+</script>
+
+<script>
+	var table, form, laytpl, element, layer_pass;
+	layui.use(['form', 'laytpl', 'element'], function() {
+		form = layui.form;
+		laytpl = layui.laytpl;
+		element = layui.element;
+		form.render();
+
+		table = new Table({
+			elem: '#doc_list',
+			url: ns.url("stock://shop/stock/allocate"),
+			cols: [
+				[{
+					field: 'allot_no',
+					title: '调拨单号',
+					width: '20%',
+				}, {
+					field: 'output_store_name',
+					title: '出库门店',
+					width: '15%',
+				}, {
+					field: 'input_store_name',
+					title: '入库门店',
+					width: '15%',
+				}, {
+					field: 'goods_money',
+					title: '商品金额',
+					width: '10%',
+				}, {
+					field: 'allot_time',
+					title: '调拨时间',
+					width: '20%',
+					templet: function(data) {
+						return ns.time_to_date(data.allot_time); //创建时间转换方法
+					}
+				}, {
+					title: '操作',
+					align: 'right',
+					toolbar: '#operation',
+				}]
+			]
+		});
+
+		/**
+		 * 监听工具栏操作
+		 */
+		table.tool(function(obj) {
+			var data = obj.data;
+			switch (obj.event) {
+				case 'audit_agree':
+					// 审核通过
+					agree(data.allot_id);
+					break;
+				case 'audit_refuse':
+					// 审核拒绝
+					refuse(data.allot_id);
+					break;
+				case 'edit':
+					// 编辑
+					edit(data.allot_id);
+					break;
+				case 'delete':
+					// 删除
+					deleteAllot(data.allot_id);
+					break;
+				case 'detail': //查看
+					window.open(ns.href("stock://shop/stock/allotrecords?allot_id="+ data.allot_id));
+					break;
+				case 'detail_refuse':
+					layer.open({
+						title: '拒绝理由',
+						content: data.refuse_reason,
+					})
+					break;
+
+			}
+		});
+
+		/**
+		 * 搜索功能
+		 */
+		form.on('submit(search)', function(data){
+			table.reload({
+				page: {
+					curr: 1
+				},
+				where: data.field
+			});
+			return false;
+		});
+		
+	});
+
+	function add() {
+		location.hash = ns.hash("stock://shop/stock/editallocate");
+	}
+
+	function edit(allot_id) {
+		location.hash = ns.hash("stock://shop/stock/editallocate",{allot_id});
+	}
+
+	// 同意
+	var agree_repeat_flag = false;
+	function agree(allot_id) {
+		layer.confirm('确定要通过该调拨单吗?', function(index) {
+			if(agree_repeat_flag) return;
+			agree_repeat_flag = true;
+			layer.close(index);
+			$.ajax({
+				url: ns.url("stock://shop/stock/allocateAgree"),
+				data: {allot_id},
+				dataType: 'JSON',
+				type: 'POST',
+				success: function(res) {
+					agree_repeat_flag = false;
+					if (res.code >= 0) {
+						listenerHash(); // 刷新页面
+					} else {
+						layer.msg(res.message);
+					}
+				}
+			});
+		});
+
+	}
+
+	// 拒绝
+	var refuse_repeat_flag = false;
+	function refuse(allot_id) {
+		layer.prompt({
+			title: '拒绝理由',
+			formType: 2,
+			yes: function (index, layero) {
+				var refuse_reason = layero.find(".layui-layer-input").val();
+				if (!refuse_reason) {
+					layer.msg('请输入拒绝理由!', {icon: 5, anim: 6});
+					return;
+				}
+				if (refuse_repeat_flag) return;
+				refuse_repeat_flag = true;
+
+				$.ajax({
+					url: ns.url("stock://shop/stock/allocateRefuse"),
+					data: {allot_id, refuse_reason},
+					dataType: 'JSON',
+					type: 'POST',
+					success: function (res) {
+						layer.msg(res.message);
+						refuse_repeat_flag = false;
+
+						if (res.code >= 0) {
+							listenerHash(); // 刷新页面
+						}
+					}
+				});
+				layer.close(index);
+
+			}
+		});
+	}
+
+	// 删除调拨单
+	var delete_repeat_flag = false;
+	function deleteAllot(allot_id) {
+		layer.confirm('确定要删除该调拨单吗?', function(index) {
+			if(delete_repeat_flag) return;
+			delete_repeat_flag = true;
+			layer.close(index);
+			$.ajax({
+				url: ns.url("stock://shop/stock/allocateDelete"),
+				data: {allot_id},
+				dataType: 'JSON',
+				type: 'POST',
+				success: function(res) {
+					delete_repeat_flag = false;
+					if (res.code >= 0) {
+						listenerHash(); // 刷新页面
+					} else {
+						layer.msg(res.message);
+					}
+				}
+			});
+		});
+	}
+</script>

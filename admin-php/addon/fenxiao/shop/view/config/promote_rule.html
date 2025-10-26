@@ -1,0 +1,58 @@
+<div class="layui-form form-wrap">
+    <div class="layui-card card-common card-brief">
+        <div class="layui-card-header">
+            <span class="card-title">推广活动规则设置</span>
+        </div>
+        <div class="layui-card-body">
+            <div class="layui-form-item">
+                <label class="layui-form-label">规则内容：</label>
+                <div class="layui-input-block">
+                    <script id="editor" type="text/plain" class="special-length" style="height:600px;"></script>
+                    <input type="hidden" name="content" id="content" value="{$document.content}" />
+                </div>
+            </div>
+            <div class="form-row">
+                <button class="layui-btn" lay-submit lay-filter="save">保存</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script type="text/javascript" charset="utf-8" src="STATIC_EXT/ueditor/ueditor.config.js?time=20240614"></script>
+<script type="text/javascript" charset="utf-8" src="STATIC_EXT/ueditor/ueditor.all.js?time=20240614"></script>
+<script type="text/javascript" charset="utf-8" src="STATIC_EXT/ueditor/lang/zh-cn/zh-cn.js"></script>
+
+<script>
+    //实例化富文本
+    var ue = UE.getEditor('editor');
+    if($("#content").val()){
+        ue.ready(function() {
+            ue.setContent($("#content").val());
+        });
+    }
+
+    layui.use(['form'], function() {
+        var form = layui.form,
+            repeat_flag = false; //防重复标识
+        form.render();
+
+        form.on('submit(save)', function(data) {
+            if (repeat_flag) return;
+            repeat_flag = true;
+
+            $.ajax({
+                type: 'POST',
+                dataType: 'JSON',
+                url: ns.url("fenxiao://shop/config/promoterule"),
+                data: {
+                    'content' : ue.getContent(),
+                },
+                success: function(res) {
+                    layer.msg(res.message);
+                    repeat_flag = false;
+                }
+            });
+        });
+    });
+</script>

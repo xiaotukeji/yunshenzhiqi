@@ -1,0 +1,122 @@
+<nc-component :data="data[index]" class="component-store-label">
+	
+	<!-- 预览 -->
+	<template slot="preview">
+
+		<template v-if="nc.lazyLoad">
+			<div class="preview-box"
+			     :style="{
+				     borderTopLeftRadius: (nc.componentAngle == 'round' ? nc.topAroundRadius + 'px' : 0),
+				     borderTopRightRadius: (nc.componentAngle == 'round' ? nc.topAroundRadius + 'px' : 0),
+				     borderBottomLeftRadius: (nc.componentAngle == 'round' ? nc.bottomAroundRadius + 'px' : 0),
+				     borderBottomRightRadius: (nc.componentAngle == 'round' ? nc.bottomAroundRadius + 'px' : 0),
+				     backgroundColor : nc.componentBgColor }">
+				<ul v-if="nc.previewList && Object.keys(nc.previewList).length" :class="{'between': Object.keys(nc.previewList).length == 3}">
+					<li v-for="(item, previewIndex) in nc.previewList" :key="previewIndex">
+						<div class="icon-box" v-if="nc.icon">
+							<iconfont :icon="nc.icon" :value="nc.style ? nc.style : ''"></iconfont>
+						</div>
+						<span :style="{color: nc.textColor ? nc.textColor : 'rgba(0,0,0,0)',fontWeight: nc.fontWeight,fontSize: nc.fontSize + 'px'}">{{item.label_name}}</span>
+					</li>
+				</ul>
+
+			</div>
+		</template>
+
+	</template>
+	
+	<!-- 内容编辑 -->
+	<template slot="edit-content">
+		<template v-if="nc.lazyLoad">
+			<store-label-sources></store-label-sources>
+			<div class="template-edit-title">
+				<h3>风格</h3>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label sm">风格</label>
+					<div class="layui-input-block">
+						<div @click="nc.contentStyle='style-1'" :class="{ 'layui-unselect layui-form-radio' : true,'layui-form-radioed' : (nc.contentStyle=='style-1') }">
+							<i class="layui-anim layui-icon">{{ nc.contentStyle=='style-1' ? "&#xe643;" : "&#xe63f;" }}</i>
+							<div>风格一</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="layui-form-item">
+					<label class="layui-form-label sm">图标</label>
+					<div class="layui-input-block diy-img">
+						<img-icon-upload :data="{data : nc, displayType : 'icon'}"></img-icon-upload>
+						<div class="right-wrap">
+							<div class="action-box">
+								<div class="action" @click="nc.tempData.methods.iconStyle($event)"><i class="iconfont iconpifu"></i></div>
+								<div class="action" :id="'store-label-color-' + nc.index"><i class="iconfont iconyanse"></i></div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="template-edit-title">
+				<h3>标签内容</h3>
+				<div class="layui-form-item" v-if="nc.tempData.labelSources">
+					<label class="layui-form-label sm">数据来源</label>
+					<div class="layui-input-block">
+						<div class="source-selected">
+							<div class="source">{{ nc.tempData.labelSources[nc.sources].text }}</div>
+							<div v-for="(item,sourcesKey) in nc.tempData.labelSources" :key="sourcesKey" class="source-item" :title="item.text" @click="nc.sources=sourcesKey" :class="{ 'text-color border-color' : (nc.sources == sourcesKey) }">
+								<i class='iconfont' :class='item.icon'></i>
+							</div>
+						</div>
+					</div>
+				</div>
+				<div class="layui-form-item" v-if="nc.sources == 'diy' && nc.tempData.methods">
+					<label class="layui-form-label sm">选择标签</label>
+					<div class="layui-input-block">
+						<div class="input-text selected-style" @click="nc.tempData.methods.addLabel()">
+							<span v-if="nc.labelIds.length == 0">请选择</span>
+							<span v-if="nc.labelIds.length > 0" class="text-color">已选{{ nc.labelIds.length }}个</span>
+							<i class="iconfont iconyoujiantou"></i>
+						</div>
+					</div>
+				</div>
+
+				<slide :data="{ field : 'count', label: '标签数量', min:1, max: 30}" v-if="nc.sources != 'diy'"></slide>
+			</div>
+
+		</template>
+
+	</template>
+
+	<!-- 样式编辑 -->
+	<template slot="edit-style">
+		<template v-if="nc.lazyLoad">
+			<div class="template-edit-title">
+				<h3>文字设置</h3>
+
+				<slide :data="{ field : 'fontSize', label : '文字大小', min: 12, max : 20 }"></slide>
+
+				<div class="layui-form-item icon-radio">
+					<label class="layui-form-label sm">文字粗细</label>
+					<div class="layui-input-block">
+						<span v-for="item in nc.tempData.thicknessList" :class="[item.value == nc.fontWeight ? '' : 'layui-hide']">{{item.name}}</span>
+						<ul class="icon-wrap">
+							<li v-for="(item, index) in nc.tempData.thicknessList" :class="[item.value == nc.fontWeight ? 'text-color border-color' : '']" @click="nc.fontWeight = item.value">
+								<i class="iconfont" :class="[{'text-color': item.value == nc.fontWeight}, item.src]"></i>
+							</li>
+						</ul>
+					</div>
+				</div>
+
+				<color :data="{ field : 'textColor', label : '文字颜色',defaultColor: '#303133' }"></color>
+			</div>
+		</template>
+	</template>
+
+	<!-- 资源 -->
+	<template slot="resource">
+		<css src="{$resource_path}/css/design.css"></css>
+		<js src="{$resource_path}/js/design.js"></js>
+	</template>
+
+</nc-component>

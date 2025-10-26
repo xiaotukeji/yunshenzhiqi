@@ -1,0 +1,137 @@
+<style>
+	.store-label-list {
+		padding: 0 20px;
+	}
+</style>
+
+<div class="store-label-list">
+	<!-- 列表 -->
+	<table id="store_label_list" lay-filter="store_label_list"></table>
+</div>
+
+<script type="text/html" id="checkbox">
+	{{# if($.inArray(d.label_id.toString(), selected_id_arr) != -1){ }}
+	<input type="checkbox" data-label-id="{{d.label_id}}" name="store_label_checkbox" lay-skin="primary" lay-filter="store_label_checkbox" checked>
+	{{# }else{ }}
+	<input type="checkbox" data-label-id="{{d.label_id}}" name="store_label_checkbox" lay-skin="primary" lay-filter="store_label_checkbox">
+	{{# } }}
+	<input type="hidden" data-label-id="{{d.label_id}}" name="store_label_json" value='{{ JSON.stringify(d) }}' />
+</script>
+
+<script>
+	var table, form, laytpl,
+		select_id = "{$select_id}", //选中商品id
+		selected_id_arr = select_id.length ? select_id.split(',') : [],
+		select_list = []; //选中商品所有数据
+
+	$(function () {
+		layui.use(['form', 'laytpl'], function () {
+			form = layui.form;
+			laytpl = layui.laytpl;
+
+			table = new Table({
+				elem: '#store_label_list',
+				url: ns.url("store://shop/store/labelSelect"),
+				cols: [
+					[
+						{
+							title:'<input type="checkbox" name="store_label_checkbox_all" lay-skin="primary" lay-filter="store_label_checkbox_all">',
+							unresize: 'false',
+							width: '10%',
+							templet: '#checkbox'
+						}, {
+							width: '55%',
+							title: '标签名称',
+							field:'label_name',
+							unresize: 'false',
+						}, {
+							width: '35%',
+							title: '创建时间',
+							unresize: 'false',
+							templet: function(data) {
+								return ns.time_to_date(data.create_time);
+							}
+						}
+					]
+				],
+				callback : function () {
+					// 更新商品复选框状态
+					for (var i=0;i<selected_id_arr.length;i++) {
+						var selected = $("input[name='store_label_checkbox'][data-label-id='" + selected_id_arr[i] + "']");
+						
+						if (selected.length) {
+							$("input[name='store_label_checkbox'][data-label-id='" + selected_id_arr[i] + "']").prop("checked", true);
+						}
+					}
+					
+					form.render();
+					initData();
+				}
+
+			});
+
+			// 勾选商品
+			form.on('checkbox(store_label_checkbox_all)', function (data) {
+				var all_checked = data.elem.checked;
+				$("input[name='store_label_checkbox']").each(function () {
+					var checked = $(this).prop('checked');
+					if (all_checked != checked) {
+						$(this).next().click();
+					}
+				});
+			});
+
+			// 勾选商品
+			form.on('checkbox(store_label_checkbox)', function(data) {
+				var label_id = $(data.elem).attr("data-label-id"), json = {};
+				form.render();
+
+				var labelLen = $("input[name='store_label_checkbox'][data-label-id="+ label_id +"]:checked").length;
+				if (labelLen){
+					json = JSON.parse($("input[name='store_label_json'][data-label-id="+ label_id +"]").val());
+					delete json.LAY_INDEX;
+					delete json.LAY_TABLE_INDEX;
+					delete json.create_time;
+					select_list.push(json);
+				} else{
+					for (var i = 0; i < select_list.length; i++) {
+						if (select_list[i].label_id == label_id) {
+							select_list.splice(i, 1);
+							break;
+						}
+					}
+				}
+				$.unique(select_list);
+			});
+
+			//初始化数据
+			function initData(){
+				var labelLen = $("input[name='store_label_checkbox'][data-label-id]:checked").length;
+				
+				for (var i = 0; i < labelLen; i++){
+					var labelId = $("input[name='store_label_checkbox'][data-label-id]:checked").eq(i).attr("data-label-id");
+					var ident = false;
+					for (var k = 0; k < select_list.length; k++){
+						if(select_list[k].id == labelId){
+							ident = true;
+							break;
+						}
+					}
+
+					if (ident) return;
+					json = JSON.parse($("input[name='store_label_json'][data-label-id="+ labelId +"]").val());
+					delete json.LAY_INDEX;
+					delete json.LAY_TABLE_INDEX;
+					delete json.create_time;
+					
+					select_list.push(json);
+				}
+			}
+		});
+	});
+
+	function selectStoreLabelListener(callback) {
+		var res = select_list;
+		callback(res);
+	}
+</script>

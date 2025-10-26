@@ -1,0 +1,84 @@
+<link rel="stylesheet" href="SHOP_CSS/goods_select.css">
+
+<div class="select-goods">
+
+	<!-- 左侧固定展示商品分类 -->
+	<div class="select-goods-left">
+		<div class="select-goods-classification layui-collapse" lay-accordion lay-filter="oneCategory">
+			<div class="layui-colla-item">
+				<h2 class="layui-colla-title classification-item text-color" data-category_id="">全部分类</h2>
+			</div>
+			{foreach $category_list as $category_one_item}
+			<div class="layui-colla-item">
+				<h2 class="layui-colla-title classification-item {notempty name="$category_one_item.children"}arrow{/notempty}" data-category_id="{$category_one_item.category_id}">{$category_one_item.title}</h2>
+				{notempty name="category_one_item.children"}
+					{foreach $category_one_item.children as $category_two_item}
+					<div class="layui-colla-content">
+						<div class="select-goods-classification layui-collapse" lay-accordion lay-filter="twoCategory">
+							<div class="layui-colla-item">
+								<h2 class="layui-colla-title classification-item {notempty name="category_two_item.children"}arrow{/notempty}" data-category_id="{$category_two_item.category_id}">{$category_two_item.title}</h2>
+								{notempty name="category_two_item.children"}
+									{foreach $category_two_item.children as $category_three_item}
+									<div class="layui-colla-content classification-item" data-category_id="{$category_three_item.category_id}">{$category_three_item.title}</div>
+									{/foreach}
+								{/notempty}
+							</div>
+						</div>
+					</div>
+					{/foreach}
+				{/notempty}
+			</div>
+			{/foreach}
+		</div>
+	</div>
+
+	<!-- 右侧固定展示筛选和商品列表 -->
+	<div class="select-goods-right">
+
+		<!-- 筛选 -->
+		<div class="single-filter-box">
+			<div></div>
+			<div class="layui-form">
+				
+				<div class="layui-input-inline">
+					<input type="text"  value="{$search_text}" name="search_text" placeholder="请输入商品名称或编码" autocomplete="off" class="layui-input len-mid">
+					<button type="button" class="layui-btn layui-btn-primary" lay-filter="search" lay-submit>
+						<i class="layui-icon">&#xe615;</i>
+					</button>
+				</div>
+				<!-- 分类id -->
+				<input type="hidden" name="category_id" value=""/>
+			</div>
+		</div>
+
+		<!-- 列表 -->
+		<table id="goods_list" lay-filter="goods_list"></table>
+
+	</div>
+
+	<input type="hidden" name="maxNum" value="{$max_num}" title="最大商品数量" />
+	<input type="hidden" name="minNum" value="{$min_num}" title="最小商品数量" />
+	<input type="hidden" name="disabled" value="{$disabled}" title="不可选中" />
+	<input type="hidden" name="search_text" value="{$search_text}" title="请输入商品名称或编码" />
+	<input type="hidden" name="store_id" value="{$store_id}" title="store_id" />
+	<input type="hidden" name="goods_class" value="{$goods_class}" title="商品类型" />
+
+</div>
+
+<script type="text/html" id="checkbox">
+	<input type="checkbox" data-sku-id="{{d.sku_id}}" name="goods_checkbox" lay-skin="primary" lay-filter="goods_checkbox" {{goodsSelectObj.goodsIdArr.indexOf(d.sku_id.toString()) > -1 ? 'checked' : ''}}>
+	<input type="hidden" data-sku-id="{{d.sku_id}}" name="goods_json" value='{{ JSON.stringify(d) }}' />
+</script>
+
+<!-- 商品信息 -->
+<script type="text/html" id="goods_info">
+	<div class="table-title">
+		<div class="title-pic" id="goods_img_{{d.goods_id}}">
+			<img layer-src src="{{ns.img(d.sku_image, 'small')}}"/>
+		</div>
+		<div class="title-content">
+			<a href="javascript:;" class="multi-line-hiding text-color" title="{{d.sku_name}}">{{d.sku_name}}</a>
+		</div>
+	</div>
+</script>
+<script src="ADDON_STOCK_JS/goods_select.js?time=2"></script>

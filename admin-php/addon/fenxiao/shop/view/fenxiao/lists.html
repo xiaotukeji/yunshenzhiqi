@@ -1,0 +1,349 @@
+<style>
+	.screen{margin-top: 15px;}
+	.goods-info{justify-content: left !important;float: unset !important;}
+	.goods-info-name{max-width: 80px;overflow: hidden;cursor: pointer;}
+	.change-name{cursor: pointer;}
+	.layui-layout-admin .layui-form-item .layui-input-inline{background-color: #fff;}
+	.layui-layout-admin .screen{margin-bottom: 15px;}
+	.layui-layout-admin .single-filter-box{padding-bottom: 0;}
+	.time-lineheight {line-height: 1.3}
+</style>
+
+<div class="single-filter-box">
+	<button class="layui-btn" onclick="clickAdd()">添加分销商</button>
+</div>
+<div class="screen layui-collapse" lay-filter="selection_panel">
+	<div class="layui-colla-item">
+		<form class="layui-colla-content layui-form layui-show">
+			<div class="layui-form-item">
+
+				<div class="layui-inline">
+					<label class="layui-form-label">分销商昵称：</label>
+					<div class="layui-input-inline">
+						<input type="text" name="nickname" placeholder="请输入分销商昵称" class="layui-input">
+					</div>
+				</div>
+
+				<div class="layui-inline">
+					<label class="layui-form-label">分销商手机号：</label>
+					<div class="layui-input-inline">
+						<input type="text" name="mobile" placeholder="请输入分销商手机号" class="layui-input">
+					</div>
+				</div>
+
+				<div class="layui-inline">
+					<label class="layui-form-label">上级分销商：</label>
+					<div class="layui-input-inline">
+						<input type="text" name="parent_name" placeholder="请输入上级分销商" class="layui-input">
+					</div>
+				</div>
+			</div>
+
+			<div class="layui-form-item">
+				<div class="layui-inline">
+					<label class="layui-form-label">添加时间：</label>
+					<div class="layui-input-inline">
+						<input type="text" class="layui-input" name="start_time"  id="start_time" autocomplete="off" placeholder="开始时间" readonly>
+						<i class="iconrili iconfont calendar"></i>
+					</div>
+					<div class="layui-form-mid">-</div>
+					<div class="layui-input-inline">
+						<input type="text" class="layui-input" name="end_time" id="end_time" autocomplete="off" placeholder="结束时间" readonly>
+						<i class="iconrili iconfont calendar"></i>
+					</div>
+				</div>
+
+				<div class="layui-inline">
+					<label class="layui-form-label">分销等级：</label>
+					<div class="layui-input-inline">
+						<select name="level_id" lay-filter="level_id">
+							<option value="">全部</option>
+							{volist name="$level_list" id="level"}
+							<option value="{$level.level_id}">{$level.level_name}</option>
+							{/volist}
+						</select>
+					</div>
+				</div>
+				<div class="layui-inline">
+					<label class="layui-form-label">分销商状态：</label>
+					<div class="layui-input-inline">
+						<select name="status" lay-filter="status">
+							<option value="">全部</option>
+							<option value="1">正常</option>
+							<option value="-1">已冻结</option>
+						</select>
+					</div>
+				</div>
+			</div>
+
+			<div class="form-row">
+				<button class="layui-btn" lay-submit lay-filter="search">筛选</button>
+				<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<!-- 列表 -->
+<table id="fenxiao_list" lay-filter="fenxiao_list"></table>
+
+<!-- 用户信息 -->
+<script type="text/html" id="account">
+	<div class="layui-elip">当前佣金：{{d.account}}</div>
+	<div class="layui-elip">已提现佣金：{{d.account_withdraw}}</div>
+</script>
+
+<!-- 会员信息 -->
+<script type="text/html" id="username">
+	<a href="javascript:memberDetail({{ d.member_id }});">{{ d.username }}</a>
+</script>
+
+<!-- 状态 -->
+<script type="text/html" id="status">
+	{{# if(d.status == 1){ }}
+	<span style="color: green;">正常</span>
+	{{# }else if(d.status == -1){ }}
+	<span style="color: gray;">冻结</span>
+	{{# } }}
+</script>
+
+<!-- 上级分销商 -->
+<script type="text/html" id="parent_name">
+	<div class="table-btn goods-info">
+	{{# if(d.parent_name){ }}
+	<span class="line-hiding goods-info-name">{{d.parent_name}}</span> &nbsp; | &nbsp; <span class="text-color change-name"  onclick="change({{d.member_id}})"><i class="layui-icon text-color-gray"> </i></span>
+	{{# }else{ }}
+	<span class="line-hiding goods-info-name">无</span> &nbsp; | &nbsp; <span class="text-color"  onclick="change({{d.member_id}})"><i class="layui-icon text-color-gray"> </i></span>
+	{{# } }}
+	</div>
+</script>
+
+<!-- 分销等级 -->
+<script type="text/html" id="level_name">
+	<div class="table-btn goods-info">
+	<span class="line-hiding goods-info-name">{{d.level_name}}</span> &nbsp; | &nbsp; <span class="text-color change-name" onclick="changeLevel({{d.member_id}},{{d.fenxiao_id}})"><i class="layui-icon text-color-gray"> </i></span>
+	</div>
+</script>
+
+<script type="text/html" id="memberInfo">
+	<div class='table-title'>
+		<div class='title-pic'>
+			<img layer-src src="{{ns.img(d.headimg)}}" onerror="this.src = '{:img('public/static/img/default_img/head.png')}' ">
+		</div>
+		<div class='title-content'>
+			<p class="layui-elip">{{d.nickname}}</p>
+			<p class="layui-elip">{{d.member_mobile}}</p>
+		</div>
+	</div>
+</script>
+
+<!-- 工具栏操作 -->
+<script type="text/html" id="operation">
+	<div class="table-btn">
+		<a class="layui-btn" lay-event="detail">查看</a>
+		{{# if(d.status == 1){ }}
+		<a class="layui-btn" lay-event="frozen">冻结</a>
+		<!-- <a class="layui-btn" lay-event="change">上级分销商变更</a> -->
+		{{# } }}
+		{{# if(d.status == -1){ }}
+		<a class="layui-btn" lay-event="unfrozen">恢复正常</a>
+		{{# } }}
+	</div>
+</script>
+
+<script>
+	var table,form,laydate, repeat_flag = false; //防重复标识;
+	layui.use(['form', 'laydate'], function() {
+		form = layui.form;
+		laydate = layui.laydate;
+		form.render();
+
+		//渲染时间
+		laydate.render({
+			elem: '#start_time',
+			type: 'datetime'
+		});
+
+		laydate.render({
+			elem: '#end_time',
+			type: 'datetime'
+		});
+
+		table = new Table({
+			elem: '#fenxiao_list',
+			url: ns.url("fenxiao://shop/fenxiao/lists"),
+			cols: [
+				[{
+					title: '会员信息',
+					unresize: 'false',
+					width: '15%',
+					templet:'#memberInfo'
+				}, {
+					field: 'fenxiao_name',
+					title: '分销商名称',
+					unresize: 'false',
+					width: '10%'
+				},{
+					title: '上级分销商',
+					unresize: 'false',
+					width: '15%',
+					templet: '#parent_name',
+					align:'left'
+				}, {
+					title: '分销等级',
+					unresize: 'false',
+					width: '15%',
+					templet: '#level_name',
+					align:'left'
+				}, {
+					title: '佣金账户',
+					width:'10%',
+					unresize: 'false',
+					templet: '#account'
+				}, {
+
+					title: '团队人数',
+					unresize: 'false',
+					width: '8%',
+					templet: function(data){
+					    return data.team_num;
+					}
+				}, {
+					field: 'status',
+					title: '当前状态',
+					templet: '#status',
+					unresize: 'false',
+					width: '7%'
+				}, {
+					field: 'create_time',
+					title: '添加时间',
+					unresize: 'false',
+					width: '10%',
+					templet: function(data) {
+						var time = ns.time_to_date(data.create_time).split(' ');
+						return `<div class="time-lineheight">
+							<div>`+ time[0] +`</div>
+							<div>`+ time[1] +`</div>
+						</div>`;
+					}
+				}, {
+					title: '操作',
+					toolbar: '#operation',
+					unresize: 'false',
+					align:'right'
+				}]
+			]
+		});
+
+		/**
+		 * 搜索功能
+		 */
+		form.on('submit(search)', function(data) {
+			table.reload({
+				page: {
+					curr: 1
+				},
+				where: data.field
+			});
+			return false;
+		});
+
+		/**
+		 * 监听工具栏操作
+		 */
+		table.tool(function(obj) {
+			var data = obj.data,
+				event = obj.event;
+			switch (event) {
+				case 'detail': //查看
+					location.hash = ns.hash('fenxiao://shop/fenxiao/detail', {'fenxiao_id': data.fenxiao_id});
+					break;
+				case 'frozen': //冻结
+					layer.confirm('确定要冻结该账户吗?', function (index) {
+						if (repeat_flag) return;
+						repeat_flag = true;
+						layer.close(index);
+
+						$.ajax({
+							url: ns.url("fenxiao://shop/fenxiao/frozen"),
+							data: {fenxiao_id: data.fenxiao_id},
+							dataType: 'JSON',
+							type: 'POST',
+							success: function (res) {
+								layer.msg(res.message);
+								repeat_flag = false;
+								if (res.code == 0) {
+									table.reload();
+								}
+							}
+						});
+					});
+					break;
+				case 'unfrozen': //解冻
+					layer.confirm('该账户确定要恢复正常吗?', function (index) {
+						if (repeat_flag) return;
+						repeat_flag = true;
+						layer.close(index);
+
+						$.ajax({
+							url: ns.url("fenxiao://shop/fenxiao/unfrozen"),
+							data: {fenxiao_id: data.fenxiao_id},
+							dataType: 'JSON',
+							type: 'POST',
+							success: function (res) {
+								layer.msg(res.message);
+								repeat_flag = false;
+								if (res.code == 0) {
+									table.reload();
+								}
+							}
+						});
+					});
+					break;
+				case 'change':
+					change(data.member_id);
+					break;
+			}
+		});
+	});
+
+	//改变上级分销商
+	function change(member_id){
+		var url = ns.url("fenxiao://shop/fenxiao/change", {request_mode: 'iframe',member_id:member_id,change_end_func:'changeEnd'});
+		layer.open({
+			title: "变更上级分销商",
+			type: 2,
+			area: ['1200px', '800px'],
+			content: url,
+		});
+	}
+	//改变上级分销商结束
+	function changeEnd() {
+		listenerHash(); // 刷新页面
+		layer.closeAll();
+	}
+
+	//改变等级
+	function changeLevel(member_id,fenxiao_id){
+		var url = ns.url("fenxiao://shop/fenxiao/changeLevel", {request_mode: 'iframe',member_id:member_id,fenxiao_id:fenxiao_id,change_end_func:'changeLevelEnd'});
+		layer.open({
+			title: "变更分销商等级",
+			type: 2,
+			area: ['800px', '650px'],
+			content: url,
+		});
+	}
+	//改变等级结束
+	function changeLevelEnd() {
+		listenerHash(); // 刷新页面
+		layer.closeAll();
+	}
+
+    function memberDetail(member_id){
+        window.open(ns.href("shop/member/editMember?member_id=" + member_id));
+    }
+
+	function clickAdd() {
+	    location.hash = ns.hash('fenxiao://shop/fenxiao/add');
+	}
+</script>

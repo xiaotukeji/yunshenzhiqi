@@ -1,0 +1,241 @@
+<style>
+    .layui-card-body .content{width: 33.3%;}
+    .layui-layout-admin .screen{margin-bottom: 15px;}
+    .account-data-sum{padding-left:10px;}
+</style>
+
+<div class="layui-card panel-content card-common card-brief">
+    <div class="layui-card-header simple">
+        <span class="card-title">账户概况</span>
+    </div>
+    <div class="layui-card-body">
+
+        <div class="content">
+            <p class="title">待结算（元）</p>
+            <p class="money">{$stat.total_account}</p>
+        </div>
+        <div class="content">
+            <p class="title">已结算（元）</p>
+            <p class="money">{$stat.total_account_withdraw}</p>
+        </div>
+        <div class="content">
+            <p class="title">结算中（元）</p>
+            <p class="money">{$stat.total_account_apply}</p>
+        </div>
+
+    </div>
+</div>
+
+<!-- 搜索框 -->
+<div class="screen layui-collapse" lay-filter="selection_panel">
+    <div class="layui-colla-item">
+        <form class="layui-colla-content layui-form layui-show">
+            <div class="layui-form-item">
+                <div class="layui-inline">
+                    <label class="layui-form-label">门店</label>
+                    <div class="layui-input-inline">
+                        <select name="store_id" lay-filter="store_id">
+                            <option value="">全部</option>
+                            {foreach name="$store_list" item="store"}
+                            <option value="{$store['store_id']}">{$store['store_name']}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">来源方式</label>
+                    <div class="layui-input-inline">
+                        <select name="from_type">
+                            <option value="">全部</option>
+                            {foreach $from_type_list as $from_type_k=> $from_type_v}
+                            <option value="{$from_type_k}">{$from_type_v.type_name}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">发生时间</label>
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" name="start_date" id="start_time" placeholder="请输入开始时间" autocomplete="off" readonly>
+                    </div>
+                    <div class="layui-input-inline split">-</div>
+                    <div class="layui-input-inline end-time">
+                        <input type="text" class="layui-input" name="end_date" id="end_time" placeholder="请输入结束时间" autocomplete="off" readonly>
+                    </div>
+                </div>
+                <div class="layui-inline">
+                    <label class="layui-form-label">备注</label>
+                    <div class="layui-input-inline">
+                        <input type="text" class="layui-input" name="remark"  placeholder="请输入开始时间" autocomplete="off">
+                    </div>
+                </div>
+            </div>
+            <div class="form-row">
+                <button class="layui-btn" lay-submit lay-filter="search">筛选</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                <button class="layui-btn layui-btn-primary" lay-submit lay-filter="export">导出</button>
+                <button class="layui-btn layui-btn-primary" onclick="exportList()">导出记录</button>
+                <span class="account-data-sum">账户汇总：<span id="account_data_sum">0.00</span>元</span>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 列表 -->
+<table id="withdraw_list" lay-filter="withdraw_list"></table>
+
+<script type="text/html" id="status">
+	{{# if(d.status == 0){ }}
+	<div class="layui-elip" style="color: red">
+	{{# }else if(d.status == 1){ }}
+	<div class="layui-elip" style="color: blue">
+	{{# }else if(d.status == 2){ }}
+	<div class="layui-elip" style="color: green">
+	{{# }else if(d.status == -1){ }}
+	<div class="layui-elip" style="color: gray">
+	{{# } }}
+    {{ d.status_name }}</div>
+</script>
+
+<!--操作-->
+<script type="text/html" id="operation">
+    <div class="table-btn">
+        <a class="layui-btn" lay-event="detail">查看</a>
+    </div>
+</script>
+
+<script>
+    var table,upload;
+    layui.use(['form', 'laydate','laytpl'], function() {
+        var form = layui.form,
+            laydate = layui.laydate,
+            currentDate = new Date(),
+            laytpl = layui.laytpl,
+            minDate = "";
+        form.render();
+
+        currentDate.setDate(currentDate.getDate() - 7);
+
+        //开始时间
+        laydate.render({
+            elem: '#start_time',
+			type: 'datetime'
+        });
+        //结束时间
+        laydate.render({
+            elem: '#end_time',
+			type: 'datetime'
+        })
+
+        /**
+         * 表格加载
+         */
+        table = new Table({
+            elem: '#withdraw_list',
+            url: ns.url("store://shop/account/lists"),
+            beforeParseData: function (res){
+                $("#account_data_sum").html(Number(res.data.account_data_sum).toFixed(2));
+            },
+            cols: [
+                [{
+					field: 'store_name',
+					title: '门店',
+                    width: '12%',
+					unresize: 'false',
+				},{
+                    field: 'type_name',
+                    title: '来源方式',
+                    width: '10%',
+                    unresize: 'false',
+                }, {
+					field: 'account_data',
+					title: '记录金额',
+					width: '10%',
+					unresize: 'false',
+				},  {
+                    title: '发生时间',
+                    unresize: 'false',
+                    width: '16%',
+                    templet: function(data) {
+                        return ns.time_to_date(data.create_time);
+                    }
+                }, {
+					field: 'remark',
+					title: '备注',
+					width: '44%',
+					unresize: 'false',
+					templet: function(data) {
+						return '<div class="text">'+ data.remark +'</div>'
+					}
+				},{
+					title: '操作',
+					toolbar: '#operation',
+					unresize: 'false',
+					align:'right'
+				}]
+            ]
+        });
+
+        /**
+         * 搜索功能
+         */
+        form.on('submit(search)', function(data) {
+            table.reload({
+                page: {
+                    curr: 1
+                },
+                where: data.field
+            });
+            return false;
+        });
+
+        /**
+         * 监听工具栏操作
+         */
+        table.tool(function(obj) {
+            var data = obj.data;
+            switch(obj.event){
+                case 'detail':
+                    detail(data);
+                    break;
+            }
+        });
+
+        form.on('submit(export)', function(data){
+            $.ajax({
+                type: 'post',
+                dataType: 'json',
+                url: ns.url("store://shop/account/addexport"),
+                data: data.field,
+                success: function (res) {
+                    console.log(res);
+                }
+            })
+            setTimeout(()=>{
+                window.open(ns.href("store://shop/account/exportlist"));
+            }, 500);
+            return false;
+        });
+    });
+    
+    /**
+     * 查看详情
+     */
+    function detail(data) {
+        switch(data.from_type){
+            case 'order':
+                window.open(ns.href("shop/order/detail",{order_id:data.related_id}));
+                break;
+            case 'refund':
+                window.open(ns.href("shop/orderrefund/detail",{order_goods_id:data.related_id}));
+                break;
+            case 'withdraw':
+                window.open(ns.href("store://shop/withdraw/detail",{withdraw_id:data.related_id}));
+                break;
+        }
+    }
+
+    function exportList(){
+        window.open(ns.href("store://shop/account/exportlist"));
+    }
+</script>

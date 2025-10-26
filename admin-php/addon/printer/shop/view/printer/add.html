@@ -1,0 +1,290 @@
+<div class="layui-collapse tips-wrap">
+	<div class="layui-colla-item">
+		<h2 class="layui-colla-title">操作提示</h2>
+		<ul class="layui-colla-content layui-show">
+            <li>易联云的打印机请购买k6、k4、w1系列的打印机</li>
+		</ul>
+	</div>
+</div>
+
+<div class="layui-form form-wrap">
+
+	<div class="layui-card card-common card-brief">
+        <div class="layui-card-header">
+            <span class="card-title">打印机设置</span>
+        </div>
+		<div class="layui-card-body">
+
+			<div class="layui-form-item">
+				<label class="layui-form-label"><span class="required">*</span>打印机名称：</label>
+				<div class="layui-input-block">
+					<input type="text" name="printer_name" lay-verify="required" autocomplete="off" class="layui-input len-long">
+				</div>
+			</div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label"><span class="required">*</span>打印机类型：</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="printer_type" value="cloud" lay-verify="required" checked title="云打印机" lay-filter="printer_type">
+                    <input type="radio" name="printer_type" value="local" lay-verify="required"  title="本地打印机" lay-filter="printer_type">
+<!--                    <input type="radio" name="printer_type" value="network" lay-verify="required"  title="网络打印机" lay-filter="printer_type">-->
+                </div>
+            </div>
+
+            <div class="printer-type cloud" style="display:block;">
+                <div class="layui-form-item express_company">
+                    <label class="layui-form-label"><span class="required">*</span>打印机品牌：</label>
+                    <div class="layui-input-block len-mid">
+                        <select name="brand" lay-verify="cloudRequired" lay-filter="brand">
+                            {foreach $brand as $k=>$v}
+                            <option value="{$v.brand}">{$v.name}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label"><span class="required">*</span>打印机编号：</label>
+                    <div class="layui-input-block">
+                        <input type="text"  name="printer_code" lay-verify="cloudRequired" autocomplete="off" class="layui-input len-long">
+                    </div>
+                </div>
+
+                <div class="layui-form-item">
+                    <label class="layui-form-label"><span class="required">*</span>打印机秘钥：</label>
+                    <div class="layui-input-block">
+                        <input type="text"  name="printer_key" lay-verify="cloudRequired" autocomplete="off" class="layui-input len-long">
+                    </div>
+                </div>
+
+                <!-- 飞鹅打印机 -->
+                <div class="layui-form-item feie">
+                    <label class="layui-form-label"><span class="required">*</span>USER：</label>
+                    <div class="layui-input-block">
+                        <input type="text"  name="user" autocomplete="off" class="layui-input len-long">
+                    </div>
+                    <div class="word-aux">
+                        <p>飞鹅云后台注册用户名</p>
+                    </div>
+                </div>
+                <div class="layui-form-item feie">
+                    <label class="layui-form-label"><span class="required">*</span>UKEY：</label>
+                    <div class="layui-input-block">
+                        <input type="text"  name="ukey" autocomplete="off" class="layui-input len-long">
+                    </div>
+                    <div class="word-aux">
+                        <p>飞鹅云后台登录生成的UKEY</p>
+                    </div>
+                </div>
+
+                <!-- 易联云打印机 -->
+                <div class="layui-form-item yilianyun">
+                    <label class="layui-form-label"><span class="required">*</span>应用id：</label>
+                    <div class="layui-input-block">
+                        <input type="text"  name="open_id" autocomplete="off" class="layui-input len-long">
+                    </div>
+                    <div class="word-aux">
+                        <p>应用id（易联云-开发者中心后台应用中心里获取）</p>
+                    </div>
+                </div>
+                <div class="layui-form-item yilianyun">
+                    <label class="layui-form-label"><span class="required">*</span>apiKey：</label>
+                    <div class="layui-input-block">
+                        <input type="text"  name="apikey" autocomplete="off" class="layui-input len-long">
+                    </div>
+                    <div class="word-aux">
+                        <p>apiKey（易联云-开发者中心后台应用中心里获取）</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="printer-type local">
+                <div class="layui-form-item">
+                    <label class="layui-form-label"><span class="required">*</span>打印机端口：</label>
+                    <div class="layui-input-block">
+                        <input type="text"  name="host" autocomplete="off" class="layui-input len-long" lay-verify="localRequired">
+                    </div>
+                    <div class="word-aux">
+                        <p>打印机端口 (可以填写打印机端口号：如LPT1 或 本地网络共享打印机：如\\192.168.1.100\POS_NAME)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="printer-type network">
+                <div class="layui-form-item">
+                    <label class="layui-form-label"><span class="required">*</span>打印机IP：</label>
+                    <div class="layui-input-block">
+                        <input type="text"  name="ip" autocomplete="off" class="layui-input len-long" lay-verify="networkRequired">
+                    </div>
+                    <div class="word-aux">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label"><span class="required">*</span>打印机端口：</label>
+                    <div class="layui-input-block">
+                        <input type="text"  name="port" autocomplete="off" class="layui-input len-long" lay-verify="networkRequired">
+                    </div>
+                    <div class="word-aux">
+                    </div>
+                </div>
+            </div>
+
+            <div class="printer-type network local">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">打印宽度：</label>
+                    <div class="layui-input-block">
+                        <input type="radio" name="print_width" value="58mm" checked title="58mm">
+                        <input type="radio" name="print_width" value="80mm" title="80mm">
+                    </div>
+                </div>
+            </div>
+
+            {if $is_exit_store == 1}
+            <div class="layui-form-item">
+                <label class="layui-form-label">关联门店：</label>
+                <div class="layui-input-block  len-mid">
+                    <select name="store_id" lay-verify="">
+                        <option value="">请选择</option>
+                        {foreach $store_list as $k=>$v}
+                        <option value="{$v.store_id}">{$v.store_name}</option>
+                        {/foreach}
+                    </select>
+
+                </div>
+            </div>
+            {/if}
+
+		</div>
+	</div>
+
+    <div class="layui-card card-common card-brief">
+        <div class="layui-card-header">
+            <span class="card-title">订单打印</span>
+        </div>
+        <div class="layui-card-body">
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">支付打印：</label>
+                <div class="layui-input-block">
+                    <input type="checkbox" name="order_pay_open" lay-filter="order_pay_open" value="1" lay-skin="switch" checked/>
+                </div>
+            </div>
+
+            <div class="layui-form-item express_company order_pay_item">
+                <label class="layui-form-label"><span class="required">*</span>打印模板：</label>
+                <div class="layui-input-block len-mid">
+                    <select name="order_pay_template_id" lay-verify="required" >
+                        <option value="">请选择</option>
+                        {foreach $template_list as $k=>$v}
+                        {if $v['type'] == 'goodsorder'}
+                        <option value="{$v.template_id}">{$v.template_name}</option>
+                        {/if}
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item order_pay_item">
+                <label class="layui-form-label"><span class="required">*</span>打印联数：</label>
+                <div class="layui-input-block">
+                    <input type="radio" name="order_pay_print_num" value="1" lay-verify="required" checked autocomplete="off" title="1" class="layui-input len-long">
+                    <input type="radio" name="order_pay_print_num" value="2" lay-verify="required" autocomplete="off" title="2" class="layui-input len-long">
+                    <input type="radio" name="order_pay_print_num" value="3" lay-verify="required" autocomplete="off" title="3" class="layui-input len-long">
+                    <input type="radio" name="order_pay_print_num" value="4" lay-verify="required" autocomplete="off" title="4" class="layui-input len-long">
+                </div>
+            </div>
+
+            <div class="layui-form-item order_pay_item">
+                <label class="layui-form-label"><span class="required">*</span>订单类型：</label>
+                <div class="layui-input-block">
+                    {foreach $order_type_list as $v}
+                    <input class="order-pay-order-type"  type="checkbox" value="{$v.type}" lay-verify="required" lay-skin="primary" title="{$v.name}" checked="">
+                    {/foreach}
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">收货打印：</label>
+                <div class="layui-input-block">
+                    <input type="checkbox" name="take_delivery_open" lay-filter="take_delivery_open" value="1" lay-skin="switch" checked/>
+                </div>
+            </div>
+
+            <div class="layui-form-item express_company take_delivery_item">
+                <label class="layui-form-label"><span class="required">*</span>打印模板：</label>
+                <div class="layui-input-block len-mid">
+                    <select name="take_delivery_template_id" lay-verify="required" >
+                        <option value="">请选择</option>
+                        {foreach $template_list as $k=>$v}
+                        {if $v['type'] == 'goodsorder'}
+                        <option value="{$v.template_id}">{$v.template_name}</option>
+                        {/if}
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item take_delivery_item">
+                <label class="layui-form-label"><span class="required">*</span>打印联数：</label>
+                <div class="layui-input-block">
+                    <input type="radio"  name="take_delivery_print_num" value="1" lay-verify="required" checked autocomplete="off" title="1" class="layui-input len-long">
+                    <input type="radio"  name="take_delivery_print_num" value="2" lay-verify="required" autocomplete="off" title="2" class="layui-input len-long">
+                    <input type="radio"  name="take_delivery_print_num" value="3" lay-verify="required" autocomplete="off" title="3" class="layui-input len-long">
+                    <input type="radio"  name="take_delivery_print_num" value="4" lay-verify="required" autocomplete="off" title="4" class="layui-input len-long">
+                </div>
+            </div>
+
+            <div class="layui-form-item take_delivery_item">
+                <label class="layui-form-label"><span class="required">*</span>订单类型：</label>
+                <div class="layui-input-block">
+                    {foreach $order_type_list as $v}
+                    <input class="take-delivery-order-type" type="checkbox" value="{$v.type}" lay-verify="required" lay-skin="primary" title="{$v.name}" checked="">
+                    {/foreach}
+                </div>
+            </div>
+
+            <div class="layui-form-item">
+                <label class="layui-form-label">手动打印：</label>
+                <div class="layui-input-block">
+                    <input type="checkbox" name="manual_open" lay-filter="manual_open" value="1" lay-skin="switch" checked/>
+                </div>
+            </div>
+
+            <div class="layui-form-item express_company default_item">
+                <label class="layui-form-label"><span class="required">*</span>打印模板：</label>
+                <div class="layui-input-block len-mid">
+                    <select name="template_id" lay-verify="required" >
+                        <option value="">请选择</option>
+                        {foreach $template_list as $k=>$v}
+                        {if $v['type'] == 'goodsorder'}
+                        <option value="{$v.template_id}">{$v.template_name}</option>
+                        {/if}
+                        {/foreach}
+                    </select>
+                </div>
+            </div>
+
+            <div class="layui-form-item default_item">
+                <label class="layui-form-label"><span class="required">*</span>打印联数：</label>
+                <div class="layui-input-block">
+                    <input type="radio"  name="print_num" value="1" lay-verify="required" checked autocomplete="off" title="1" class="layui-input len-long">
+                    <input type="radio"  name="print_num" value="2" lay-verify="required" autocomplete="off" title="2" class="layui-input len-long">
+                    <input type="radio"  name="print_num" value="3" lay-verify="required" autocomplete="off" title="3" class="layui-input len-long">
+                    <input type="radio"  name="print_num" value="4" lay-verify="required" autocomplete="off" title="4" class="layui-input len-long">
+                </div>
+            </div>
+
+        </div>
+    </div>
+    {php}
+        $html = event('PrinterHtml');
+        foreach($html as $k => $v) echo $v;
+    {/php}
+
+    <div class="form-row">
+		<button class="layui-btn" lay-submit lay-filter="save">保存</button>
+		<button class="layui-btn layui-btn-primary" onclick="backPrinterList()">返回</button>
+	</div>
+</div>
+
+<script src="SHOP_ADDON_JS/printer.js"></script>

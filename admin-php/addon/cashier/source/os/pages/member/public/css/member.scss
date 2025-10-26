@@ -1,0 +1,343 @@
+.page-height {
+  height: 100%;
+}
+
+.common-wrap {
+  display: flex;
+  -webkit-flex: 1;
+  flex: 1;
+}
+
+.left-wrap {
+  position: relative;
+  width: 5rem;
+  border-right: 0.01rem solid #e6e6e6;
+
+  .left-wrap-head {
+    height: 0.6rem;
+    box-sizing: border-box;
+    line-height: 0.6rem;
+    display: flex;
+    position: relative;
+    text-align: center;
+    justify-content: center;
+    border-bottom: 0.01rem solid #e6e6e6;
+
+    .head-icon {
+      position: absolute;
+      right: 0.15rem;
+      font-size: 0.26rem;
+      cursor: pointer;
+    }
+
+    .head-text {
+      font-size: 0.18rem;
+      font-weight: 500;
+    }
+  }
+
+  .left-wrap-content {
+    height: calc(100% - 0.6rem);
+
+    .wrap-search-box {
+      height: 0.35rem;
+      padding: 0.1rem 0.2rem;
+      border-bottom: 0.01rem solid #e6e6e6;
+
+      .wrap-search {
+        background: #f5f5f5;
+        display: flex;
+        position: relative;
+        padding: 0.05rem 0.15rem 0.05rem 0.4rem;
+
+        input {
+          width: 100%;
+        }
+
+        .iconfont {
+          position: absolute;
+          left: 0.15rem;
+          top: 0.08rem;
+          cursor: pointer;
+        }
+      }
+    }
+
+    .content-list {
+      height: calc(100% - 1.23rem);
+
+      .content-item {
+        padding: 0.15rem;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        border-bottom: 0.01rem solid #e6e6e6;
+
+        &.active {
+          background: var(--primary-color-light-9);
+        }
+
+        .item-img {
+          width: 0.45rem;
+          height: 0.45rem;
+          border-radius: 50%;
+
+          image {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+          }
+        }
+
+        .item-content {
+          padding-left: 0.15rem;
+          width: calc(100% - 0.45rem);
+          box-sizing: border-box;
+
+          .item-title {
+            width: 100%;
+            font-size: 0.16rem;
+            align-items: center;
+            display: flex;
+            justify-content: space-between;
+
+            .item-label {
+              border: 0.01rem solid $primary-color;
+              color: $primary-color;
+              background-color: #fff;
+              border-radius: 0.02rem;
+              width: fit-content;
+              padding: 0.01rem 0.05rem;
+              margin-left: 0.15rem;
+            }
+
+            .item-title-text {
+              overflow: hidden;
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              max-width: 50%;
+              font-size: 0.15rem;
+            }
+          }
+
+          .item-desc {
+            margin-top: 0.15rem;
+            font-size: 0.14rem;
+            display: flex;
+            justify-content: space-between;
+
+            text {
+              color: #fe2278;
+              font-size: 0.18rem;
+            }
+          }
+        }
+      }
+    }
+
+    .add-member {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 0.24rem 0.2rem;
+      background: #fff;
+    }
+  }
+}
+
+.right-wrap {
+  width: calc(100% - 5rem);
+  border-left: 0;
+
+  .right-wrap-head {
+    height: 0.6rem;
+    box-sizing: border-box;
+    line-height: 0.6rem;
+    display: flex;
+    position: relative;
+    text-align: center;
+    justify-content: center;
+    border-bottom: 0.01rem solid #e6e6e6;
+
+    .head-text {
+      font-size: 0.18rem;
+      font-weight: 500;
+    }
+  }
+
+}
+
+.empty {
+  text-align: center;
+  padding-top: 1.2rem;
+
+  image {
+    width: 2rem;
+  }
+
+  .tips {
+    color: #999;
+    margin-top: 0.15rem;
+  }
+}
+
+/deep/ .uni-scroll-view {
+  &::-webkit-scrollbar {
+    width: 0.06rem;
+    height: 0.06rem;
+    background-color: rgba($color: #000000, $alpha: 0);
+  }
+
+  &::-webkit-scrollbar-button {
+    display: none;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    border-radius: 0.06rem;
+    box-shadow: inset 0 0 0.06rem rgba(45, 43, 43, 0.45);
+    background-color: #ddd;
+    display: none;
+  }
+
+  &:hover::-webkit-scrollbar-thumb {
+    display: block;
+  }
+
+  &::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+}
+
+// pop弹框
+.pop-box {
+  background: #ffffff;
+  width: 8rem;
+  height: 7rem;
+
+  .pop-header {
+    padding: 0 0.15rem 0 0.2rem;
+    height: 0.5rem;
+    line-height: 0.5rem;
+    border-bottom: 0.01rem solid #f0f0f0;
+    font-size: 0.14rem;
+    color: #333;
+    overflow: hidden;
+    border-radius: 0.02rem 0.2rem 0 0;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: space-between;
+
+    .pop-header-text {
+    }
+
+    .pop-header-close {
+      cursor: pointer;
+
+      text {
+        font-size: 0.18rem;
+      }
+    }
+  }
+
+  .pop-content {
+    height: calc(100% - 1.05rem);
+    overflow-y: scroll;
+    padding: 0.2rem;
+    box-sizing: border-box;
+  }
+
+  .pop-bottom {
+    padding: 0.1rem;
+    height: 0.65rem;
+    border-top: 0.01rem solid #eee;
+
+    button {
+      width: 1rem;
+    }
+  }
+}
+
+//表单
+.form-content {
+  .form-item {
+    margin-bottom: 0.1rem;
+    display: flex;
+
+    .form-label {
+      width: 1.3rem;
+      text-align: right;
+      padding-right: 0.1rem;
+      box-sizing: border-box;
+      height: 0.32rem;
+      line-height: 0.32rem;
+
+      .required {
+        color: red;
+        margin-right: 0.03rem;
+      }
+    }
+
+    .form-inline {
+      width: 2.5rem;
+      line-height: 0.32rem;
+      box-sizing: border-box;
+
+      .form-input {
+        border-width: 0.01rem;
+        border-style: solid;
+        background-color: #fff;
+        color: rgba(0, 0, 0, 0.85);
+        border-radius: 0.02rem;
+        padding-left: 0.1rem;
+        height: 0.32rem;
+        line-height: 0.32rem;
+        font-size: 0.14rem;
+        border-color: #e6e6e6;
+      }
+
+    }
+
+    .search-wrap {
+      position: relative;
+
+      text {
+        position: absolute;
+        top: 50%;
+        right: 0.1rem;
+        transform: translateY(-50%);
+        border-left: 0.01rem solid #e6e6e6;
+        line-height: 0.3rem;
+        padding-left: 0.1rem;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.add-member-pop-box {
+  width: 3.8rem;
+  height: 3.38rem;
+
+  .pop-content {
+    overflow-y: inherit;
+  }
+
+  .form-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .form-label {
+      width: 0.9rem;
+    }
+  }
+
+  .pop-bottom {
+    height: auto;
+
+    button {
+      width: 95%;
+    }
+  }
+}

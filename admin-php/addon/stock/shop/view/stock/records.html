@@ -1,0 +1,198 @@
+<style>
+	#records_list{
+		margin-top: 14px;
+	}
+	.layui-icon-next{
+		font-size:14px;
+		color: #999;
+	}
+</style>
+<div class="main-wrap">
+
+	<div class="screen layui-collapse margin-bot ">
+		<div class="layui-colla-item">
+			<form class="layui-colla-content layui-form layui-show" lay-filter="screen">
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">业务类型：</label>
+						<div class="layui-input-inline">
+							<select name="type">
+								<option value="">全部</option>
+								{foreach $type_list as $k => $v}
+									<option value="{$v.key}">{$v.name}</option>
+								{/foreach}
+							</select>
+						</div>
+					</div>
+					<div class="layui-inline">
+						<label class="layui-form-label">门店：</label>
+						<div class="layui-input-inline">
+							<select name="store_id"  class="len-mid">
+								<option value="">全部</option>
+								{foreach $store_list as $store_k => $store_v}
+								<option value="{$store_v.store_id}">{$store_v.store_name}</option>
+								{/foreach}
+							</select>
+						</div>
+					</div>
+				</div>
+				<div class="layui-form-item">
+					<div class="layui-inline">
+						<label class="layui-form-label">时间：</label>
+						<div class="layui-inline layui-inline-margin" id="time_fission">
+							<div class="layui-input-inline">
+								<input type="text" id="start_time" name="start_time" class="layui-input" placeholder="请输入开始时间" autocomplete="off">
+								<i class="iconfont iconriqi"></i>
+							</div>
+							<div class="layui-form-mid">-</div>
+							<div class="layui-input-inline">
+								<input type="text" id="end_time" name="end_time" class="layui-input" placeholder="请输入结束时间" autocomplete="off">
+								<i class="iconfont iconriqi"></i>
+							</div>
+						</div>
+					</div>
+
+					<input type="hidden" name="state" value="all">
+				</div>
+				<div class="form-row">
+					<button class="layui-btn bg-color" lay-submit lay-filter="search">筛选</button>
+					<button type="reset" class="layui-btn layui-btn-primary">重置</button>
+				</div>
+			</form>
+		</div>
+			<table id="records_list" lay-filter="records_list"></table>
+
+	</div>
+
+</div>
+
+<!-- 操作 -->
+<script type="text/html" id="operation">
+	<div class="table-btn">
+		<a class="layui-btn" lay-event="detail">查看</a>
+	</div>
+</script>
+
+<script>
+	var laytpl,table,form,element, laydate;
+	layui.use(['form','element','laytpl', 'laydate'], function() {
+		form = layui.form;
+		laydate = layui.laydate;
+		element = layui.element;
+		laytpl = layui.laytpl;
+		form.render();
+
+		//日期时间选择器
+		laydate.render({
+			elem: '#start_time'
+			,type: 'datetime'
+		});
+
+		//日期时间选择器
+		laydate.render({
+			elem: '#end_time'
+			,type: 'datetime'
+		});
+
+		table = new Table({
+			elem: '#records_list',
+			url: ns.url("stock://shop/stock/records"),
+			where:{sku_id:'{$sku_id}'},
+			cols: [
+				[{
+					title: '时间',
+					width: '12%',
+					templet: function(data) {
+						return '<div class="text">'+ns.time_to_date(data.create_time)+'</div>'; //创建时间转换方法
+					}
+				}, {
+					field: 'operater_name',
+					title: '操作人',
+					width: '6%',
+					templet: function(data) {
+						return '<div class="text">'+data.operater_name+'</div>';
+					}
+				}, {
+					field: 'store_name',
+					title: '门店',
+					width: '10%',
+					templet: function(data) {
+						return '<div class="text">'+data.store_name+'</div>';
+					}
+				},{
+					title: '业务类型',
+					field: 'name',
+					width: '8%',
+					templet: function(data) {
+						return '<div class="text">'+data.name+'</div>';
+					}
+				},{
+					title: '原库存',
+					field: 'before_store_stock',
+				},{
+					title: '库存变化',
+					templet: function(data) {
+						var change = data.type == 'input' ? '+' : '-';
+						return change + data.goods_num; //创建时间转换方法
+					}
+				},{
+					title: '现库存',
+					field: 'after_store_stock',
+				},{
+					title: '成本价',
+					templet: function(data) {
+						return data.goods_price; //创建时间转换方法
+					}
+				},{
+					title: '成本价变化',
+					width: '12%',
+					templet: function(data) {
+						return '<div class="text">'+data.before_store_goods_price + ' <i class="layui-icon layui-icon-next"></i> ' + data.after_store_goods_price+'</div>';
+					}
+				},{
+					title: '备注',
+					field: 'remark',
+					width:'10%',
+					templet: function(data) {
+						return '<div class="text">'+data.remark+'</div>';
+					}
+				},{
+					title: '操作',
+					toolbar: '#operation',
+					align:'right'
+				}]
+			]
+		});
+		
+		/**
+		 * 监听工具栏操作
+		 */
+		table.tool(function(obj) {
+			var data = obj.data;
+			switch (obj.event) {
+				case 'detail': //查看详情
+					if(data.type == "input"){
+						location.hash = ns.hash("stock://shop/stock/inputdetail?document_id="+ data.document_id);
+					}else{
+						location.hash = ns.hash("stock://shop/stock/outputdetail?document_id="+ data.document_id);
+					}
+					break;
+			}
+		});
+
+		/**
+		 * 搜索功能
+		 */
+		form.on('submit(search)', function(data) {
+			table.reload({
+				page: {
+					curr: 1
+				},
+				where: data.field
+			});
+
+			return false;
+		});
+
+	});
+</script>
