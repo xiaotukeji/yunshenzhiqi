@@ -74,7 +74,7 @@ return [
         'name' => 'CASHIER',
         'title' => '收银',
         'url' => 'cashier://shop/index/cashier',
-        'is_show' => 1,
+        'is_show' => 0,
         'is_control' => 0,
         'is_icon' => 0,
         'picture' => 'icon12',
