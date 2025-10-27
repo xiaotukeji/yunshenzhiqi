@@ -1,48 +1,15 @@
 <link rel="stylesheet" href="SHOP_CSS/index.css">
 
-{if $is_admin && $is_new_version == 1}
-<div class="top-tips bg-color-light-9">
-    <i class="iconfont icongantanhao"></i>
-    <div>小程序已更新，为了不影响您的使用请尽快下载小程序上传<a href="{:href_url('shop/config/sitedeploy')}" target="_blank" style="margin-left: 0;">更新</a></div>
-</div>
-{/if}
 
-{if $is_admin && $is_new_domain == 1}
-<div class="top-tips bg-color-light-9">
-    <i class="iconfont icongantanhao"></i>
-    <div>检测到店铺域名发生变化，为了不影响您的使用，请尽快 <a href="{:href_url('shop/config/sitedeploy')}" target="_blank" style="margin-left: 0;">部署网站</a>（手机端、电脑端、手机商家管理端、微信小程序等上传更新）独立部署除外</div>
-</div>
-{/if}
-
-{if $is_admin && ($shop_status.shop_pc_status == 0 || $shop_status.shop_h5_status == 0 || $shop_status.shop_weapp_status == 0)}
-<div class="top-tips bg-color-light-9">
-    <i class="iconfont icongantanhao"></i>
-    <div>该商城{if $shop_status.shop_pc_status == 0}pc端、{/if}{if $shop_status.shop_h5_status == 0}h5端、{/if}{if $shop_status.shop_weapp_status == 0}小程序端{/if}为关闭状态，用户无法访问。  <a href="{:href_url('shop/shop/config')}" target="_blank" style="margin-left: 0;">点击跳转开启</a></div>
-</div>
-{/if}
-
-{if $is_admin && $img_extension_error}
-<div class="top-tips bg-color-light-9">
-    <i class="iconfont icongantanhao"></i>
-    <div>检测到当前配置的图片处理引擎为imagemagick，但未检测到该扩展，为了不影响您的使用，请安装该扩展或切换为使用GD库</div>
-</div>
-{/if}
 
 <div class="top-tips bg-color-light-9 check-cron layui-hide">
     <i class="iconfont icongantanhao"></i>
     <div></div>
 </div>
-<div class="top-tips bg-color-light-9 sms_num">
-    <i class="iconfont icongantanhao"></i>
-    <div>店铺剩余短信条数 <span id="sms_num">0</span> 条，如需正常发送短信，请订购短信套餐<a href="{:href_url('niusms://shop/sms/index?buy=1')}">立即订购</a></div>
-</div>
-<div class="top-tips bg-color-light-9 redis">
-    <i class="iconfont icongantanhao"></i>
-    <div>检测到消息队列未启用，请配置。<a href="https://www.kancloud.cn/niucloud/niushop_b2c_v5/3065124" target="_blank" style="margin-left: 0px">查看文档</a></div>
-</div>
+
 
 {if $is_admin && !$guide_close}
-<div class="common-wrap guide">
+<div class="common-wrap guide layui-hide">
     <div class="head">
         <div class="title">新手导向</div>
         <i class="iconfont iconclose_light"></i>
@@ -317,7 +284,7 @@
     </div>
 </div>
 
-<div class="promotion-wrap">
+<div class="promotion-wrap layui-hide">
     <div class="common-wrap">
         <div class="head">
             <div class="title">营销活动</div>
