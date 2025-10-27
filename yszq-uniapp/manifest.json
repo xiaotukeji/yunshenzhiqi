@@ -1,6 +1,6 @@
 {
-    "name" : "单商户V5",
-    "appid" : "__UNI__5E97E14",
+    "name" : "云声智器商城",
+    "appid" : "__UNI__7736970",
     "description" : "",
     "versionName" : "1.0.0",
     "versionCode" : "100",
@@ -59,7 +59,7 @@
     "quickapp" : {},
     /* 小程序特有相关 */
     "mp-weixin" : {
-        "appid" : "",
+        "appid" : "wxc0a3df4e59d2de4c",
         "setting" : {
             "urlCheck" : false,
             "postcss" : false,

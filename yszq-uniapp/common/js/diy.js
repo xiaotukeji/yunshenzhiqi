@@ -517,13 +517,16 @@ export default {
 		closeGetLocationFailPopup(){
 			if(this.$refs.getLocationFailRef) this.$refs.getLocationFailRef.close();
 		},
-		openChooseStorePopup() {
-			let globalStoreInfo = this.globalStoreInfo;
-			if (this.globalStoreConfig && this.globalStoreConfig.confirm_popup_control == 1) {
-				this.currentStore.show_address = this.currentStore.full_address.replace(/,/g, ' ') + ' ' + this.currentStore.address;
-				if (this.$refs.chooseStorePopup) this.$refs.chooseStorePopup.open();
-			}
-		},
+	openChooseStorePopup() {
+		let globalStoreInfo = this.globalStoreInfo;
+		// 修改：不再弹出门店选择确认框，直接静默选择默认门店
+		// if (this.globalStoreConfig && this.globalStoreConfig.confirm_popup_control == 1) {
+		// 	this.currentStore.show_address = this.currentStore.full_address.replace(/,/g, ' ') + ' ' + this.currentStore.address;
+		// 	if (this.$refs.chooseStorePopup) this.$refs.chooseStorePopup.open();
+		// }
+		// 静默确认，不弹出弹窗
+		return;
+	},
 		closeChooseStorePopup() {
 			if (this.$refs.chooseStorePopup) this.$refs.chooseStorePopup.close();
 		},

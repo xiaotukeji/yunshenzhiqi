@@ -1,23 +1,13 @@
-// 动态获取当前域名，强制使用HTTPS
-function getCurrentDomain() {
-	if (typeof window !== 'undefined') {
-		return 'https://' + window.location.host;
-	}
-	return '';
-}
-
 var config = {
 
-	// api请求地址 - 动态使用当前域名
-	baseUrl: getCurrentDomain(),
+	// api请求地址
+	baseUrl: 'https://m.aidollyun.com/',
 
-	// 图片域名 - 动态使用当前域名
-	imgDomain: getCurrentDomain(),
+	// 图片域名
+	imgDomain: 'https://m.aidollyun.com/',
 
-	// H5端域名 - 动态使用当前域名
-	h5Domain: getCurrentDomain() + '/h5',
-
-
+	// H5端域名
+	h5Domain: 'https://m.aidollyun.com/h5',
 
 	// 腾讯地图key
 	mpKey: '{{$mpKey}}',
@@ -29,7 +19,7 @@ var config = {
 	pingInterval: 1500,
 
 	// 版本号
-	version: '5.5.2'
+	version: '1.2.2'
 
 };
 
