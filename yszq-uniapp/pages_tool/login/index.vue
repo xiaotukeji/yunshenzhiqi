@@ -13,8 +13,8 @@
 			<!-- #ifdef MP-WEIXIN -->
 			<view class="btn quick-login" v-if="registerConfig && Number(registerConfig.third_party)" @click="quickLogin">快捷登录/注册</view>
 			<!-- #endif -->
-			<view class="btn" :class="isQuickLogin ? '':'quick-login'" @click="toLogin('mobile')" v-if="registerConfig.login.indexOf('mobile') != -1">手机号登录</view>
-			<view class="btn" :class="isQuickLogin ? '':'quick-login'" @click="toLogin('account')" v-if="registerConfig.login.indexOf('mobile') == -1 && registerConfig.login.indexOf('username') != -1">账号密码登录</view>
+<!-- 			<view class="btn" :class="isQuickLogin ? '':'quick-login'" @click="toLogin('mobile')" v-if="registerConfig.login.indexOf('mobile') != -1">手机号登录</view>
+			<view class="btn" :class="isQuickLogin ? '':'quick-login'" @click="toLogin('account')" v-if="registerConfig.login.indexOf('mobile') == -1 && registerConfig.login.indexOf('username') != -1">账号密码登录</view> -->
 			<view class="agreement" v-if="registerConfig.agreement_show">
 				<text class="iconfont agree" :class=" isAgree ? 'icon-yuan_checked color-base-text' : 'icon-yuan_checkbox' " @click="isAgree = !isAgree"></text>
 				<view class="tips-text">
