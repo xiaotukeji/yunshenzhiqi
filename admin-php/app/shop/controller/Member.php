@@ -877,9 +877,9 @@ class Member extends BaseShop
         $phpExcel->getActiveSheet()->setTitle('会员信息');
         // 设置第一个sheet为工作的sheet
         $phpExcel->setActiveSheetIndex(0);
-        // 保存Excel 2007格式文件，保存路径为当前路径，名字为export.xlsx
+        // 保存Excel 2007格式文件，保存路径为upload/excel/目录
         $objWriter = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($phpExcel, 'Xlsx');
-        $file = date('Y年m月d日-会员信息表', time()) . '.xlsx';
+        $file = 'upload/excel/' . date('Y年m月d日-会员信息表', time()) . '.xlsx';
         $objWriter->save($file);
 
         header('Content-type:application/octet-stream');
@@ -1000,9 +1000,9 @@ class Member extends BaseShop
         $phpExcel->getActiveSheet()->setCellValue('L1', '会员等级(名称)');
         // 设置第一个sheet为工作的sheet
         $phpExcel->setActiveSheetIndex(0);
-        // 保存Excel 2007格式文件，保存路径为当前路径，名字为export.xlsx
+        // 保存Excel 2007格式文件，保存路径为upload/excel/目录
         $objWriter = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($phpExcel, 'Xlsx');
-        $file = date('Y年m月d日-会员导入模板', time()) . '.xlsx';
+        $file = 'upload/excel/' . date('Y年m月d日-会员导入模板', time()) . '.xlsx';
         $objWriter->save($file);
 
         header('Content-type:application/octet-stream');
